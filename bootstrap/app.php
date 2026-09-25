@@ -1,7 +1,9 @@
 <?php
 
+use App\Http\Middleware\EnsureOnboardingIsComplete;
 use App\Http\Middleware\HandleAppearance;
 use App\Http\Middleware\HandleInertiaRequests;
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -22,6 +24,19 @@ return Application::configure(basePath: dirname(__DIR__))
             HandleInertiaRequests::class,
             AddLinkHeadersForPreloadedAssets::class,
         ]);
+
+        $middleware->alias([
+            'onboarded' => EnsureOnboardingIsComplete::class,
+        ]);
+    })
+    ->withSchedule(function (Schedule $schedule): void {
+        // No persistent worker on cPanel — a single cron entry running
+        // `schedule:run` every minute drains the queue in short bursts
+        // instead. `--stop-when-empty` exits as soon as there's nothing
+        // left, and `--max-time=55` guards against overlapping the next run.
+        $schedule->command('queue:work --stop-when-empty --max-time=55')
+            ->everyMinute()
+            ->withoutOverlapping();
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

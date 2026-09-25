@@ -1,7 +1,17 @@
 <?php
 
-test('returns a successful response', function () {
-    $response = $this->get(route('home'));
+use App\Models\User;
 
-    $response->assertOk();
+test('guests see the public landing page', function () {
+    $this->get(route('root'))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page->component('landing'));
+});
+
+test('authenticated users are redirected to home', function () {
+    $this->actingAs(User::factory()->create());
+
+    $response = $this->get(route('root'));
+
+    $response->assertRedirect(route('home'));
 });

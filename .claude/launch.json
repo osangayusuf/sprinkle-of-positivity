@@ -1,0 +1,17 @@
+{
+    "version": "0.0.1",
+    "configurations": [
+        {
+            "name": "sop-dev",
+            "runtimeExecutable": "php",
+            "runtimeArgs": ["artisan", "dev"],
+            "port": 8000
+        },
+        {
+            "name": "sop-serve",
+            "runtimeExecutable": "php",
+            "runtimeArgs": ["artisan", "serve"],
+            "port": 8000
+        }
+    ]
+}

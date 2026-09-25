@@ -45,7 +45,7 @@ export default function ManageTwoFactor(props: Props) {
     }
 
     return (
-        <div className="space-y-6">
+        <div className="bg-muted space-y-4 rounded-2xl p-4">
             <Heading
                 variant="small"
                 title="Two-factor authentication"
@@ -66,6 +66,7 @@ export default function ManageTwoFactor(props: Props) {
                                     variant="destructive"
                                     type="submit"
                                     disabled={processing}
+                                    className="rounded-full"
                                 >
                                     Disable 2FA
                                 </Button>
@@ -90,7 +91,10 @@ export default function ManageTwoFactor(props: Props) {
 
                     <div>
                         {hasSetupData ? (
-                            <Button onClick={() => setShowSetupModal(true)}>
+                            <Button
+                                onClick={() => setShowSetupModal(true)}
+                                className="rounded-full"
+                            >
                                 <ShieldCheck />
                                 Continue setup
                             </Button>
@@ -100,7 +104,11 @@ export default function ManageTwoFactor(props: Props) {
                                 onSuccess={() => setShowSetupModal(true)}
                             >
                                 {({ processing }) => (
-                                    <Button type="submit" disabled={processing}>
+                                    <Button
+                                        type="submit"
+                                        disabled={processing}
+                                        className="rounded-full"
+                                    >
                                         Enable 2FA
                                     </Button>
                                 )}

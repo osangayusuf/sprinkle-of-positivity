@@ -1,3 +1,12 @@
+<IfModule mod_headers.c>
+    # The service worker file lives under /build/ (Vite's output dir), but
+    # needs to control the whole app. This header is what lets a browser
+    # allow that widened scope — see vite.config.ts's VitePWA `scope` option.
+    <Files "sw.js">
+        Header set Service-Worker-Allowed "/"
+    </Files>
+</IfModule>
+
 <IfModule mod_rewrite.c>
     <IfModule mod_negotiation.c>
         Options -MultiViews -Indexes

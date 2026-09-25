@@ -1,5 +1,12 @@
 <?php
 
+use App\Enums\GroupMembershipRole;
+use App\Enums\GroupMembershipStatus;
+use App\Models\Group;
+use App\Models\GroupMembership;
+use App\Models\GroupVerse;
+use App\Models\Insight;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -44,7 +51,58 @@ expect()->extend('toBeOne', function () {
 |
 */
 
-function something()
+/**
+ * Create a user who is an approved manager of the given group.
+ */
+function createApprovedManager(Group $group): User
 {
-    // ..
+    return createApprovedMember($group, GroupMembershipRole::Manager);
+}
+
+/**
+ * Create a user who is an approved member (or manager) of the given group.
+ */
+function createApprovedMember(Group $group, GroupMembershipRole $role = GroupMembershipRole::Member): User
+{
+    $user = User::factory()->create();
+
+    $membership = new GroupMembership;
+    $membership->group_id = $group->id;
+    $membership->user_id = $user->id;
+    $membership->role = $role;
+    $membership->status = GroupMembershipStatus::Approved;
+    $membership->applied_at = now();
+    $membership->decided_at = now();
+    $membership->save();
+
+    return $user;
+}
+
+/**
+ * Create an insight on a fresh group verse, for tests that need one but
+ * aren't exercising verse or insight creation themselves.
+ */
+function insightFor(Group $group): Insight
+{
+    $verse = GroupVerse::factory()->for($group)->create([
+        'date' => today()->subDays(fake()->unique()->numberBetween(0, 100000)),
+    ]);
+
+    return Insight::factory()->for($verse, 'verseable')->create();
+}
+
+/**
+ * Join a specific, already-existing user to a group as an approved member —
+ * unlike createApprovedMember(), which always creates a brand-new user.
+ */
+function joinAsApprovedMember(Group $group, User $user, GroupMembershipRole $role = GroupMembershipRole::Member): GroupMembership
+{
+    $membership = new GroupMembership;
+    $membership->group_id = $group->id;
+    $membership->user_id = $user->id;
+    $membership->role = $role;
+    $membership->status = GroupMembershipStatus::Approved;
+    $membership->save();
+
+    return $membership;
 }

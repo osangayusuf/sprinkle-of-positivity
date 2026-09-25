@@ -1,32 +1,22 @@
 import { Head } from '@inertiajs/react';
 import AppearanceTabs from '@/components/appearance-tabs';
 import Heading from '@/components/heading';
-import { edit as editAppearance } from '@/routes/appearance';
+import { SettingsHeader } from '@/components/settings-tabs';
 
 export default function Appearance() {
     return (
         <>
             <Head title="Appearance settings" />
+            <SettingsHeader />
 
-            <h1 className="sr-only">Appearance settings</h1>
-
-            <div className="space-y-6">
+            <div className="flex flex-col gap-4 px-4 py-6">
                 <Heading
                     variant="small"
-                    title="Appearance settings"
-                    description="Update the appearance settings for your account"
+                    title="Appearance"
+                    description="Choose how Sprinkle of Positivity looks on this device"
                 />
                 <AppearanceTabs />
             </div>
         </>
     );
 }
-
-Appearance.layout = {
-    breadcrumbs: [
-        {
-            title: 'Appearance settings',
-            href: editAppearance(),
-        },
-    ],
-};

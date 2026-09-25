@@ -1,0 +1,27 @@
+<?php
+
+namespace Database\Factories;
+
+use App\Models\Quiz;
+use App\Models\QuizOption;
+use Illuminate\Database\Eloquent\Factories\Factory;
+
+/**
+ * @extends Factory<QuizOption>
+ */
+class QuizOptionFactory extends Factory
+{
+    /**
+     * Define the model's default state.
+     *
+     * @return array<string, mixed>
+     */
+    public function definition(): array
+    {
+        return [
+            'quiz_id' => Quiz::factory(),
+            'label' => fake()->words(3, true),
+            'position' => 0,
+        ];
+    }
+}

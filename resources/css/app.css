@@ -13,6 +13,14 @@
         'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
         'Noto Color Emoji';
 
+    --font-display: 'Fraunces', ui-serif, Georgia, serif;
+
+    --color-paper: oklch(0.972 0.014 88);
+    --color-paper-deep: oklch(0.935 0.028 84);
+    --color-ink: oklch(0.213 0.103 269.66);
+    --color-ink-soft: oklch(0.42 0.05 269.66);
+    --color-blush: oklch(0.82 0.11 350);
+
     --radius-lg: var(--radius);
     --radius-md: calc(var(--radius) - 2px);
     --radius-sm: calc(var(--radius) - 4px);
@@ -45,6 +53,18 @@
     --color-input: var(--input);
     --color-ring: var(--ring);
 
+    --color-heading: var(--heading);
+
+    --color-success: var(--success);
+    --color-success-foreground: var(--success-foreground);
+
+    --color-gold: var(--gold);
+    --color-gold-light: var(--gold-light);
+    --color-gold-foreground: var(--gold-foreground);
+
+    --color-primary-tint: var(--primary-tint);
+    --color-primary-tint-foreground: var(--primary-tint-foreground);
+
     --color-chart-1: var(--chart-1);
     --color-chart-2: var(--chart-2);
     --color-chart-3: var(--chart-3);
@@ -68,8 +88,8 @@
     --card-foreground: oklch(0.145 0 0);
     --popover: oklch(1 0 0);
     --popover-foreground: oklch(0.145 0 0);
-    --primary: oklch(0.205 0 0);
-    --primary-foreground: oklch(0.985 0 0);
+    --primary: oklch(0.576 0.236 352.931);
+    --primary-foreground: oklch(1 0 0);
     --secondary: oklch(0.97 0 0);
     --secondary-foreground: oklch(0.205 0 0);
     --muted: oklch(0.97 0 0);
@@ -87,14 +107,29 @@
     --chart-4: oklch(0.828 0.189 84.429);
     --chart-5: oklch(0.769 0.188 70.08);
     --radius: 0.625rem;
-    --sidebar: oklch(0.985 0 0);
-    --sidebar-foreground: oklch(0.145 0 0);
-    --sidebar-primary: oklch(0.205 0 0);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.97 0 0);
-    --sidebar-accent-foreground: oklch(0.205 0 0);
-    --sidebar-border: oklch(0.922 0 0);
-    --sidebar-ring: oklch(0.87 0 0);
+
+    --heading: oklch(0.213 0.103 269.66);
+
+    --success: oklch(0.744 0.189 153.589);
+    --success-foreground: oklch(1 0 0);
+
+    --gold: oklch(0.821 0.16 75.965);
+    --gold-light: oklch(0.893 0.171 95.756);
+    --gold-foreground: oklch(0.213 0.103 269.66);
+
+    --primary-tint: oklch(0.944 0.027 340.866);
+    --primary-tint-foreground: oklch(0.145 0 0);
+
+    /* Sidebar (admin shell) — pink-tinted surface, brand pink for the
+       active nav item, navy heading color for nav text. */
+    --sidebar: oklch(0.98 0.008 340);
+    --sidebar-foreground: oklch(0.213 0.103 269.66);
+    --sidebar-primary: oklch(0.576 0.236 352.931);
+    --sidebar-primary-foreground: oklch(1 0 0);
+    --sidebar-accent: oklch(0.944 0.027 340.866);
+    --sidebar-accent-foreground: oklch(0.576 0.236 352.931);
+    --sidebar-border: oklch(0.93 0.02 340);
+    --sidebar-ring: oklch(0.576 0.236 352.931);
 }
 
 .dark {
@@ -104,8 +139,8 @@
     --card-foreground: oklch(0.985 0 0);
     --popover: oklch(0.145 0 0);
     --popover-foreground: oklch(0.985 0 0);
-    --primary: oklch(0.985 0 0);
-    --primary-foreground: oklch(0.205 0 0);
+    --primary: oklch(0.576 0.236 352.931);
+    --primary-foreground: oklch(1 0 0);
     --secondary: oklch(0.269 0 0);
     --secondary-foreground: oklch(0.985 0 0);
     --muted: oklch(0.269 0 0);
@@ -122,14 +157,29 @@
     --chart-3: oklch(0.769 0.188 70.08);
     --chart-4: oklch(0.627 0.265 303.9);
     --chart-5: oklch(0.645 0.246 16.439);
-    --sidebar: oklch(0.205 0 0);
+
+    --heading: oklch(0.985 0 0);
+
+    --success: oklch(0.744 0.189 153.589);
+    --success-foreground: oklch(0.145 0 0);
+
+    --gold: oklch(0.821 0.16 75.965);
+    --gold-light: oklch(0.893 0.171 95.756);
+    --gold-foreground: oklch(0.145 0 0);
+
+    --primary-tint: oklch(0.269 0.05 340);
+    --primary-tint-foreground: oklch(0.985 0 0);
+
+    /* Sidebar (admin shell) — navy-tinted dark surface, same brand pink
+       for the active nav item as light mode. */
+    --sidebar: oklch(0.16 0.03 269.66);
     --sidebar-foreground: oklch(0.985 0 0);
-    --sidebar-primary: oklch(0.985 0 0);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.269 0 0);
+    --sidebar-primary: oklch(0.576 0.236 352.931);
+    --sidebar-primary-foreground: oklch(1 0 0);
+    --sidebar-accent: oklch(0.269 0.05 340);
     --sidebar-accent-foreground: oklch(0.985 0 0);
-    --sidebar-border: oklch(0.269 0 0);
-    --sidebar-ring: oklch(0.439 0 0);
+    --sidebar-border: oklch(0.25 0.04 269.66);
+    --sidebar-ring: oklch(0.576 0.236 352.931);
 }
 
 @layer base {
@@ -140,4 +190,31 @@
     body {
         @apply bg-background text-foreground;
     }
+}
+
+/* Public landing page: fine paper grain, laid over a section with `.grain`. */
+.grain {
+    position: relative;
+    isolation: isolate;
+}
+
+.grain::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    opacity: 0.35;
+    mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .3 0 0 0 0 .2 0 0 0 0 .25 0 0 0 .18 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.grain-light::after {
+    mix-blend-mode: screen;
+    opacity: 0.25;
+}
+
+/* The landing page is always light, whatever the portal's appearance is. */
+.landing {
+    --heading: oklch(0.213 0.103 269.66);
 }
