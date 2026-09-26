@@ -18,4 +18,5 @@ require __DIR__.'/admin.php';
 require __DIR__.'/notifications.php';
 require __DIR__.'/leaderboard.php';
 require __DIR__.'/marketplace.php';
+require __DIR__.'/certificates.php';
 require __DIR__.'/settings.php';

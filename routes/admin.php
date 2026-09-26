@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AnnouncementController;
+use App\Http\Controllers\Admin\CertificateController;
 use App\Http\Controllers\Admin\DailyVerseBulkController;
 use App\Http\Controllers\Admin\DailyVerseController;
 use App\Http\Controllers\Admin\DashboardController;
@@ -37,6 +38,13 @@ Route::middleware(['auth', 'verified', 'onboarded', 'can:access-admin'])
         Route::get('marketplace/{listing}/edit', [MarketplaceController::class, 'edit'])->name('marketplace.edit');
         Route::put('marketplace/{listing}', [MarketplaceController::class, 'update'])->name('marketplace.update');
         Route::delete('marketplace/{listing}', [MarketplaceController::class, 'destroy'])->name('marketplace.destroy');
+
+        Route::get('certificates', [CertificateController::class, 'index'])->name('certificates.index');
+        Route::get('certificates/groups/{group}', [CertificateController::class, 'show'])->name('certificates.show');
+        Route::post('certificates/groups/{group}/members/{user}', [CertificateController::class, 'issue'])->name('certificates.issue');
+        Route::patch('certificates/{certificate}/revoke', [CertificateController::class, 'revoke'])->name('certificates.revoke');
+        Route::patch('certificates/{certificate}/restore', [CertificateController::class, 'restore'])->name('certificates.restore');
+        Route::patch('certificates/{certificate}/name', [CertificateController::class, 'updateName'])->name('certificates.update-name');
 
         Route::get('users', [UserController::class, 'index'])->name('users.index');
         Route::put('users/{user}/role', [UserController::class, 'updateRole'])->name('users.update-role');

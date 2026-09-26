@@ -123,3 +123,27 @@ export type MarketplaceListing = {
     starts_at: string | null;
     ends_at: string | null;
 };
+
+export type ChallengeProgress = {
+    completed_days: number[];
+    completed_count: number;
+    current_streak: number;
+    longest_streak: number;
+    completed_today: boolean;
+    required_days: number[];
+    missing_days: number[];
+    eligible: boolean;
+};
+
+export type Certificate = {
+    id: number;
+    code: string;
+    recipient_name: string;
+    duration_days: number;
+    year: number;
+    issued_at: string;
+    revoked: boolean;
+    group_name?: string;
+    override_reason?: string | null;
+    revoke_reason?: string | null;
+};

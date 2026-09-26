@@ -9,7 +9,13 @@ import { StreakTracker } from '@/components/streak-tracker';
 import { VerseCard } from '@/components/verse-card';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import type { Group, Insight, Quiz, Verse } from '@/types/models';
+import type {
+    ChallengeProgress,
+    Group,
+    Insight,
+    Quiz,
+    Verse,
+} from '@/types/models';
 
 type Props = {
     group: Group;
@@ -18,6 +24,7 @@ type Props = {
     canParticipate: boolean;
     insights: Insight[];
     quizzes: Quiz[];
+    progress: ChallengeProgress | null;
 };
 
 type Tab = 'insights' | 'qa';
@@ -29,6 +36,7 @@ export default function VerseShow({
     canParticipate,
     insights,
     quizzes,
+    progress,
 }: Props) {
     const [tab, setTab] = useState<Tab>('insights');
 
@@ -48,6 +56,7 @@ export default function VerseShow({
                         currentDay={group.current_day as number}
                         totalDays={group.duration_days as number}
                         startsOn={group.starts_on as string}
+                        progress={progress}
                     />
                 )}
 

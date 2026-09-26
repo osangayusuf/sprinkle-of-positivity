@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\GroupMembershipRole;
 use App\Enums\GroupMembershipStatus;
 use App\Enums\GroupStatus;
+use Carbon\CarbonInterface;
 use Database\Factories\GroupFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -67,6 +68,14 @@ class Group extends Model
     }
 
     /**
+     * @return HasMany<Certificate, $this>
+     */
+    public function certificates(): HasMany
+    {
+        return $this->hasMany(Certificate::class);
+    }
+
+    /**
      * @return BelongsToMany<User, $this, GroupMembership>
      */
     public function users(): BelongsToMany
@@ -122,5 +131,27 @@ class Group extends Model
         $day = $startsOn->diffInDays($today) + 1;
 
         return $day > $this->duration_days ? null : $day;
+    }
+
+    /**
+     * The last day of this group's challenge, or null when none is configured.
+     */
+    public function challengeEndsOn(): ?CarbonInterface
+    {
+        if (! $this->starts_on || ! $this->duration_days) {
+            return null;
+        }
+
+        return $this->starts_on->copy()->startOfDay()->addDays($this->duration_days - 1);
+    }
+
+    /**
+     * Whether the challenge's final day is already behind us.
+     */
+    public function challengeHasEnded(): bool
+    {
+        $endsOn = $this->challengeEndsOn();
+
+        return $endsOn !== null && today()->gt($endsOn);
     }
 }

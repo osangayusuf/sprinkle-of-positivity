@@ -10,6 +10,7 @@ use App\Http\Resources\QuizResource;
 use App\Http\Resources\VerseResource;
 use App\Models\Group;
 use App\Models\GroupVerse;
+use App\Services\ChallengeProgress;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -21,7 +22,7 @@ class GroupVerseController extends Controller
      * Show the group's verse for today (or an empty state if the manager
      * hasn't set one yet).
      */
-    public function show(Request $request, Group $group): Response
+    public function show(Request $request, Group $group, ChallengeProgress $challengeProgress): Response
     {
         $this->authorize('view', $group);
 
@@ -45,6 +46,7 @@ class GroupVerseController extends Controller
             'canParticipate' => $request->user()->can('participate', $group),
             'insights' => InsightResource::collection($insights),
             'quizzes' => QuizResource::collection($quizzes),
+            'progress' => $challengeProgress->forMember($group, $request->user()),
         ]);
     }
 

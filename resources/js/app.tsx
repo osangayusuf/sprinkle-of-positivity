@@ -21,6 +21,7 @@ const MOBILE_SHELL_PAGE_PREFIXES = [
     'marketplace/',
     'settings/',
     'quizzes/',
+    'certificates/',
 ];
 
 void createInertiaApp({
@@ -28,6 +29,7 @@ void createInertiaApp({
     layout: (name) => {
         switch (true) {
             case name === 'landing':
+            case name === 'certificates/show':
             case name.startsWith('onboarding/'):
                 return null;
             case name.startsWith('auth/'):

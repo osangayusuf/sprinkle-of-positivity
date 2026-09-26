@@ -37,6 +37,8 @@ return Application::configure(basePath: dirname(__DIR__))
         $schedule->command('queue:work --stop-when-empty --max-time=55')
             ->everyMinute()
             ->withoutOverlapping();
+
+        $schedule->command('certificates:issue')->dailyAt('01:00');
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

@@ -1,5 +1,6 @@
 import { Head, Link } from '@inertiajs/react';
 import {
+    Award,
     BookMarked,
     Megaphone,
     ShoppingBag,
@@ -46,6 +47,12 @@ export default function AdminDashboard({
             href: '/admin/marketplace',
             icon: ShoppingBag,
             count: counts.activeListings,
+        },
+        {
+            title: 'Certificates',
+            description: 'Review, issue and revoke completion certificates',
+            href: '/admin/certificates',
+            icon: Award,
         },
         {
             title: 'Users',

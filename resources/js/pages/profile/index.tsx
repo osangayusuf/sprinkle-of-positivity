@@ -1,5 +1,11 @@
 import { Head, Link, usePage } from '@inertiajs/react';
-import { Bell, ChevronRight, LogOut, User as UserIcon } from 'lucide-react';
+import {
+    Award,
+    Bell,
+    ChevronRight,
+    LogOut,
+    User as UserIcon,
+} from 'lucide-react';
 import { PageHeader } from '@/components/page-header';
 import { PointsBadge } from '@/components/points-badge';
 import { UserAvatar } from '@/components/user-avatar';
@@ -61,6 +67,17 @@ export default function ProfileIndex({
                         <UserIcon className="text-muted-foreground size-4" />
                         <span className="flex-1 text-sm font-medium">
                             Leaderboard
+                        </span>
+                        <ChevronRight className="text-muted-foreground size-4" />
+                    </Link>
+
+                    <Link
+                        href="/certificates"
+                        className="flex items-center gap-3 px-4 py-3"
+                    >
+                        <Award className="text-muted-foreground size-4" />
+                        <span className="flex-1 text-sm font-medium">
+                            Certificates
                         </span>
                         <ChevronRight className="text-muted-foreground size-4" />
                     </Link>

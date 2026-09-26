@@ -106,3 +106,43 @@ function joinAsApprovedMember(Group $group, User $user, GroupMembershipRole $rol
 
     return $membership;
 }
+
+/**
+ * A group running a challenge that started `$startedDaysAgo` days ago, with a
+ * verse set for every day except those listed in `$daysWithoutVerse`.
+ *
+ * @param  array<int, int>  $daysWithoutVerse
+ */
+function challengeGroup(int $durationDays = 5, int $startedDaysAgo = 10, array $daysWithoutVerse = []): Group
+{
+    $group = Group::factory()->create([
+        'duration_days' => $durationDays,
+        'starts_on' => today()->subDays($startedDaysAgo),
+    ]);
+
+    foreach (range(1, $durationDays) as $day) {
+        if (in_array($day, $daysWithoutVerse, true)) {
+            continue;
+        }
+
+        GroupVerse::factory()->for($group)->create([
+            'date' => $group->starts_on->copy()->addDays($day - 1),
+        ]);
+    }
+
+    return $group;
+}
+
+/**
+ * Record that a member completed a challenge day by posting an insight on
+ * that day's verse.
+ */
+function completeDay(Group $group, User $user, int $day): Insight
+{
+    $verse = GroupVerse::query()
+        ->where('group_id', $group->id)
+        ->whereDate('date', $group->starts_on->copy()->addDays($day - 1))
+        ->firstOrFail();
+
+    return Insight::factory()->for($verse, 'verseable')->for($user)->create();
+}

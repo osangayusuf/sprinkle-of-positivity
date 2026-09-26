@@ -17,6 +17,9 @@ export default defineConfig({
                 bunny('Instrument Sans', {
                     weights: [400, 500, 600],
                 }),
+                bunny('Pinyon Script', {
+                    weights: [400],
+                }),
                 bunny('Fraunces', {
                     weights: [400, 600],
                     styles: ['normal', 'italic'],
