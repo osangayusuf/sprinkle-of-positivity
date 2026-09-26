@@ -29,7 +29,7 @@ export default function InsightShow({
         <>
             <Head title={`${insight.user.name}'s insight`} />
             <PageHeader
-                title="Insight"
+                title="Bible Study Insight"
                 backHref={`/groups/${group.slug}/verse`}
             />
 

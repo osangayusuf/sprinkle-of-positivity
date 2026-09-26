@@ -86,7 +86,7 @@ export default function VerseShow({
                     <div className="border-border flex border-b">
                         {(
                             [
-                                ['insights', 'Insights'],
+                                ['insights', 'Bible Study Insights'],
                                 ['qa', 'Q&A'],
                             ] as [Tab, string][]
                         ).map(([value, label]) => (
@@ -120,7 +120,7 @@ export default function VerseShow({
 
                             {insights.length === 0 ? (
                                 <p className="text-muted-foreground py-10 text-center text-sm">
-                                    No insights have been shared yet.
+                                    No Bible Study Insights have been shared yet.
                                 </p>
                             ) : (
                                 <div className="divide-border divide-y">

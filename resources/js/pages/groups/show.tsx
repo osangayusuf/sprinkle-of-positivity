@@ -83,7 +83,7 @@ export default function GroupShow({ group, membership, canManage }: Props) {
                         className="border-primary text-primary h-14 w-full rounded-full text-base"
                     >
                         <Link href={`/groups/${group.slug}/verse`}>
-                            Read Insights
+                            Read Bible Study Insights
                         </Link>
                     </Button>
                 </div>
