@@ -189,8 +189,7 @@ const testimonials: Testimonial[] = [
 ];
 
 const contact = {
-    /** Placeholder. Replace with the real address. */
-    email: 'hello@example.com',
+    email: 'l.i.dbiblestudypartners@gmail.com',
     phoneDisplay: '0808 111 4235',
     phoneLink: 'tel:+2348081114235',
     whatsapp: 'https://wa.me/2348081114235',
