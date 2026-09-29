@@ -1,4 +1,4 @@
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link } from "@inertiajs/react";
 import {
     ArrowUpRight,
     CalendarDays,
@@ -10,214 +10,128 @@ import {
     Mail,
     MessageCircle,
     Phone,
-} from 'lucide-react';
-import AppLogoIcon from '@/components/app-logo-icon';
-import Reveal from '@/components/landing/reveal';
-import { Sprinkle } from '@/components/landing/sprinkle';
-import { login, register } from '@/routes';
+} from "lucide-react";
+import AppLogoIcon from "@/components/app-logo-icon";
+import Reveal from "@/components/landing/reveal";
+import { Sprinkle } from "@/components/landing/sprinkle";
+import { login, register } from "@/routes";
 
 /* -------------------------------------------------------------------------
  * Edit content here. Nothing below this block needs to change for copy,
  * people, photos or links.
  * ---------------------------------------------------------------------- */
 
-type Testimonial = {
-    quote: string;
-    name: string;
-    detail: string;
-};
-
 const program = {
-    name: 'Light Shining in the Dark',
-    kind: 'A Bible study accountability community',
-    intro: "To help people of all ages embrace their identity in God, that they may shine God's light across their spheres of influence without reservation.",
+    name: "Light Shining in the Dark",
+    kind: "A Bible study accountability community",
+    headline: "A Virtual Cave of Adullam",
+    visionTitle: "Our Vision",
+    intro: "“To help people of all ages embrace their identity in God, that they may shine God’s light across their spheres of influence without reservation.”",
 };
 
 const anchor = {
-    reference: 'Matthew 5:14–16',
-    version: 'KJV',
+    reference: "Matthew 5:14–16",
+    version: "KJV",
     verses: [
         {
             number: 14,
-            text: 'Ye are the light of the world. A city that is set on an hill cannot be hid.',
+            text: "Ye are the light of the world. A city that is set on an hill cannot be hid.",
         },
         {
             number: 15,
-            text: 'Neither do men light a candle, and put it under a bushel, but on a candlestick; and it giveth light unto all that are in the house.',
+            text: "Neither do men light a candle, and put it under a bushel, but on a candlestick; and it giveth light unto all that are in the house.",
         },
         {
             number: 16,
-            text: 'Let your light so shine before men, that they may see your good works, and glorify your Father which is in heaven.',
-        },
-    ],
-};
-
-const vision = {
-    statement:
-        'A community where people of every age know who they are in God, study His word together, and shine His light without reservation in their homes, workplaces and communities.',
-    pillars: [
-        {
-            term: 'A chapter a day',
-            detail: 'Read, then write your Bible Study Insight.',
-        },
-        {
-            term: 'Never alone',
-            detail: 'A volunteer accountability partner walks with you.',
-        },
-        {
-            term: 'Lights in the world',
-            detail: 'Grow in the word, then carry it into your sphere of influence.',
+            text: "Let your light so shine before men, that they may see your good works, and glorify your Father which is in heaven.",
         },
     ],
 };
 
 const visioneer = {
-    name: 'Nnenna Sam-Obioha',
-    role: 'Visioneer',
-    photo: '/images/organizer.webp',
-    photoAlt: 'Portrait of Nnenna Sam-Obioha',
-    note: 'The vision of Light Shining in the Dark was born with our Visioneer, and it is carried forward by every member and volunteer.',
+    name: "Nnenna Sam-Obioha",
+    role: "Business Leader / Visioneer",
+    photo: "/images/organizer.webp",
+    photoAlt: "Portrait of Nnenna Sam-Obioha",
+    bio: [
+        "Nnenna Sam-Obioha is a business leader, customer experience consultant, and author with over a decade of experience in telecomms, Supply Chain and financial services.",
+        "She holds a BSc and MSc in Psychology and specializes in service efficiency, operations, and people development.",
+        "Driven by her faith in God and a passion for social impact and innovation, Nnenna is the founder of The Service Excellence Mentor Consulting and Nut Just Salad Enterprise. She is an author of three books and a recipient of the 2024 Global Entrepreneurship Festival Award for Social Impact.",
+        "As the Visioneer of Light Shining in the Dark, she works alongside a dedicated team of Volunteer Accountability Partners to nurture and advance God's mandate to go into the world and make disciples of all nations.",
+    ],
 };
 
 const partners = {
-    title: 'Volunteer accountability partners',
-    body: 'Every participant is paired with a volunteer accountability partner. They check in, encourage you on the slow days, pray with you, and hold your hand from the first chapter to the sixtieth day. The community runs on their generosity and faithfulness.',
-    duties: ['Check in daily', 'Encourage and pray', 'Walk you to the finish'],
+    title: "Volunteer accountability partners",
+    body: "Every participant is paired with a volunteer accountability partner. They check in, encourage you on the slow days, pray with you, and hold your hand from the first chapter to the sixtieth day. The community runs on their generosity and faithfulness.",
+    duties: ["Check in daily", "Encourage and pray", "Walk you to the finish"],
 };
 
 const activities = [
     {
         icon: CalendarDays,
-        title: 'Monthly live Bible study',
-        body: 'On the 3rd Thursday of every month we open our doors. Non-members are welcome to join that day’s session.',
-        tag: '3rd Thursday',
+        title: "Monthly live Bible study",
+        body: "We open our doors to non-members of the community to join our sessions every third Thursday of the month.",
+        tag: "3rd Thursday",
         wide: true,
     },
     {
         icon: Flame,
-        title: 'Fasting and prayer watch hour',
-        body: 'Every Thursday, we fast and keep a prayer watch together.',
-        tag: 'Every Thursday',
+        title: "Fasting and prayer watch hour",
+        body: "We host weekly fasting and prayer watches.",
+        tag: "Weekly",
         wide: true,
     },
     {
         icon: Award,
-        title: '60-day certification',
-        body: 'Finish the 60 days and your certificate is issued automatically.',
-        tag: 'Automatic',
+        title: "60-day certification",
+        body: "To encourage consistency, certificates are issued to participants after the first 60 days of daily bible study and submission of bible study learnings.",
+        tag: "60 days",
     },
     {
         icon: GraduationCap,
-        title: 'Alumni community',
-        body: 'After 60 days, join the Alumni Group and keep studying, or simply step away with our blessing. The choice is yours.',
-        tag: 'Stay or leave',
+        title: "Alumni community",
+        body: "Join the Alumni Group to continue studying after 60 days of consistency.",
+        tag: "After 60 days",
     },
     {
         icon: Coffee,
-        title: 'Community hangouts',
-        body: 'Meet in person and online. Study is better with people you know.',
-        tag: 'Physical and virtual',
-    },
-];
-
-const testimonials: Testimonial[] = [
-    {
-        quote: 'Intimacy and consistency with God’s Word is achievable.',
-        name: 'Abuoma Ogbuka',
-        detail: 'Public servant, United Kingdom',
-    },
-    {
-        quote: 'My accountability partner was amazing. She was always checking in and encouraging me.',
-        name: 'Success Emebu',
-        detail: 'Legal practitioner, Nigeria',
-    },
-    {
-        quote: 'Trusting God even when we don’t understand what He is doing is key.',
-        name: 'Omolara Thomas',
-        detail: 'Children and education safeguarding business support, United Kingdom',
-    },
-    {
-        quote: 'Writing those insights forced me to study deeply and not just read for knowledge.',
-        name: 'Eno Onen',
-        detail: 'Medical doctor, Nigeria',
-    },
-    {
-        quote: 'One thing that stood out was that God walked with me.',
-        name: 'Onyekwere Maryclara',
-        detail: 'Financial technology, Nigeria',
-    },
-    {
-        quote: 'I became more discerning and disciplined.',
-        name: 'Inegbenose Ibafidon',
-        detail: 'Student, Nigeria',
-    },
-    {
-        quote: 'I’ve learned to listen more, pray with greater understanding, and trust God’s leading.',
-        name: 'Adebowale Isaac',
-        detail: 'Banking, Nigeria',
-    },
-    {
-        quote: 'This experience has made me more aware of the person of God and the essence of His judgement.',
-        name: 'Deji Durotimi',
-        detail: 'Project manager, United Kingdom',
-    },
-    {
-        quote: 'I’ve grown significantly and feel more grounded in my faith.',
-        name: 'Blessing Ogunsanwo',
-        detail: 'Medical practitioner, Nigeria',
-    },
-    {
-        quote: 'This experience helped me to be consistent with the word.',
-        name: 'Omolara Adekunbi',
-        detail: 'Pharmaceutical marketing, Nigeria',
-    },
-    {
-        quote: 'I had clearer dreams, and became more discerning, prayed more.',
-        name: 'Chidimma Ikemka',
-        detail: 'Business, Nigeria',
-    },
-    {
-        quote: 'It has taught me to be consistent with Bible reading and comprehension.',
-        name: 'Sunkanmi Ogunsanwo',
-        detail: 'Medical practitioner, Nigeria',
-    },
-    {
-        quote: 'My study of the Word has grown deeply.',
-        name: 'Mosimiloluwa Oduke',
-        detail: 'Financial compliance analyst, Canada',
+        title: "Community hangouts",
+        body: "Hangouts are held periodically.",
+        tag: "Periodic",
     },
 ];
 
 const contact = {
-    email: 'l.i.dbiblestudypartners@gmail.com',
-    phoneDisplay: '0808 111 4235',
-    phoneLink: 'tel:+2348081114235',
-    whatsapp: 'https://wa.me/2348081114235',
-    instagramHandle: '@thebiblestudycommunity',
-    instagram: 'https://www.instagram.com/thebiblestudycommunity',
+    email: "l.i.dbiblestudypartners@gmail.com",
+    phoneDisplay: "0808 111 4235",
+    phoneLink: "tel:+2348081114235",
+    whatsapp: "https://wa.me/2348081114235",
+    instagramHandle: "@thebiblestudycommunity",
+    instagram: "https://www.instagram.com/thebiblestudycommunity",
 };
 
 /* ---------------------------------------------------------------------- */
 
 const buttonBase =
-    'inline-flex min-h-12 items-center justify-center gap-2 rounded-full px-7 text-base font-semibold transition-[background-color,color,transform] duration-200 outline-none focus-visible:ring-[3px] focus-visible:ring-offset-2 motion-safe:active:scale-[0.98]';
+    "inline-flex min-h-12 items-center justify-center gap-2 rounded-full px-7 text-base font-semibold transition-[background-color,color,transform] duration-200 outline-none focus-visible:ring-[3px] focus-visible:ring-offset-2 motion-safe:active:scale-[0.98]";
 
 const linkBase =
-    'text-ink hover:text-primary decoration-primary focus-visible:ring-primary rounded-sm font-semibold underline underline-offset-4 outline-none focus-visible:ring-[3px]';
+    "text-ink hover:text-primary decoration-primary focus-visible:ring-primary rounded-sm font-semibold underline underline-offset-4 outline-none focus-visible:ring-[3px]";
 
 function SectionLabel({
     children,
-    tone = 'ink',
+    tone = "ink",
 }: {
     children: string;
-    tone?: 'ink' | 'paper';
+    tone?: "ink" | "paper";
 }) {
     return (
         <p
             className={
-                tone === 'paper'
-                    ? 'text-blush text-sm font-semibold tracking-[0.18em] uppercase'
-                    : 'text-primary text-sm font-semibold tracking-[0.18em] uppercase'
+                tone === "paper"
+                    ? "text-blush text-sm font-semibold tracking-[0.18em] uppercase"
+                    : "text-primary text-sm font-semibold tracking-[0.18em] uppercase"
             }
         >
             {children}
@@ -281,12 +195,22 @@ function Hero() {
                         {program.kind}
                     </p>
                     <h1 className="font-display text-ink text-[clamp(3.2rem,8vw,6.5rem)] leading-[0.92] font-semibold tracking-[-0.04em]">
-                        Let your light{' '}
-                        <em className="text-primary font-normal">so shine.</em>
+                        {program.headline}
                     </h1>
-                    <p className="text-ink-soft mt-8 max-w-xl text-lg leading-relaxed md:text-xl">
-                        {program.intro}
-                    </p>
+                    <section
+                        aria-labelledby="vision-title"
+                        className="mt-8 max-w-xl"
+                    >
+                        <h2
+                            id="vision-title"
+                            className="text-primary text-sm font-semibold tracking-[0.18em] uppercase"
+                        >
+                            {program.visionTitle}
+                        </h2>
+                        <p className="text-ink-soft mt-3 text-lg leading-relaxed md:text-xl">
+                            {program.intro}
+                        </p>
+                    </section>
                     <div className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-4">
                         <Link
                             href={register()}
@@ -322,8 +246,8 @@ function Hero() {
 function Anchor() {
     return (
         <section
-            id="vision"
-            aria-labelledby="vision-title"
+            id="anchor"
+            aria-labelledby="anchor-title"
             className="grain grain-light bg-ink text-paper relative overflow-hidden"
         >
             <Sprinkle
@@ -331,12 +255,12 @@ function Anchor() {
                 className="absolute top-16 right-[8%] hidden rotate-[40deg] lg:block"
             />
             <div className="mx-auto grid max-w-7xl gap-14 px-5 py-20 md:px-8 lg:grid-cols-12 lg:gap-16 lg:py-28">
-                <Reveal className="lg:col-span-6">
+                <Reveal className="lg:col-span-12">
                     <SectionLabel tone="paper">
                         Our anchor scripture
                     </SectionLabel>
                     <h2
-                        id="vision-title"
+                        id="anchor-title"
                         className="font-display mt-5 text-5xl leading-[0.98] font-semibold tracking-[-0.03em] md:text-6xl"
                     >
                         {anchor.reference}
@@ -358,43 +282,45 @@ function Anchor() {
                         {anchor.reference} · {anchor.version}
                     </p>
                 </Reveal>
+            </div>
+        </section>
+    );
+}
 
-                <Reveal className="lg:col-span-6 lg:pt-6" delay={1}>
-                    <SectionLabel tone="paper">Our vision</SectionLabel>
-                    <p className="font-display mt-5 text-3xl leading-snug md:text-4xl">
-                        {vision.statement}
+function Visioneer() {
+    return (
+        <section
+            id="visioneer"
+            aria-labelledby="visioneer-title"
+            className="bg-paper-deep"
+        >
+            <div className="mx-auto grid max-w-7xl gap-10 px-5 py-20 md:px-8 lg:grid-cols-12 lg:gap-16 lg:py-28">
+                <Reveal className="lg:col-span-4">
+                    <img
+                        src={visioneer.photo}
+                        alt={visioneer.photoAlt}
+                        width={480}
+                        height={600}
+                        loading="lazy"
+                        decoding="async"
+                        className="aspect-[4/5] w-full max-w-sm rounded-t-full object-cover object-top"
+                    />
+                </Reveal>
+                <Reveal className="lg:col-span-8 lg:self-center" delay={1}>
+                    <SectionLabel>Meet our Visioneer</SectionLabel>
+                    <h2
+                        id="visioneer-title"
+                        className="font-display text-ink mt-5 text-5xl leading-[0.98] font-semibold tracking-[-0.03em] md:text-6xl"
+                    >
+                        {visioneer.name}
+                    </h2>
+                    <p className="text-primary mt-3 text-lg font-semibold">
+                        {visioneer.role}
                     </p>
-                    <dl className="divide-paper/15 border-paper/20 mt-10 divide-y border-y">
-                        {vision.pillars.map((pillar) => (
-                            <div
-                                key={pillar.term}
-                                className="grid gap-1 py-4 sm:grid-cols-[11rem_1fr] sm:gap-6"
-                            >
-                                <dt className="text-blush font-semibold">
-                                    {pillar.term}
-                                </dt>
-                                <dd className="text-paper/90">
-                                    {pillar.detail}
-                                </dd>
-                            </div>
+                    <div className="text-ink-soft mt-6 max-w-2xl space-y-4 text-lg leading-relaxed">
+                        {visioneer.bio.map((paragraph) => (
+                            <p key={paragraph}>{paragraph}</p>
                         ))}
-                    </dl>
-                    <div className="mt-8 flex items-center gap-4">
-                        <img
-                            src={visioneer.photo}
-                            alt={visioneer.photoAlt}
-                            width={64}
-                            height={64}
-                            loading="lazy"
-                            decoding="async"
-                            className="size-16 shrink-0 rounded-full object-cover object-top"
-                        />
-                        <p className="text-paper/80 text-sm leading-snug">
-                            <span className="text-paper font-semibold">
-                                {visioneer.name}, {visioneer.role}.
-                            </span>{' '}
-                            {visioneer.note}
-                        </p>
                     </div>
                 </Reveal>
             </div>
@@ -425,7 +351,7 @@ function Activities() {
                         <li
                             key={item.title}
                             className={
-                                item.wide ? 'md:col-span-3' : 'md:col-span-2'
+                                item.wide ? "md:col-span-3" : "md:col-span-2"
                             }
                         >
                             <Reveal
@@ -501,67 +427,18 @@ function Voices() {
             className="bg-paper-deep"
         >
             <div className="mx-auto max-w-7xl px-5 py-20 md:px-8 lg:py-28">
-                <Reveal className="max-w-2xl">
+                <Reveal className="flex flex-col items-start gap-6">
                     <SectionLabel>Testimonials</SectionLabel>
-                    <h2
-                        id="voices-title"
-                        className="font-display text-ink mt-5 text-5xl leading-[0.98] font-semibold tracking-[-0.03em] md:text-6xl"
-                    >
-                        See what past participants have to say
+                    <h2 id="voices-title" className="sr-only">
+                        Testimonials
                     </h2>
-                </Reveal>
-
-                <div className="mt-14 gap-x-12 md:columns-2 lg:columns-3">
-                    {testimonials.slice(0, 6).map((item, index) => (
-                        <Reveal
-                            key={item.name}
-                            delay={Math.min(index % 3, 3) as 0 | 1 | 2 | 3}
-                            className="mb-10 break-inside-avoid"
-                        >
-                            <figure className="border-ink/20 border-t pt-6">
-                                <blockquote className="font-display text-ink text-2xl leading-snug italic">
-                                    {item.quote}
-                                </blockquote>
-                                <figcaption className="mt-4 text-sm">
-                                    <span className="text-primary font-semibold">
-                                        {item.name}
-                                    </span>
-                                    <span className="text-ink-soft block">
-                                        {item.detail}
-                                    </span>
-                                </figcaption>
-                            </figure>
-                        </Reveal>
-                    ))}
-                </div>
-            </div>
-        </section>
-    );
-}
-
-function Closing() {
-    return (
-        <section aria-labelledby="closing-title" className="bg-paper">
-            <div className="mx-auto max-w-7xl px-5 py-20 md:px-8 lg:py-28">
-                <Reveal className="grid items-center gap-10 lg:grid-cols-12">
-                    <h2
-                        id="closing-title"
-                        className="font-display text-ink text-[clamp(3rem,8vw,6.5rem)] leading-[0.92] font-semibold tracking-[-0.04em] lg:col-span-8"
+                    <Link
+                        href="/testimonials"
+                        className={`${buttonBase} bg-primary text-primary-foreground hover:bg-ink focus-visible:ring-primary focus-visible:ring-offset-paper`}
                     >
-                        Come and shine{' '}
-                        <em className="text-primary font-normal">with us.</em>
-                    </h2>
-                    <div className="flex flex-col items-start gap-4 sm:items-center sm:gap-6 lg:col-span-4">
-                        <Link
-                            href={register()}
-                            className={`${buttonBase} bg-primary text-primary-foreground hover:bg-ink focus-visible:ring-primary focus-visible:ring-offset-paper`}
-                        >
-                            Join the program
-                        </Link>
-                        <Link href={login()} className={linkBase}>
-                            Log in to the portal
-                        </Link>
-                    </div>
+                        See What Past Participants Have to Say
+                        <ArrowUpRight className="size-5" aria-hidden="true" />
+                    </Link>
                 </Reveal>
             </div>
         </section>
@@ -570,7 +447,7 @@ function Closing() {
 
 function Footer() {
     const linkClass =
-        'inline-flex items-center gap-2 rounded-sm underline decoration-paper/40 underline-offset-4 outline-none hover:decoration-current focus-visible:ring-[3px] focus-visible:ring-blush';
+        "inline-flex items-center gap-2 rounded-sm underline decoration-paper/40 underline-offset-4 outline-none hover:decoration-current focus-visible:ring-[3px] focus-visible:ring-blush";
 
     return (
         <footer id="contact" className="bg-ink text-paper">
@@ -657,7 +534,7 @@ export default function Landing() {
             </Head>
 
             <a
-                href="#vision"
+                href="#anchor"
                 className="bg-ink text-paper focus:ring-primary sr-only rounded-full px-5 py-3 focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:ring-[3px]"
             >
                 Skip to content
@@ -667,9 +544,9 @@ export default function Landing() {
                 <Hero />
                 <main>
                     <Anchor />
+                    <Visioneer />
                     <Activities />
                     <Voices />
-                    <Closing />
                 </main>
                 <Footer />
             </div>

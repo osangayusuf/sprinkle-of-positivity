@@ -8,6 +8,8 @@ Route::get('/', function () {
     return request()->user() ? to_route('home') : Inertia::render('landing');
 })->name('root');
 
+Route::get('testimonials', fn () => Inertia::render('testimonials'))->name('testimonials');
+
 Route::middleware(['auth', 'verified', 'onboarded'])->group(function () {
     Route::get('home', [HomeController::class, 'show'])->name('home');
 });
