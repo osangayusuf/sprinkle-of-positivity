@@ -15,3 +15,9 @@ test('authenticated users are redirected to home', function () {
 
     $response->assertRedirect(route('home'));
 });
+
+test('anyone can see the testimonials page', function () {
+    $this->get(route('testimonials'))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page->component('testimonials'));
+});
