@@ -2,6 +2,7 @@ import { Head, Link } from '@inertiajs/react';
 import {
     Award,
     BookMarked,
+    ChartColumn,
     Megaphone,
     ShoppingBag,
     Users as UsersIcon,
@@ -22,6 +23,12 @@ export default function AdminDashboard({
     counts: { groups: number; users: number; activeListings: number };
 }) {
     const cards: DashboardCard[] = [
+        {
+            title: 'Analytics',
+            description: 'Visitors, logins and member activity',
+            href: '/admin/analytics',
+            icon: ChartColumn,
+        },
         {
             title: 'Groups',
             description: 'Create and manage Bible study groups',
