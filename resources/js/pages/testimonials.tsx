@@ -1,6 +1,6 @@
-import { Head, Link } from "@inertiajs/react";
-import { ArrowLeft } from "lucide-react";
-import Reveal from "@/components/landing/reveal";
+import { Head, Link } from '@inertiajs/react';
+import { ArrowLeft } from 'lucide-react';
+import Reveal from '@/components/landing/reveal';
 
 type Testimonial = {
     quote: string;
@@ -10,69 +10,69 @@ type Testimonial = {
 
 const testimonials: Testimonial[] = [
     {
-        quote: "Intimacy and consistency with God’s Word is achievable.",
-        name: "Abuoma Ogbuka",
-        detail: "Public servant, United Kingdom",
+        quote: 'Intimacy and consistency with God’s Word is achievable.',
+        name: 'Abuoma Ogbuka',
+        detail: 'Public servant, United Kingdom',
     },
     {
-        quote: "My accountability partner was amazing. She was always checking in and encouraging me.",
-        name: "Success Emebu",
-        detail: "Legal practitioner, Nigeria",
+        quote: 'My accountability partner was amazing. She was always checking in and encouraging me.',
+        name: 'Success Emebu',
+        detail: 'Legal practitioner, Nigeria',
     },
     {
-        quote: "Trusting God even when we don’t understand what He is doing is key.",
-        name: "Omolara Thomas",
-        detail: "Children and education safeguarding business support, United Kingdom",
+        quote: 'Trusting God even when we don’t understand what He is doing is key.',
+        name: 'Omolara Thomas',
+        detail: 'Children and education safeguarding business support, United Kingdom',
     },
     {
-        quote: "Writing those insights forced me to study deeply and not just read for knowledge.",
-        name: "Eno Onen",
-        detail: "Medical doctor, Nigeria",
+        quote: 'Writing those insights forced me to study deeply and not just read for knowledge.',
+        name: 'Eno Onen',
+        detail: 'Medical doctor, Nigeria',
     },
     {
-        quote: "One thing that stood out was that God walked with me.",
-        name: "Onyekwere Maryclara",
-        detail: "Financial technology, Nigeria",
+        quote: 'One thing that stood out was that God walked with me.',
+        name: 'Onyekwere Maryclara',
+        detail: 'Financial technology, Nigeria',
     },
     {
-        quote: "I became more discerning and disciplined.",
-        name: "Inegbenose Ibafidon",
-        detail: "Student, Nigeria",
+        quote: 'I became more discerning and disciplined.',
+        name: 'Inegbenose Ibafidon',
+        detail: 'Student, Nigeria',
     },
     {
-        quote: "I’ve learned to listen more, pray with greater understanding, and trust God’s leading.",
-        name: "Adebowale Isaac",
-        detail: "Banking, Nigeria",
+        quote: 'I’ve learned to listen more, pray with greater understanding, and trust God’s leading.',
+        name: 'Adebowale Isaac',
+        detail: 'Banking, Nigeria',
     },
     {
-        quote: "This experience has made me more aware of the person of God and the essence of His judgement.",
-        name: "Deji Durotimi",
-        detail: "Project manager, United Kingdom",
+        quote: 'This experience has made me more aware of the person of God and the essence of His judgement.',
+        name: 'Deji Durotimi',
+        detail: 'Project manager, United Kingdom',
     },
     {
-        quote: "I’ve grown significantly and feel more grounded in my faith.",
-        name: "Blessing Ogunsanwo",
-        detail: "Medical practitioner, Nigeria",
+        quote: 'I’ve grown significantly and feel more grounded in my faith.',
+        name: 'Blessing Ogunsanwo',
+        detail: 'Medical practitioner, Nigeria',
     },
     {
-        quote: "This experience helped me to be consistent with the word.",
-        name: "Omolara Adekunbi",
-        detail: "Pharmaceutical marketing, Nigeria",
+        quote: 'This experience helped me to be consistent with the word.',
+        name: 'Omolara Adekunbi',
+        detail: 'Pharmaceutical marketing, Nigeria',
     },
     {
-        quote: "I had clearer dreams, and became more discerning, prayed more.",
-        name: "Chidimma Ikemka",
-        detail: "Business, Nigeria",
+        quote: 'I had clearer dreams, and became more discerning, prayed more.',
+        name: 'Chidimma Ikemka',
+        detail: 'Business, Nigeria',
     },
     {
-        quote: "It has taught me to be consistent with Bible reading and comprehension.",
-        name: "Sunkanmi Ogunsanwo",
-        detail: "Medical practitioner, Nigeria",
+        quote: 'It has taught me to be consistent with Bible reading and comprehension.',
+        name: 'Sunkanmi Ogunsanwo',
+        detail: 'Medical practitioner, Nigeria',
     },
     {
-        quote: "My study of the Word has grown deeply.",
-        name: "Mosimiloluwa Oduke",
-        detail: "Financial compliance analyst, Canada",
+        quote: 'My study of the Word has grown deeply.',
+        name: 'Mosimiloluwa Oduke',
+        detail: 'Financial compliance analyst, Canada',
     },
 ];
 

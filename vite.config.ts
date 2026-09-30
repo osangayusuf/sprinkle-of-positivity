@@ -124,6 +124,13 @@ export default defineConfig({
             'resources/js/components/ui/*',
             'resources/views/mail/*',
             'public/**',
+            // Generated and rewritten by Laravel Boost (`boost:update`,
+            // `record-rule`), so any formatting here would be undone.
+            '.ai/**',
+            '.claude/**',
+            '.mcp.json',
+            'boost.json',
+            'CLAUDE.md',
         ],
         sortTailwindcss: {
             functions: ['clsx', 'cn', 'cva'],
