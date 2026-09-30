@@ -3,6 +3,8 @@
 use App\Http\Middleware\EnsureOnboardingIsComplete;
 use App\Http\Middleware\HandleAppearance;
 use App\Http\Middleware\HandleInertiaRequests;
+use App\Http\Middleware\RecordPageVisit;
+use App\Models\PageVisit;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -23,6 +25,7 @@ return Application::configure(basePath: dirname(__DIR__))
             HandleAppearance::class,
             HandleInertiaRequests::class,
             AddLinkHeadersForPreloadedAssets::class,
+            RecordPageVisit::class,
         ]);
 
         $middleware->alias([
@@ -39,6 +42,8 @@ return Application::configure(basePath: dirname(__DIR__))
             ->withoutOverlapping();
 
         $schedule->command('certificates:issue')->dailyAt('01:00');
+
+        $schedule->command('model:prune', ['--model' => [PageVisit::class]])->dailyAt('02:00');
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

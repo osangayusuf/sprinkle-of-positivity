@@ -9,8 +9,9 @@ Route::get('/', function () {
 })->name('root');
 
 Route::get('testimonials', fn () => Inertia::render('testimonials'))->name('testimonials');
+Route::get('support', fn () => Inertia::render('support'))->name('support');
 
-Route::middleware(['auth', 'verified', 'onboarded'])->group(function () {
+Route::middleware('onboarded')->group(function () {
     Route::get('home', [HomeController::class, 'show'])->name('home');
 });
 

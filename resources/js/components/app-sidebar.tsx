@@ -1,6 +1,7 @@
 import { Link } from '@inertiajs/react';
 import {
     BookMarked,
+    ChartColumn,
     LayoutDashboard,
     Megaphone,
     ShoppingBag,
@@ -26,6 +27,11 @@ const mainNavItems: NavItem[] = [
         title: 'Dashboard',
         href: '/admin/dashboard',
         icon: LayoutDashboard,
+    },
+    {
+        title: 'Analytics',
+        href: '/admin/analytics',
+        icon: ChartColumn,
     },
     {
         title: 'Groups',

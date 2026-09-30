@@ -13,6 +13,7 @@ use App\Models\GroupVerse;
 use App\Services\ChallengeProgress;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -22,9 +23,13 @@ class GroupVerseController extends Controller
      * Show the group's verse for today (or an empty state if the manager
      * hasn't set one yet).
      */
-    public function show(Request $request, Group $group, ChallengeProgress $challengeProgress): Response
+    public function show(Request $request, Group $group, ChallengeProgress $challengeProgress): Response|RedirectResponse
     {
-        $this->authorize('view', $group);
+        if (Gate::denies('viewContent', $group)) {
+            return $this->privateGroupRedirect($group);
+        }
+
+        $user = $request->user();
 
         $verse = GroupVerse::query()
             ->where('group_id', $group->id)
@@ -42,11 +47,11 @@ class GroupVerseController extends Controller
         return Inertia::render('verses/show', [
             'group' => new GroupResource($group),
             'verse' => $verse ? new VerseResource($verse) : null,
-            'canManage' => $request->user()->can('manage', $group),
-            'canParticipate' => $request->user()->can('participate', $group),
+            'canManage' => $user?->can('manage', $group) ?? false,
+            'canParticipate' => $user?->can('participate', $group) ?? false,
             'insights' => InsightResource::collection($insights),
             'quizzes' => QuizResource::collection($quizzes),
-            'progress' => $challengeProgress->forMember($group, $request->user()),
+            'progress' => $user ? $challengeProgress->forMember($group, $user) : null,
         ]);
     }
 
@@ -84,5 +89,16 @@ class GroupVerseController extends Controller
         Inertia::flash('toast', ['type' => 'success', 'message' => __("Today's verse was updated.")]);
 
         return to_route('groups.verse.show', $group);
+    }
+
+    /**
+     * Send visitors who can't read a private group's content back to its
+     * public page, which explains that membership is required.
+     */
+    private function privateGroupRedirect(Group $group): RedirectResponse
+    {
+        Inertia::flash('toast', ['type' => 'info', 'message' => __('This is a private group. Join it to read its Bible Study Insights.')]);
+
+        return to_route('groups.show', $group);
     }
 }

@@ -10,21 +10,36 @@ use App\Models\User;
 class GroupPolicy
 {
     /**
-     * Any authenticated, onboarded user can browse group listings.
+     * Anyone, including guests, can browse group listings.
      */
-    public function viewAny(User $user): bool
+    public function viewAny(?User $user): bool
     {
         return true;
     }
 
     /**
      * Group details (purpose, members, join/manage) are visible to anyone,
-     * including users who haven't joined yet — matches the "preview before
-     * joining" screen in the design.
+     * including guests and users who haven't joined yet — matches the
+     * "preview before joining" screen in the design. Private groups are
+     * still listed; only their content is restricted (see viewContent).
      */
-    public function view(User $user, Group $group): bool
+    public function view(?User $user, Group $group): bool
     {
         return true;
+    }
+
+    /**
+     * A group's verses, insights, comments, and quizzes are readable by
+     * anyone, including guests, unless the group is private — then only
+     * approved members and platform admins can read them.
+     */
+    public function viewContent(?User $user, Group $group): bool
+    {
+        if (! $group->is_private) {
+            return true;
+        }
+
+        return $user !== null && $this->participate($user, $group);
     }
 
     /**

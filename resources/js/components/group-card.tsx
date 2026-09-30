@@ -1,4 +1,5 @@
 import { Link } from '@inertiajs/react';
+import { Lock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { Group, GroupMembershipStatus } from '@/types/models';
 
@@ -37,8 +38,14 @@ export function GroupCard({
             </span>
 
             <span className="min-w-0 flex-1">
-                <span className="block truncate font-semibold">
-                    {group.name}
+                <span className="flex items-center gap-1.5 font-semibold">
+                    <span className="truncate">{group.name}</span>
+                    {group.is_private && (
+                        <Lock
+                            className="text-muted-foreground size-3.5 shrink-0"
+                            aria-label="Private group"
+                        />
+                    )}
                 </span>
                 <span className="text-muted-foreground block truncate text-sm">
                     {group.purpose}

@@ -12,7 +12,7 @@ import { UserAvatar } from '@/components/user-avatar';
 import { usePushSubscription } from '@/hooks/use-push-subscription';
 import { logout } from '@/routes';
 import { edit } from '@/routes/profile';
-import type { Auth } from '@/types/auth';
+import type { AuthenticatedAuth } from '@/types/auth';
 
 export default function ProfileIndex({
     points,
@@ -21,7 +21,7 @@ export default function ProfileIndex({
     points: number;
     level: string | null;
 }) {
-    const { auth } = usePage<{ auth: Auth }>().props;
+    const { auth } = usePage<{ auth: AuthenticatedAuth }>().props;
     const push = usePushSubscription();
 
     return (
@@ -33,6 +33,7 @@ export default function ProfileIndex({
                 <div className="bg-muted flex flex-col items-center gap-2 rounded-2xl p-6 text-center">
                     <UserAvatar
                         name={auth.user.name}
+                        src={auth.user.avatar}
                         className="size-20 text-xl"
                     />
 

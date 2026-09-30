@@ -2,7 +2,7 @@ export type User = {
     id: number;
     name: string;
     email: string;
-    avatar?: string;
+    avatar: string | null;
     email_verified_at: string | null;
     two_factor_enabled?: boolean;
     created_at: string;
@@ -11,8 +11,16 @@ export type User = {
 };
 
 export type Auth = {
-    user: User;
+    user: User | null;
     isAdmin: boolean;
+};
+
+/**
+ * Shared auth props on pages that sit behind the `auth` middleware, where a
+ * signed-in user is guaranteed.
+ */
+export type AuthenticatedAuth = Auth & {
+    user: User;
 };
 
 export type Passkey = {

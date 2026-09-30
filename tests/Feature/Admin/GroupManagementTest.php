@@ -149,3 +149,31 @@ test('admins can delete a group, cascading its verses and quizzes', function () 
     expect(GroupVerse::query()->count())->toBe(0);
     expect(Quiz::query()->count())->toBe(0);
 });
+
+test('admins can create a private group', function () {
+    $this->actingAs(User::factory()->admin()->create());
+
+    $this->post(route('admin.groups.store'), [
+        'name' => 'Leaders Circle',
+        'purpose' => 'For group leaders.',
+        'is_private' => '1',
+        'manager_id' => User::factory()->create()->id,
+    ])->assertRedirect(route('admin.groups.index'));
+
+    expect(Group::query()->sole()->is_private)->toBeTrue();
+});
+
+test('admins can make a private group public by unticking the private box', function () {
+    $group = Group::factory()->private()->create();
+    $manager = createApprovedManager($group);
+    $this->actingAs(User::factory()->admin()->create());
+
+    $this->put(route('admin.groups.update', $group), [
+        'name' => $group->name,
+        'purpose' => $group->purpose,
+        'status' => GroupStatus::Active->value,
+        'manager_id' => $manager->id,
+    ])->assertRedirect(route('admin.groups.index'));
+
+    expect($group->refresh()->is_private)->toBeFalse();
+});

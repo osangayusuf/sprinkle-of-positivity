@@ -34,6 +34,6 @@ class OnboardingController extends Controller
             'birthday_month' => $request->validated('birthday_month'),
         ]);
 
-        return to_route('home');
+        return redirect()->intended(route('home'));
     }
 }

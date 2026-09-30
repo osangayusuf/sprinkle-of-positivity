@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AnalyticsController;
 use App\Http\Controllers\Admin\AnnouncementController;
 use App\Http\Controllers\Admin\CertificateController;
 use App\Http\Controllers\Admin\DailyVerseBulkController;
@@ -15,6 +16,7 @@ Route::middleware(['auth', 'verified', 'onboarded', 'can:access-admin'])
     ->name('admin.')
     ->group(function () {
         Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
+        Route::get('analytics', [AnalyticsController::class, 'index'])->name('analytics');
 
         Route::get('groups', [GroupController::class, 'index'])->name('groups.index');
         Route::get('groups/create', [GroupController::class, 'create'])->name('groups.create');

@@ -15,6 +15,7 @@ export type Group = {
     duration_days: number | null;
     starts_on: string | null;
     status: 'active' | 'archived';
+    is_private: boolean;
     members_count?: number;
     current_day: number | null;
 };
@@ -28,6 +29,7 @@ export type GroupMember = {
     membership_id: number;
     user_id: number;
     name: string;
+    avatar: string | null;
     role: GroupMembershipRole;
     status: GroupMembershipStatus;
     applied_at: string | null;
@@ -49,6 +51,7 @@ export type ReactionSummary = {
 export type InsightAuthor = {
     id: number;
     name: string;
+    avatar: string | null;
 };
 
 export type Insight = {
@@ -89,6 +92,7 @@ export type Quiz = {
     id: number;
     question: string;
     created_by_name: string;
+    created_by_avatar: string | null;
     created_at: string;
     options: QuizOption[];
     responses_count: number;
@@ -100,6 +104,7 @@ export type LeaderboardEntry = {
     rank: number;
     id: number;
     name: string;
+    avatar: string | null;
     points: number;
     progress: number;
     is_me: boolean;

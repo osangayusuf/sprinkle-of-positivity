@@ -27,6 +27,7 @@ class GroupMembershipResource extends JsonResource
             'membership_id' => $membership->id,
             'user_id' => $this->id,
             'name' => $this->name,
+            'avatar' => $this->avatar,
             'role' => $membership->role->value,
             'status' => $membership->status->value,
             'applied_at' => $membership->applied_at?->toIso8601String(),

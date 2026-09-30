@@ -1,14 +1,16 @@
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
 import { InsightCard } from '@/components/insight-card';
 import { PageHeader } from '@/components/page-header';
 import { QuizComposer } from '@/components/quiz-composer';
 import { QuizCard } from '@/components/quiz-card';
+import { SignInPrompt } from '@/components/sign-in-prompt';
 import { StreakTracker } from '@/components/streak-tracker';
 import { VerseCard } from '@/components/verse-card';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import type { Auth } from '@/types/auth';
 import type {
     ChallengeProgress,
     Group,
@@ -38,6 +40,7 @@ export default function VerseShow({
     quizzes,
     progress,
 }: Props) {
+    const { auth } = usePage<{ auth: Auth }>().props;
     const [tab, setTab] = useState<Tab>('insights');
 
     const hasChallenge =
@@ -118,9 +121,17 @@ export default function VerseShow({
                                 </Link>
                             )}
 
+                            {!auth.user && (
+                                <SignInPrompt
+                                    className="mt-4"
+                                    message="Log in or create an account to share your reflection."
+                                />
+                            )}
+
                             {insights.length === 0 ? (
                                 <p className="text-muted-foreground py-10 text-center text-sm">
-                                    No Bible Study Insights have been shared yet.
+                                    No Bible Study Insights have been shared
+                                    yet.
                                 </p>
                             ) : (
                                 <div className="divide-border divide-y">

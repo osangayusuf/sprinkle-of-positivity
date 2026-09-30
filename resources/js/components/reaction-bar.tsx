@@ -6,6 +6,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { useGuestRedirect } from '@/hooks/use-guest-redirect';
 import { cn } from '@/lib/utils';
 import type { ReactionSummary } from '@/types/models';
 
@@ -24,7 +25,13 @@ export function ReactionBar({
     commentsCount?: number;
     commentsHref?: string;
 }) {
+    const redirectGuest = useGuestRedirect();
+
     function react(emoji: string) {
+        if (redirectGuest()) {
+            return;
+        }
+
         router.post(
             reactUrl,
             { emoji },

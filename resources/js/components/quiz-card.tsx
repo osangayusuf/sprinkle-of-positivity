@@ -11,6 +11,7 @@ import {
     DialogTitle,
     DialogTrigger,
 } from '@/components/ui/dialog';
+import { useGuestRedirect } from '@/hooks/use-guest-redirect';
 import { formatRelativeTime } from '@/lib/format';
 import { cn } from '@/lib/utils';
 import type { Quiz } from '@/types/models';
@@ -31,8 +32,10 @@ export function QuizCard({
     const answered = quiz.my_response_option_id !== null;
     const hasResponses = quiz.responses_count > 0;
 
+    const redirectGuest = useGuestRedirect();
+
     function respond(optionId: number) {
-        if (answered) {
+        if (answered || redirectGuest()) {
             return;
         }
 
@@ -46,7 +49,11 @@ export function QuizCard({
     return (
         <div className="flex flex-col gap-3 py-4">
             <div className="flex items-center gap-3">
-                <UserAvatar name={quiz.created_by_name} className="size-9" />
+                <UserAvatar
+                    name={quiz.created_by_name}
+                    src={quiz.created_by_avatar}
+                    className="size-9"
+                />
                 <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-semibold">
                         {quiz.created_by_name}

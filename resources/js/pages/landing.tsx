@@ -1,4 +1,4 @@
-import { Head, Link } from "@inertiajs/react";
+import { Head, Link } from '@inertiajs/react';
 import {
     ArrowUpRight,
     CalendarDays,
@@ -10,11 +10,11 @@ import {
     Mail,
     MessageCircle,
     Phone,
-} from "lucide-react";
-import AppLogoIcon from "@/components/app-logo-icon";
-import Reveal from "@/components/landing/reveal";
-import { Sprinkle } from "@/components/landing/sprinkle";
-import { login, register } from "@/routes";
+} from 'lucide-react';
+import AppLogoIcon from '@/components/app-logo-icon';
+import Reveal from '@/components/landing/reveal';
+import { Sprinkle } from '@/components/landing/sprinkle';
+import { home, login, register, support as supportPage } from '@/routes';
 
 /* -------------------------------------------------------------------------
  * Edit content here. Nothing below this block needs to change for copy,
@@ -22,116 +22,116 @@ import { login, register } from "@/routes";
  * ---------------------------------------------------------------------- */
 
 const program = {
-    name: "Light Shining in the Dark",
-    kind: "A Bible study accountability community",
-    headline: "A Virtual Cave of Adullam",
-    visionTitle: "Our Vision",
-    intro: "“To help people of all ages embrace their identity in God, that they may shine God’s light across their spheres of influence without reservation.”",
+    name: 'Light Shining in the Dark',
+    kind: 'A Bible study accountability community',
+    headline: 'A Virtual Cave of Adullam',
+    visionTitle: 'Our Vision',
+    intro: '“To help people of all ages embrace their identity in God, that they may shine God’s light across their spheres of influence without reservation.”',
 };
 
 const anchor = {
-    reference: "Matthew 5:14–16",
-    version: "KJV",
+    reference: 'Matthew 5:14–16',
+    version: 'KJV',
     verses: [
         {
             number: 14,
-            text: "Ye are the light of the world. A city that is set on an hill cannot be hid.",
+            text: 'Ye are the light of the world. A city that is set on an hill cannot be hid.',
         },
         {
             number: 15,
-            text: "Neither do men light a candle, and put it under a bushel, but on a candlestick; and it giveth light unto all that are in the house.",
+            text: 'Neither do men light a candle, and put it under a bushel, but on a candlestick; and it giveth light unto all that are in the house.',
         },
         {
             number: 16,
-            text: "Let your light so shine before men, that they may see your good works, and glorify your Father which is in heaven.",
+            text: 'Let your light so shine before men, that they may see your good works, and glorify your Father which is in heaven.',
         },
     ],
 };
 
 const visioneer = {
-    name: "Nnenna Sam-Obioha",
-    role: "Business Leader / Visioneer",
-    photo: "/images/organizer.webp",
-    photoAlt: "Portrait of Nnenna Sam-Obioha",
+    name: 'Nnenna Sam-Obioha',
+    role: 'Business Leader / Visioneer',
+    photo: '/images/organizer.webp',
+    photoAlt: 'Portrait of Nnenna Sam-Obioha',
     bio: [
-        "Nnenna Sam-Obioha is a business leader, customer experience consultant, and author with over a decade of experience in telecomms, Supply Chain and financial services.",
-        "She holds a BSc and MSc in Psychology and specializes in service efficiency, operations, and people development.",
-        "Driven by her faith in God and a passion for social impact and innovation, Nnenna is the founder of The Service Excellence Mentor Consulting and Nut Just Salad Enterprise. She is an author of three books and a recipient of the 2024 Global Entrepreneurship Festival Award for Social Impact.",
+        'Nnenna Sam-Obioha is a business leader, customer experience consultant, and author with over a decade of experience in telecomms, Supply Chain and financial services.',
+        'She holds a BSc and MSc in Psychology and specializes in service efficiency, operations, and people development.',
+        'Driven by her faith in God and a passion for social impact and innovation, Nnenna is the founder of The Service Excellence Mentor Consulting and Nut Just Salad Enterprise. She is an author of three books and a recipient of the 2024 Global Entrepreneurship Festival Award for Social Impact.',
         "As the Visioneer of Light Shining in the Dark, she works alongside a dedicated team of Volunteer Accountability Partners to nurture and advance God's mandate to go into the world and make disciples of all nations.",
     ],
 };
 
 const partners = {
-    title: "Volunteer accountability partners",
-    body: "Every participant is paired with a volunteer accountability partner. They check in, encourage you on the slow days, pray with you, and hold your hand from the first chapter to the sixtieth day. The community runs on their generosity and faithfulness.",
-    duties: ["Check in daily", "Encourage and pray", "Walk you to the finish"],
+    title: 'Volunteer accountability partners',
+    body: 'Every participant is paired with a volunteer accountability partner. They check in, encourage you on the slow days, pray with you, and hold your hand from the first chapter to the sixtieth day. The community runs on their generosity and faithfulness.',
+    duties: ['Check in daily', 'Encourage and pray', 'Walk you to the finish'],
 };
 
 const activities = [
     {
         icon: CalendarDays,
-        title: "Monthly live Bible study",
-        body: "We open our doors to non-members of the community to join our sessions every third Thursday of the month.",
-        tag: "3rd Thursday",
+        title: 'Monthly live Bible study',
+        body: 'We open our doors to non-members of the community to join our sessions every third Thursday of the month.',
+        tag: '3rd Thursday',
         wide: true,
     },
     {
         icon: Flame,
-        title: "Fasting and prayer watch hour",
-        body: "We host weekly fasting and prayer watches.",
-        tag: "Weekly",
+        title: 'Fasting and prayer watch hour',
+        body: 'We host weekly fasting and prayer watches.',
+        tag: 'Weekly',
         wide: true,
     },
     {
         icon: Award,
-        title: "60-day certification",
-        body: "To encourage consistency, certificates are issued to participants after the first 60 days of daily bible study and submission of bible study learnings.",
-        tag: "60 days",
+        title: '60-day certification',
+        body: 'To encourage consistency, certificates are issued to participants after the first 60 days of daily bible study and submission of bible study learnings.',
+        tag: '60 days',
     },
     {
         icon: GraduationCap,
-        title: "Alumni community",
-        body: "Join the Alumni Group to continue studying after 60 days of consistency.",
-        tag: "After 60 days",
+        title: 'Alumni community',
+        body: 'Join the Alumni Group to continue studying after 60 days of consistency.',
+        tag: 'After 60 days',
     },
     {
         icon: Coffee,
-        title: "Community hangouts",
-        body: "Hangouts are held periodically.",
-        tag: "Periodic",
+        title: 'Community hangouts',
+        body: 'Hangouts are held periodically.',
+        tag: 'Periodic',
     },
 ];
 
 const contact = {
-    email: "l.i.dbiblestudypartners@gmail.com",
-    phoneDisplay: "0808 111 4235",
-    phoneLink: "tel:+2348081114235",
-    whatsapp: "https://wa.me/2348081114235",
-    instagramHandle: "@thebiblestudycommunity",
-    instagram: "https://www.instagram.com/thebiblestudycommunity",
+    email: 'l.i.dbiblestudypartners@gmail.com',
+    phoneDisplay: '0808 111 4235',
+    phoneLink: 'tel:+2348081114235',
+    whatsapp: 'https://wa.me/2348081114235',
+    instagramHandle: '@thebiblestudycommunity',
+    instagram: 'https://www.instagram.com/thebiblestudycommunity',
 };
 
 /* ---------------------------------------------------------------------- */
 
 const buttonBase =
-    "inline-flex min-h-12 items-center justify-center gap-2 rounded-full px-7 text-base font-semibold transition-[background-color,color,transform] duration-200 outline-none focus-visible:ring-[3px] focus-visible:ring-offset-2 motion-safe:active:scale-[0.98]";
+    'inline-flex min-h-12 items-center justify-center gap-2 rounded-full px-7 text-base font-semibold transition-[background-color,color,transform] duration-200 outline-none focus-visible:ring-[3px] focus-visible:ring-offset-2 motion-safe:active:scale-[0.98]';
 
 const linkBase =
-    "text-ink hover:text-primary decoration-primary focus-visible:ring-primary rounded-sm font-semibold underline underline-offset-4 outline-none focus-visible:ring-[3px]";
+    'text-ink hover:text-primary decoration-primary focus-visible:ring-primary rounded-sm font-semibold underline underline-offset-4 outline-none focus-visible:ring-[3px]';
 
 function SectionLabel({
     children,
-    tone = "ink",
+    tone = 'ink',
 }: {
     children: string;
-    tone?: "ink" | "paper";
+    tone?: 'ink' | 'paper';
 }) {
     return (
         <p
             className={
-                tone === "paper"
-                    ? "text-blush text-sm font-semibold tracking-[0.18em] uppercase"
-                    : "text-primary text-sm font-semibold tracking-[0.18em] uppercase"
+                tone === 'paper'
+                    ? 'text-blush text-sm font-semibold tracking-[0.18em] uppercase'
+                    : 'text-primary text-sm font-semibold tracking-[0.18em] uppercase'
             }
         >
             {children}
@@ -163,6 +163,12 @@ function Nav() {
                 >
                     Activities
                 </a>
+                <Link
+                    href={supportPage()}
+                    className="text-ink hover:text-primary focus-visible:ring-primary rounded-full px-3 py-3 outline-none focus-visible:ring-[3px]"
+                >
+                    Give / Support
+                </Link>
                 <Link
                     href={login()}
                     className="text-ink hover:text-primary focus-visible:ring-primary rounded-full px-3 py-3 outline-none focus-visible:ring-[3px]"
@@ -217,6 +223,9 @@ function Hero() {
                             className={`${buttonBase} bg-primary text-primary-foreground hover:bg-ink focus-visible:ring-primary focus-visible:ring-offset-paper`}
                         >
                             Join the program
+                        </Link>
+                        <Link href={home()} className={linkBase}>
+                            Explore the community
                         </Link>
                         <Link href={login()} className={linkBase}>
                             Already a member? Log in
@@ -351,7 +360,7 @@ function Activities() {
                         <li
                             key={item.title}
                             className={
-                                item.wide ? "md:col-span-3" : "md:col-span-2"
+                                item.wide ? 'md:col-span-3' : 'md:col-span-2'
                             }
                         >
                             <Reveal
@@ -447,7 +456,7 @@ function Voices() {
 
 function Footer() {
     const linkClass =
-        "inline-flex items-center gap-2 rounded-sm underline decoration-paper/40 underline-offset-4 outline-none hover:decoration-current focus-visible:ring-[3px] focus-visible:ring-blush";
+        'inline-flex items-center gap-2 rounded-sm underline decoration-paper/40 underline-offset-4 outline-none hover:decoration-current focus-visible:ring-[3px] focus-visible:ring-blush';
 
     return (
         <footer id="contact" className="bg-ink text-paper">
@@ -509,6 +518,15 @@ function Footer() {
                                 <Mail className="size-4" aria-hidden="true" />
                                 {contact.email}
                             </a>
+                        </li>
+                        <li>
+                            <Link href={supportPage()} className={linkClass}>
+                                <HandHeart
+                                    className="size-4"
+                                    aria-hidden="true"
+                                />
+                                Give / Support
+                            </Link>
                         </li>
                     </ul>
                 </div>

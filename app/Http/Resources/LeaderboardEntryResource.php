@@ -24,6 +24,7 @@ class LeaderboardEntryResource extends JsonResource
             'rank' => $this->rank,
             'id' => $this->id,
             'name' => $this->name,
+            'avatar' => $this->avatar,
             'points' => $this->points,
             'progress' => $this->progress,
             'is_me' => $this->is_me,

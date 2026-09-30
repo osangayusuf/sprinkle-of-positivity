@@ -30,6 +30,17 @@ class GroupFactory extends Factory
     }
 
     /**
+     * Indicate that only approved members can read the group's verses and
+     * insights.
+     */
+    public function private(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'is_private' => true,
+        ]);
+    }
+
+    /**
      * Indicate that the group runs a fixed-length daily challenge starting
      * today.
      */

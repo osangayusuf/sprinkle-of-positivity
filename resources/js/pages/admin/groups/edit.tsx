@@ -3,6 +3,7 @@ import GroupController from '@/actions/App/Http/Controllers/Admin/GroupControlle
 import Heading from '@/components/heading';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -145,6 +146,26 @@ export default function AdminGroupsEdit({ group, users, managerId }: Props) {
                                     </SelectContent>
                                 </Select>
                                 <InputError message={errors.status} />
+                            </div>
+
+                            <div className="flex items-start gap-3">
+                                <Checkbox
+                                    id="is_private"
+                                    name="is_private"
+                                    value="1"
+                                    defaultChecked={group.is_private}
+                                />
+                                <div className="grid gap-1">
+                                    <Label htmlFor="is_private">
+                                        Private group
+                                    </Label>
+                                    <p className="text-muted-foreground text-sm">
+                                        Anyone can see the group and apply to
+                                        join, but only members can read its
+                                        verses and insights.
+                                    </p>
+                                    <InputError message={errors.is_private} />
+                                </div>
                             </div>
 
                             <div className="grid gap-2">

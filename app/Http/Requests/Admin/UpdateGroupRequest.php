@@ -30,6 +30,7 @@ class UpdateGroupRequest extends FormRequest
             'duration_days' => ['nullable', 'integer', 'min:1', 'max:1000'],
             'starts_on' => ['nullable', 'date'],
             'status' => ['required', Rule::enum(GroupStatus::class)],
+            'is_private' => ['boolean'],
             'manager_id' => ['required', 'integer', 'exists:users,id'],
             'cover_image' => ['nullable', 'image', 'max:2048'],
         ];

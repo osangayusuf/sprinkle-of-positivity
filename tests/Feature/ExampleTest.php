@@ -21,3 +21,9 @@ test('anyone can see the testimonials page', function () {
         ->assertOk()
         ->assertInertia(fn ($page) => $page->component('testimonials'));
 });
+
+test('anyone can see the support page', function () {
+    $this->get(route('support'))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page->component('support'));
+});

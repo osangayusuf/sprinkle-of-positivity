@@ -1,4 +1,7 @@
+import type { FormComponentRef } from '@inertiajs/core';
 import { Form, Head, Link, usePage } from '@inertiajs/react';
+import { useRef } from 'react';
+import AvatarController from '@/actions/App/Http/Controllers/Settings/AvatarController';
 import ProfileController from '@/actions/App/Http/Controllers/Settings/ProfileController';
 import DeleteUser from '@/components/delete-user';
 import InputError from '@/components/input-error';
@@ -7,8 +10,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
+import { UserAvatar } from '@/components/user-avatar';
 import { send } from '@/routes/verification';
-import type { Auth } from '@/types';
+import type { AuthenticatedAuth } from '@/types';
 
 const fieldClassName = 'bg-muted h-12 rounded-xl border-transparent px-4';
 
@@ -19,7 +23,7 @@ export default function Profile({
     mustVerifyEmail: boolean;
     status?: string;
 }) {
-    const { auth } = usePage<{ auth: Auth }>().props;
+    const { auth } = usePage<{ auth: AuthenticatedAuth }>().props;
 
     return (
         <>
@@ -27,6 +31,8 @@ export default function Profile({
             <SettingsHeader />
 
             <div className="flex flex-col gap-6 px-4 py-6">
+                <ProfilePicture />
+
                 <Form
                     {...ProfileController.update.form()}
                     options={{ preserveScroll: true }}
@@ -103,5 +109,73 @@ export default function Profile({
                 <DeleteUser />
             </div>
         </>
+    );
+}
+
+function ProfilePicture() {
+    const { auth } = usePage<{ auth: AuthenticatedAuth }>().props;
+    const formRef = useRef<FormComponentRef>(null);
+
+    return (
+        <div className="flex items-center gap-4">
+            <UserAvatar
+                name={auth.user.name}
+                src={auth.user.avatar}
+                className="size-20 text-xl"
+            />
+
+            <div className="flex flex-col gap-2">
+                <Form
+                    ref={formRef}
+                    {...AvatarController.update.form()}
+                    options={{ preserveScroll: true }}
+                    resetOnSuccess
+                >
+                    {({ processing, errors }) => (
+                        <>
+                            <Label
+                                htmlFor="avatar"
+                                className="bg-muted hover:bg-muted/80 inline-flex h-10 cursor-pointer items-center gap-2 rounded-full px-4 text-sm font-semibold"
+                            >
+                                {processing && <Spinner />}
+                                {auth.user.avatar
+                                    ? 'Change photo'
+                                    : 'Upload photo'}
+                            </Label>
+                            <input
+                                id="avatar"
+                                name="avatar"
+                                type="file"
+                                accept="image/*"
+                                className="sr-only"
+                                disabled={processing}
+                                onChange={(event) =>
+                                    event.currentTarget.files?.length &&
+                                    formRef.current?.submit()
+                                }
+                            />
+                            <InputError message={errors.avatar} />
+                        </>
+                    )}
+                </Form>
+
+                {auth.user.avatar && (
+                    <Form
+                        {...AvatarController.destroy.form()}
+                        options={{ preserveScroll: true }}
+                    >
+                        {({ processing }) => (
+                            <button
+                                type="submit"
+                                disabled={processing}
+                                className="text-muted-foreground hover:text-destructive text-sm font-medium"
+                            >
+                                Remove photo
+                            </button>
+                        )}
+                    </Form>
+                )}
+            </div>
+        </div>
     );
 }
