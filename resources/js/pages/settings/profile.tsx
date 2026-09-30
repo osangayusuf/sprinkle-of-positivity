@@ -12,7 +12,7 @@ import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
 import { UserAvatar } from '@/components/user-avatar';
 import { send } from '@/routes/verification';
-import type { Auth } from '@/types';
+import type { AuthenticatedAuth } from '@/types';
 
 const fieldClassName = 'bg-muted h-12 rounded-xl border-transparent px-4';
 
@@ -23,7 +23,7 @@ export default function Profile({
     mustVerifyEmail: boolean;
     status?: string;
 }) {
-    const { auth } = usePage<{ auth: Auth }>().props;
+    const { auth } = usePage<{ auth: AuthenticatedAuth }>().props;
 
     return (
         <>
@@ -113,7 +113,7 @@ export default function Profile({
 }
 
 function ProfilePicture() {
-    const { auth } = usePage<{ auth: Auth }>().props;
+    const { auth } = usePage<{ auth: AuthenticatedAuth }>().props;
     const formRef = useRef<FormComponentRef>(null);
 
     return (

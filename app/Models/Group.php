@@ -24,9 +24,10 @@ use Illuminate\Support\Carbon;
  * @property int|null $duration_days
  * @property Carbon|null $starts_on
  * @property GroupStatus $status
+ * @property bool $is_private
  * @property int $created_by
  */
-#[Fillable(['name', 'slug', 'purpose', 'cover_image_path', 'duration_days', 'starts_on'])]
+#[Fillable(['name', 'slug', 'purpose', 'cover_image_path', 'duration_days', 'starts_on', 'is_private'])]
 class Group extends Model
 {
     /** @use HasFactory<GroupFactory> */
@@ -40,6 +41,7 @@ class Group extends Model
         return [
             'status' => GroupStatus::class,
             'starts_on' => 'date',
+            'is_private' => 'boolean',
         ];
     }
 

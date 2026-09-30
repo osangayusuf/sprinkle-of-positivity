@@ -11,8 +11,16 @@ export type User = {
 };
 
 export type Auth = {
-    user: User;
+    user: User | null;
     isAdmin: boolean;
+};
+
+/**
+ * Shared auth props on pages that sit behind the `auth` middleware, where a
+ * signed-in user is guaranteed.
+ */
+export type AuthenticatedAuth = Auth & {
+    user: User;
 };
 
 export type Passkey = {

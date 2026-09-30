@@ -20,8 +20,9 @@ use Inertia\Response;
 class HomeController extends Controller
 {
     /**
-     * The authenticated home feed: today's global verse of the day, the
-     * member's most recently active groups, and featured marketplace listings.
+     * The home feed: today's global verse of the day, the member's most
+     * recently active groups (none for guests), and featured marketplace
+     * listings.
      */
     public function show(Request $request): Response
     {
@@ -30,7 +31,7 @@ class HomeController extends Controller
         return Inertia::render('home/index', [
             'verse' => $verse ? new VerseResource($verse) : null,
             'yourGroups' => GroupResource::collection(
-                $this->recentlyActiveGroups($request->user())
+                $request->user() ? $this->recentlyActiveGroups($request->user()) : collect()
             ),
             'featuredListings' => MarketplaceListingResource::collection(
                 MarketplaceListing::active()->limit(7)->get()

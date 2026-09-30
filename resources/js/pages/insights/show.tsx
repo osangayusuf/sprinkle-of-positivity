@@ -1,11 +1,13 @@
-import { Form, Head } from '@inertiajs/react';
+import { Form, Head, usePage } from '@inertiajs/react';
 import { ArrowRight } from 'lucide-react';
 import CommentController from '@/actions/App/Http/Controllers/CommentController';
 import { CommentItem } from '@/components/comment-item';
 import { PageHeader } from '@/components/page-header';
 import { ReactionBar } from '@/components/reaction-bar';
+import { SignInPrompt } from '@/components/sign-in-prompt';
 import { UserAvatar } from '@/components/user-avatar';
 import { formatRelativeTime } from '@/lib/format';
+import type { Auth } from '@/types/auth';
 import type { Comment, Group, Insight } from '@/types/models';
 
 export default function InsightShow({
@@ -19,6 +21,7 @@ export default function InsightShow({
     comments: Comment[];
     canParticipate: boolean;
 }) {
+    const { auth } = usePage<{ auth: Auth }>().props;
     const totalComments = countComments(comments);
 
     function buildReactUrl(commentId: number): string {
@@ -89,6 +92,10 @@ export default function InsightShow({
                         </p>
                     )}
                 </div>
+
+                {!auth.user && (
+                    <SignInPrompt message="Log in or create an account to join the conversation." />
+                )}
 
                 {canParticipate && (
                     <Form

@@ -11,6 +11,7 @@ import {
     DialogTitle,
     DialogTrigger,
 } from '@/components/ui/dialog';
+import { useGuestRedirect } from '@/hooks/use-guest-redirect';
 import { formatRelativeTime } from '@/lib/format';
 import { cn } from '@/lib/utils';
 import type { Quiz } from '@/types/models';
@@ -31,8 +32,10 @@ export function QuizCard({
     const answered = quiz.my_response_option_id !== null;
     const hasResponses = quiz.responses_count > 0;
 
+    const redirectGuest = useGuestRedirect();
+
     function respond(optionId: number) {
-        if (answered) {
+        if (answered || redirectGuest()) {
             return;
         }
 

@@ -6,6 +6,7 @@ use App\Enums\GroupStatus;
 use App\Http\Resources\GroupResource;
 use App\Models\Group;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -13,12 +14,13 @@ class GroupController extends Controller
 {
     /**
      * List the user's own groups and other groups they can discover/join.
+     * Guests see every active group under "discover".
      */
     public function index(Request $request): Response
     {
         $user = $request->user();
 
-        $myGroupIds = $user->groupMemberships->pluck('group_id');
+        $myGroupIds = $user?->groupMemberships->pluck('group_id') ?? collect();
 
         $discoverGroups = Group::query()
             ->where('status', GroupStatus::Active)
@@ -29,7 +31,7 @@ class GroupController extends Controller
 
         return Inertia::render('groups/index', [
             'myGroups' => GroupResource::collection(
-                $user->approvedGroups()->withCount('approvedMembers')->get()
+                $user?->approvedGroups()->withCount('approvedMembers')->get() ?? collect()
             ),
             'discoverGroups' => GroupResource::collection($discoverGroups),
         ]);
@@ -44,7 +46,7 @@ class GroupController extends Controller
         $this->authorize('view', $group);
 
         $user = $request->user();
-        $membership = $user->groupMemberships->firstWhere('group_id', $group->id);
+        $membership = $user?->groupMemberships->firstWhere('group_id', $group->id);
 
         return Inertia::render('groups/show', [
             'group' => new GroupResource($group->loadCount('approvedMembers')),
@@ -52,7 +54,8 @@ class GroupController extends Controller
                 'role' => $membership->role->value,
                 'status' => $membership->status->value,
             ] : null,
-            'canManage' => $user->can('manage', $group),
+            'canManage' => $user?->can('manage', $group) ?? false,
+            'canViewContent' => Gate::forUser($user)->allows('viewContent', $group),
         ]);
     }
 }

@@ -12,6 +12,7 @@ use App\Models\GroupVerse;
 use App\Models\Insight;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -60,9 +61,11 @@ class InsightController extends Controller
     /**
      * Show a single insight with its comment thread.
      */
-    public function show(Request $request, Group $group, Insight $insight): Response
+    public function show(Request $request, Group $group, Insight $insight): Response|RedirectResponse
     {
-        $this->authorize('view', $group);
+        if (Gate::denies('viewContent', $group)) {
+            return $this->privateGroupRedirect($group);
+        }
         abort_unless($this->belongsToGroup($insight, $group), 404);
 
         $insight->load(['user', 'reactions']);
@@ -77,7 +80,7 @@ class InsightController extends Controller
             'group' => new GroupResource($group),
             'insight' => new InsightResource($insight),
             'comments' => CommentResource::collection($comments),
-            'canParticipate' => $request->user()->can('participate', $group),
+            'canParticipate' => $request->user()?->can('participate', $group) ?? false,
         ]);
     }
 
@@ -89,5 +92,16 @@ class InsightController extends Controller
     {
         return $insight->verseable instanceof GroupVerse
             && $insight->verseable->group_id === $group->id;
+    }
+
+    /**
+     * Send visitors who can't read a private group's content back to its
+     * public page, which explains that membership is required.
+     */
+    private function privateGroupRedirect(Group $group): RedirectResponse
+    {
+        Inertia::flash('toast', ['type' => 'info', 'message' => __('This is a private group. Join it to read its Bible Study Insights.')]);
+
+        return to_route('groups.show', $group);
     }
 }

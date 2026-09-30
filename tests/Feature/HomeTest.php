@@ -2,9 +2,13 @@
 
 use App\Models\User;
 
-test('guests are redirected to the login page', function () {
-    $response = $this->get(route('home'));
-    $response->assertRedirect(route('login'));
+test('guests can visit home without any groups of their own', function () {
+    $this->get(route('home'))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->component('home/index')
+            ->where('yourGroups', [])
+        );
 });
 
 test('users who have not completed onboarding are redirected to it', function () {

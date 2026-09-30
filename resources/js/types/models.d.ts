@@ -15,6 +15,7 @@ export type Group = {
     duration_days: number | null;
     starts_on: string | null;
     status: 'active' | 'archived';
+    is_private: boolean;
     members_count?: number;
     current_day: number | null;
 };

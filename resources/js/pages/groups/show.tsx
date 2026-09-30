@@ -1,15 +1,25 @@
-import { Head, Link } from '@inertiajs/react';
-import { ChevronLeft, MoreVertical } from 'lucide-react';
+import { Head, Link, usePage } from '@inertiajs/react';
+import { ChevronLeft, Lock, MoreVertical } from 'lucide-react';
+import { SignInPrompt } from '@/components/sign-in-prompt';
 import { Button } from '@/components/ui/button';
+import type { Auth } from '@/types/auth';
 import type { Group, GroupMembershipInfo } from '@/types/models';
 
 type Props = {
     group: Group;
     membership: GroupMembershipInfo | null;
     canManage: boolean;
+    canViewContent: boolean;
 };
 
-export default function GroupShow({ group, membership, canManage }: Props) {
+export default function GroupShow({
+    group,
+    membership,
+    canManage,
+    canViewContent,
+}: Props) {
+    const { auth } = usePage<{ auth: Auth }>().props;
+
     return (
         <>
             <Head title={group.name} />
@@ -41,6 +51,12 @@ export default function GroupShow({ group, membership, canManage }: Props) {
                 <h1 className="relative z-10 text-2xl font-bold">
                     {group.name}
                 </h1>
+                {group.is_private && (
+                    <p className="relative z-10 mt-1 inline-flex items-center gap-1 text-sm font-medium text-white/80">
+                        <Lock className="size-3.5" />
+                        Private group
+                    </p>
+                )}
             </div>
 
             <div className="flex flex-col gap-6 px-4 py-6">
@@ -60,7 +76,11 @@ export default function GroupShow({ group, membership, canManage }: Props) {
                 )}
 
                 <div className="flex flex-col gap-3">
-                    {membership === null && (
+                    {!auth.user && (
+                        <SignInPrompt message="Log in or create an account to join this group." />
+                    )}
+
+                    {auth.user && membership === null && (
                         <Button
                             asChild
                             className="h-14 w-full rounded-full text-base"
@@ -77,15 +97,22 @@ export default function GroupShow({ group, membership, canManage }: Props) {
                         </div>
                     )}
 
-                    <Button
-                        asChild
-                        variant="outline"
-                        className="border-primary text-primary h-14 w-full rounded-full text-base"
-                    >
-                        <Link href={`/groups/${group.slug}/verse`}>
-                            Read Bible Study Insights
-                        </Link>
-                    </Button>
+                    {canViewContent ? (
+                        <Button
+                            asChild
+                            variant="outline"
+                            className="border-primary text-primary h-14 w-full rounded-full text-base"
+                        >
+                            <Link href={`/groups/${group.slug}/verse`}>
+                                Read Bible Study Insights
+                            </Link>
+                        </Button>
+                    ) : (
+                        <div className="bg-muted text-muted-foreground flex items-center justify-center gap-2 rounded-full px-5 py-4 text-center text-sm">
+                            <Lock className="size-4 shrink-0" />
+                            Bible Study Insights are visible to members only.
+                        </div>
+                    )}
                 </div>
             </div>
         </>

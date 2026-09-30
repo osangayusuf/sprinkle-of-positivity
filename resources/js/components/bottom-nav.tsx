@@ -1,10 +1,13 @@
-import { Link } from '@inertiajs/react';
-import { primaryNavItems } from '@/lib/navigation';
+import { Link, usePage } from '@inertiajs/react';
+import { guestNavItems, primaryNavItems } from '@/lib/navigation';
 import { cn } from '@/lib/utils';
 import { useCurrentUrl } from '@/hooks/use-current-url';
+import type { Auth } from '@/types/auth';
 
 export function BottomNav() {
     const { isCurrentOrParentUrl } = useCurrentUrl();
+    const { auth } = usePage<{ auth: Auth }>().props;
+    const navItems = auth.user ? primaryNavItems : guestNavItems;
 
     return (
         <nav
@@ -14,7 +17,7 @@ export function BottomNav() {
             )}
         >
             <ul className="mx-auto flex max-w-md items-stretch justify-between">
-                {primaryNavItems.map((item) => {
+                {navItems.map((item) => {
                     const active = isCurrentOrParentUrl(item.href);
 
                     return (

@@ -28,6 +28,7 @@ class StoreGroupRequest extends FormRequest
             'purpose' => ['required', 'string'],
             'duration_days' => ['nullable', 'integer', 'min:1', 'max:1000'],
             'starts_on' => ['nullable', 'date'],
+            'is_private' => ['boolean'],
             'manager_id' => ['required', 'integer', 'exists:users,id'],
             'cover_image' => ['nullable', 'image', 'max:2048'],
         ];

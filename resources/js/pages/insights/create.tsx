@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
 import { Textarea } from '@/components/ui/textarea';
 import { UserAvatar } from '@/components/user-avatar';
-import type { Auth } from '@/types/auth';
+import type { AuthenticatedAuth } from '@/types/auth';
 import type { Group } from '@/types/models';
 
 export default function InsightCreate({
@@ -17,7 +17,7 @@ export default function InsightCreate({
     group: Group;
     verse: { id: number; reference: string };
 }) {
-    const { auth } = usePage<{ auth: Auth }>().props;
+    const { auth } = usePage<{ auth: AuthenticatedAuth }>().props;
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [imagePreview, setImagePreview] = useState<string | null>(null);
 
