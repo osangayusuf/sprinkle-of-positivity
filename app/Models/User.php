@@ -8,12 +8,14 @@ use App\Enums\GroupMembershipStatus;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Storage;
 use Laravel\Fortify\Contracts\PasskeyUser;
 use Laravel\Fortify\PasskeyAuthenticatable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
@@ -23,6 +25,8 @@ use NotificationChannels\WebPush\HasPushSubscriptions;
  * @property int $id
  * @property string $name
  * @property string $email
+ * @property string|null $avatar_path
+ * @property-read string|null $avatar
  * @property Carbon|null $email_verified_at
  * @property string $password
  * @property string|null $whatsapp_number
@@ -39,11 +43,18 @@ use NotificationChannels\WebPush\HasPushSubscriptions;
  * @property Carbon|null $updated_at
  */
 #[Fillable(['name', 'email', 'password', 'whatsapp_number', 'goals', 'birthday_day', 'birthday_month'])]
-#[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'])]
+#[Hidden(['password', 'avatar_path', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'])]
 class User extends Authenticatable implements PasskeyUser
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, HasPushSubscriptions, Notifiable, PasskeyAuthenticatable, TwoFactorAuthenticatable;
+
+    /**
+     * The accessors to append to the model's array form.
+     *
+     * @var list<string>
+     */
+    protected $appends = ['avatar'];
 
     /**
      * Get the attributes that should be cast.
@@ -61,6 +72,19 @@ class User extends Authenticatable implements PasskeyUser
             'goals' => 'array',
             'onboarding_completed_at' => 'datetime',
         ];
+    }
+
+    /**
+     * The public URL of the user's profile picture, or null to fall back to
+     * their initials.
+     *
+     * @return Attribute<string|null, never>
+     */
+    protected function avatar(): Attribute
+    {
+        return Attribute::get(
+            fn (): ?string => $this->avatar_path ? Storage::disk('public')->url($this->avatar_path) : null
+        );
     }
 
     /**

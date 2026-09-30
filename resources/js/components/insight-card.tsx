@@ -14,7 +14,11 @@ export function InsightCard({
     return (
         <div className="flex flex-col gap-3 py-4">
             <div className="flex items-center gap-3">
-                <UserAvatar name={insight.user.name} className="size-9" />
+                <UserAvatar
+                    name={insight.user.name}
+                    src={insight.user.avatar}
+                    className="size-9"
+                />
                 <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-semibold">
                         {insight.user.name}

@@ -2,6 +2,7 @@ import { Form, Head } from '@inertiajs/react';
 import GroupApplicationController from '@/actions/App/Http/Controllers/GroupApplicationController';
 import { PageHeader } from '@/components/page-header';
 import { Button } from '@/components/ui/button';
+import { UserAvatar } from '@/components/user-avatar';
 import type { Group, GroupMember } from '@/types/models';
 
 type Props = {
@@ -39,9 +40,16 @@ export default function GroupManage({
                                 key={application.membership_id}
                                 className="bg-muted flex items-center justify-between rounded-2xl p-3"
                             >
-                                <span className="font-semibold">
-                                    {application.name}
-                                </span>
+                                <div className="flex min-w-0 items-center gap-3">
+                                    <UserAvatar
+                                        name={application.name}
+                                        src={application.avatar}
+                                        className="size-9"
+                                    />
+                                    <span className="truncate font-semibold">
+                                        {application.name}
+                                    </span>
+                                </div>
                                 <div className="flex gap-2">
                                     <Form
                                         {...GroupApplicationController.update.form(
@@ -104,13 +112,22 @@ export default function GroupManage({
                             key={member.membership_id}
                             className="bg-muted flex items-center justify-between rounded-2xl p-3"
                         >
-                            <div>
-                                <p className="font-semibold">{member.name}</p>
-                                {member.role === 'manager' && (
-                                    <p className="text-muted-foreground text-xs">
-                                        Manager
+                            <div className="flex min-w-0 items-center gap-3">
+                                <UserAvatar
+                                    name={member.name}
+                                    src={member.avatar}
+                                    className="size-9"
+                                />
+                                <div className="min-w-0">
+                                    <p className="truncate font-semibold">
+                                        {member.name}
                                     </p>
-                                )}
+                                    {member.role === 'manager' && (
+                                        <p className="text-muted-foreground text-xs">
+                                            Manager
+                                        </p>
+                                    )}
+                                </div>
                             </div>
                             {member.role !== 'manager' && (
                                 <Form

@@ -22,6 +22,7 @@ class QuizResource extends JsonResource
             'id' => $this->id,
             'question' => $this->question,
             'created_by_name' => $this->creator->name,
+            'created_by_avatar' => $this->creator->avatar,
             'created_at' => $this->created_at->toIso8601String(),
             'options' => $this->options->map(fn ($option) => [
                 'id' => $option->id,

@@ -22,6 +22,7 @@ class InsightResource extends JsonResource
             'user' => [
                 'id' => $this->user->id,
                 'name' => $this->user->name,
+                'avatar' => $this->user->avatar,
             ],
             'body' => $this->body,
             'image_url' => $this->image_path

@@ -16,7 +16,11 @@ export function CommentItem({
     return (
         <div className={cn('flex flex-col gap-2 py-3', nested && 'ml-10')}>
             <div className="flex items-start gap-3">
-                <UserAvatar name={comment.user.name} className="size-8" />
+                <UserAvatar
+                    name={comment.user.name}
+                    src={comment.user.avatar}
+                    className="size-8"
+                />
                 <div className="min-w-0 flex-1">
                     <div className="flex items-baseline gap-2">
                         <p className="truncate text-sm font-semibold">

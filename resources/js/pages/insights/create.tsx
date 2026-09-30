@@ -45,7 +45,7 @@ export default function InsightCreate({
 
             <div className="flex flex-col gap-6 px-4 pb-6">
                 <div className="flex items-center gap-3">
-                    <UserAvatar name={auth.user.name} />
+                    <UserAvatar name={auth.user.name} src={auth.user.avatar} />
                     <div>
                         <p className="text-base font-bold">
                             Share Your Reflection on {verse.reference}

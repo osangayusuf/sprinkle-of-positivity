@@ -72,7 +72,11 @@ export default function LeaderboardIndex({
                                 {MEDALS[entry.rank] ?? entry.rank}
                             </span>
 
-                            <UserAvatar name={entry.name} className="size-9" />
+                            <UserAvatar
+                                name={entry.name}
+                                src={entry.avatar}
+                                className="size-9"
+                            />
 
                             <div className="min-w-0 flex-1">
                                 <p className="truncate text-sm font-semibold">

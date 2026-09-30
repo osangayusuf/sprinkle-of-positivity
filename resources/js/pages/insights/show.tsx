@@ -35,7 +35,10 @@ export default function InsightShow({
 
             <div className="flex flex-col gap-4 px-4 py-4">
                 <div className="flex items-center gap-3">
-                    <UserAvatar name={insight.user.name} />
+                    <UserAvatar
+                        name={insight.user.name}
+                        src={insight.user.avatar}
+                    />
                     <div>
                         <p className="text-sm font-semibold">
                             {insight.user.name}

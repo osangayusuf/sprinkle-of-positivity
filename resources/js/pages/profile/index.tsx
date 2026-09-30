@@ -33,6 +33,7 @@ export default function ProfileIndex({
                 <div className="bg-muted flex flex-col items-center gap-2 rounded-2xl p-6 text-center">
                     <UserAvatar
                         name={auth.user.name}
+                        src={auth.user.avatar}
                         className="size-20 text-xl"
                     />
 
