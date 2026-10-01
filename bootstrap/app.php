@@ -43,6 +43,9 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $schedule->command('certificates:issue')->dailyAt('01:00');
 
+        // Migrations and cache rebuilds after an FTP deploy (see FinishDeploy).
+        $schedule->command('deploy:finish')->everyMinute()->withoutOverlapping();
+
         $schedule->command('model:prune', ['--model' => [PageVisit::class]])->dailyAt('02:00');
     })
     ->withExceptions(function (Exceptions $exceptions): void {

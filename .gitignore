@@ -29,3 +29,4 @@ yarn-error.log
 /.zed
 .env.prod
 Archive.zip
+/.deploy
