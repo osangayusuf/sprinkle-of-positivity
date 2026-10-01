@@ -82,8 +82,8 @@ class User extends Authenticatable implements PasskeyUser
      */
     protected function avatar(): Attribute
     {
-        return Attribute::get(
-            fn (): ?string => $this->avatar_path ? Storage::disk('public')->url($this->avatar_path) : null
+        return Attribute::make(
+            get: fn (): ?string => $this->avatar_path ? Storage::disk('public')->url($this->avatar_path) : null,
         );
     }
 

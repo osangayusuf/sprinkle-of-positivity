@@ -83,7 +83,7 @@ class SiteAnalytics
     /**
      * The most viewed pages.
      *
-     * @return list<array{path: string, page_views: int, unique_visitors: int}>
+     * @return array<int, array{path: string, page_views: int, unique_visitors: int}>
      */
     public function topPages(CarbonInterface $since, int $limit = 10): array
     {
@@ -105,7 +105,7 @@ class SiteAnalytics
     /**
      * The other sites that sent the most visitors.
      *
-     * @return list<array{referrer: string, page_views: int}>
+     * @return array<int, array{referrer: string, page_views: int}>
      */
     public function topReferrers(CarbonInterface $since, int $limit = 5): array
     {
@@ -127,7 +127,7 @@ class SiteAnalytics
     /**
      * The most recent sign-ins, newest first.
      *
-     * @return list<array{id: int, user: array{id: int, name: string, avatar: string|null}, logged_in_at: string}>
+     * @return array<int, array{id: int, user: array{id: int, name: string, avatar: string|null}, logged_in_at: string}>
      */
     public function recentLogins(int $limit = 15): array
     {
