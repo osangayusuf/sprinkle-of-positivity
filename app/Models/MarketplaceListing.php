@@ -2,13 +2,13 @@
 
 namespace App\Models;
 
+use Carbon\CarbonInterface;
 use Database\Factories\MarketplaceListingFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
@@ -19,8 +19,8 @@ use Illuminate\Support\Carbon;
  * @property string|null $cta_url
  * @property int $position
  * @property bool $is_active
- * @property Carbon|null $starts_at
- * @property Carbon|null $ends_at
+ * @property CarbonInterface|null $starts_at
+ * @property CarbonInterface|null $ends_at
  * @property int $created_by
  */
 #[Fillable(['title', 'description', 'cta_label', 'cta_url', 'position', 'starts_at', 'ends_at'])]

@@ -30,7 +30,7 @@ class StreakCalculator
             ->sort()
             ->values();
 
-        $completedToday = $completed->contains($todayDay);
+        $completedToday = $todayDay >= 1 && $completed->contains($todayDay);
 
         $cursor = min($todayDay, $durationDays);
 

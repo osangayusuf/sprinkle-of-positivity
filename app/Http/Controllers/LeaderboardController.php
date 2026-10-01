@@ -29,9 +29,9 @@ class LeaderboardController extends Controller
         $topPoints = $ranked->max('points') ?: 1;
 
         $entries = $ranked->values()->map(function (User $entry, int $index) use ($topPoints, $user) {
-            $entry->rank = $index + 1;
-            $entry->progress = min(1, $entry->points / $topPoints);
-            $entry->is_me = $entry->id === $user->id;
+            $entry->setAttribute('rank', $index + 1);
+            $entry->setAttribute('progress', min(1, $entry->points / $topPoints));
+            $entry->setAttribute('is_me', $entry->id === $user->id);
 
             return $entry;
         });

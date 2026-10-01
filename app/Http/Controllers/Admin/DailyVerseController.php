@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Actions\StorePublicUpload;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\SetDailyVerseRequest;
 use App\Http\Resources\VerseResource;
@@ -37,7 +38,7 @@ class DailyVerseController extends Controller
     /**
      * Set the global verse for today or a future date.
      */
-    public function update(SetDailyVerseRequest $request, ?string $date = null): RedirectResponse
+    public function update(SetDailyVerseRequest $request, StorePublicUpload $storePublicUpload, ?string $date = null): RedirectResponse
     {
         $resolvedDate = $date ? Carbon::parse($date) : today();
 
@@ -50,7 +51,7 @@ class DailyVerseController extends Controller
         $verse->created_by = $request->user()->id;
 
         if ($request->hasFile('image')) {
-            $verse->image_path = $request->file('image')->store('daily-verses', 'public');
+            $verse->image_path = $storePublicUpload->handle($request->file('image'), 'daily-verses');
         }
 
         $verse->save();

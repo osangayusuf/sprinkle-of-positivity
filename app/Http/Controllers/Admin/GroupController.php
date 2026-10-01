@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Actions\StorePublicUpload;
 use App\Enums\GroupMembershipRole;
 use App\Enums\GroupMembershipStatus;
 use App\Enums\GroupStatus;
@@ -48,7 +49,7 @@ class GroupController extends Controller
     /**
      * Create a group and appoint its manager.
      */
-    public function store(StoreGroupRequest $request): RedirectResponse
+    public function store(StoreGroupRequest $request, StorePublicUpload $storePublicUpload): RedirectResponse
     {
         $group = new Group($request->safe()->only(['name', 'purpose', 'duration_days', 'starts_on']));
         $group->slug = $this->uniqueSlug($request->string('name')->value());
@@ -56,7 +57,7 @@ class GroupController extends Controller
         $group->is_private = $request->boolean('is_private');
 
         if ($request->hasFile('cover_image')) {
-            $group->cover_image_path = $request->file('cover_image')->store('groups', 'public');
+            $group->cover_image_path = $storePublicUpload->handle($request->file('cover_image'), 'groups');
         }
 
         $group->save();
@@ -93,14 +94,14 @@ class GroupController extends Controller
     /**
      * Update a group's own fields, reassigning its manager if changed.
      */
-    public function update(UpdateGroupRequest $request, Group $group): RedirectResponse
+    public function update(UpdateGroupRequest $request, Group $group, StorePublicUpload $storePublicUpload): RedirectResponse
     {
         $group->fill($request->safe()->only(['name', 'purpose', 'duration_days', 'starts_on']));
         $group->status = $request->enum('status', GroupStatus::class);
         $group->is_private = $request->boolean('is_private');
 
         if ($request->hasFile('cover_image')) {
-            $group->cover_image_path = $request->file('cover_image')->store('groups', 'public');
+            $group->cover_image_path = $storePublicUpload->handle($request->file('cover_image'), 'groups');
         }
 
         $group->save();

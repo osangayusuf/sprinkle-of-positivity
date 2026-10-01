@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Settings;
 
+use App\Actions\StorePublicUpload;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Settings\UpdateAvatarRequest;
 use Illuminate\Http\RedirectResponse;
@@ -14,12 +15,12 @@ class AvatarController extends Controller
     /**
      * Replace the user's profile picture, removing the previous file.
      */
-    public function update(UpdateAvatarRequest $request): RedirectResponse
+    public function update(UpdateAvatarRequest $request, StorePublicUpload $storePublicUpload): RedirectResponse
     {
         $user = $request->user();
         $previousPath = $user->avatar_path;
 
-        $user->avatar_path = $request->file('avatar')->store('avatars', 'public');
+        $user->avatar_path = $storePublicUpload->handle($request->file('avatar'), 'avatars');
         $user->save();
 
         if ($previousPath) {

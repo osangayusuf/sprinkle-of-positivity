@@ -9,6 +9,8 @@ use Illuminate\Support\Carbon;
 
 class BulkSetDailyVerses
 {
+    public function __construct(private StorePublicUpload $storePublicUpload) {}
+
     /**
      * Set (or update) the global daily verse for each of the given dates.
      *
@@ -29,7 +31,7 @@ class BulkSetDailyVerses
             $verse->created_by = $author->id;
 
             if (! empty($row['image'])) {
-                $verse->image_path = $row['image']->store('daily-verses', 'public');
+                $verse->image_path = $this->storePublicUpload->handle($row['image'], 'daily-verses');
             }
 
             $verse->save();

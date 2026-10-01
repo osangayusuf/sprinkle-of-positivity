@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Groups;
 
+use App\Models\Quiz;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -17,8 +18,11 @@ class UpdateQuizRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return $this->user()->can('manage', $this->route('group'))
-            && $this->route('quiz')->responses()->doesntExist();
+        $quiz = $this->route('quiz');
+
+        return $quiz instanceof Quiz
+            && $this->user()->can('manage', $this->route('group'))
+            && $quiz->responses()->doesntExist();
     }
 
     /**

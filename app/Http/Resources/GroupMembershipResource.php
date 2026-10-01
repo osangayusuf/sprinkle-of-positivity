@@ -12,6 +12,8 @@ use Illuminate\Http\Resources\Json\JsonResource;
  * `$this->pivot` is the underlying GroupMembership record.
  *
  * @mixin User
+ *
+ * @property-read GroupMembership $pivot
  */
 class GroupMembershipResource extends JsonResource
 {
@@ -20,7 +22,6 @@ class GroupMembershipResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        /** @var GroupMembership $membership */
         $membership = $this->pivot;
 
         return [

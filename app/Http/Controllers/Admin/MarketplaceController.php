@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Actions\StorePublicUpload;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreMarketplaceListingRequest;
 use App\Http\Requests\Admin\UpdateMarketplaceListingRequest;
@@ -40,7 +41,7 @@ class MarketplaceController extends Controller
     /**
      * Create a marketplace listing.
      */
-    public function store(StoreMarketplaceListingRequest $request): RedirectResponse
+    public function store(StoreMarketplaceListingRequest $request, StorePublicUpload $storePublicUpload): RedirectResponse
     {
         $listing = new MarketplaceListing($request->safe()->only([
             'title', 'description', 'cta_label', 'cta_url', 'position',
@@ -48,7 +49,7 @@ class MarketplaceController extends Controller
         $listing->created_by = $request->user()->id;
 
         if ($request->hasFile('image')) {
-            $listing->image_path = $request->file('image')->store('marketplace', 'public');
+            $listing->image_path = $storePublicUpload->handle($request->file('image'), 'marketplace');
         }
 
         $listing->save();
@@ -73,7 +74,7 @@ class MarketplaceController extends Controller
     /**
      * Update a marketplace listing.
      */
-    public function update(UpdateMarketplaceListingRequest $request, MarketplaceListing $listing): RedirectResponse
+    public function update(UpdateMarketplaceListingRequest $request, MarketplaceListing $listing, StorePublicUpload $storePublicUpload): RedirectResponse
     {
         $listing->fill($request->safe()->only([
             'title', 'description', 'cta_label', 'cta_url', 'position', 'starts_at', 'ends_at',
@@ -81,7 +82,7 @@ class MarketplaceController extends Controller
         $listing->is_active = $request->boolean('is_active');
 
         if ($request->hasFile('image')) {
-            $listing->image_path = $request->file('image')->store('marketplace', 'public');
+            $listing->image_path = $storePublicUpload->handle($request->file('image'), 'marketplace');
         }
 
         $listing->save();
