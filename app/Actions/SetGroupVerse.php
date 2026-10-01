@@ -10,6 +10,8 @@ use Illuminate\Support\Carbon;
 
 class SetGroupVerse
 {
+    public function __construct(private StorePublicUpload $storePublicUpload) {}
+
     /**
      * Set (or update) a group's verse for the given date — defaults to
      * today, since that's the only day a manager can ever post for.
@@ -30,7 +32,7 @@ class SetGroupVerse
         $verse->created_by = $author->id;
 
         if ($image) {
-            $verse->image_path = $image->store('group-verses', 'public');
+            $verse->image_path = $this->storePublicUpload->handle($image, 'group-verses');
         }
 
         $verse->save();

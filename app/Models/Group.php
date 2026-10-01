@@ -13,7 +13,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
@@ -22,7 +21,7 @@ use Illuminate\Support\Carbon;
  * @property string $purpose
  * @property string|null $cover_image_path
  * @property int|null $duration_days
- * @property Carbon|null $starts_on
+ * @property CarbonInterface|null $starts_on
  * @property GroupStatus $status
  * @property bool $is_private
  * @property int $created_by
@@ -130,7 +129,7 @@ class Group extends Model
             return null;
         }
 
-        $day = $startsOn->diffInDays($today) + 1;
+        $day = (int) $startsOn->diffInDays($today) + 1;
 
         return $day > $this->duration_days ? null : $day;
     }

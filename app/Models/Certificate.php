@@ -2,12 +2,12 @@
 
 namespace App\Models;
 
+use Carbon\CarbonInterface;
 use Database\Factories\CertificateFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 
 /**
@@ -21,10 +21,10 @@ use Illuminate\Support\Str;
  * @property string $recipient_name
  * @property int $duration_days
  * @property int $year
- * @property Carbon $issued_at
+ * @property CarbonInterface $issued_at
  * @property int|null $issued_by
  * @property string|null $override_reason
- * @property Carbon|null $revoked_at
+ * @property CarbonInterface|null $revoked_at
  * @property int|null $revoked_by
  * @property string|null $revoke_reason
  */

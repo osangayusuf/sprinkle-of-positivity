@@ -8,6 +8,7 @@ use App\Http\Requests\Admin\BulkSetDailyVersesRequest;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
 use Inertia\Response;
+use RuntimeException;
 
 class DailyVerseBulkController extends Controller
 {
@@ -29,12 +30,7 @@ class DailyVerseBulkController extends Controller
     {
         $rows = $request->hasFile('file')
             ? $this->parseCsv($request->file('file')->getRealPath())
-            : collect($request->input('rows', []))
-                ->map(fn (array $row, int|string $key) => [
-                    ...$row,
-                    'image' => $request->file("rows.$key.image"),
-                ])
-                ->all();
+            : $request->verseRows();
 
         $count = $action->handle($rows, $request->user());
 
@@ -52,6 +48,10 @@ class DailyVerseBulkController extends Controller
     {
         $rows = [];
         $handle = fopen($path, 'r');
+
+        if ($handle === false) {
+            throw new RuntimeException('Could not open the uploaded CSV file.');
+        }
 
         $header = fgetcsv($handle);
         $isHeader = $header && strtolower((string) ($header[0] ?? '')) === 'date';

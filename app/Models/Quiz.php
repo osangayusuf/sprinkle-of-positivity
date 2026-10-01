@@ -2,13 +2,13 @@
 
 namespace App\Models;
 
+use Carbon\CarbonInterface;
 use Database\Factories\QuizFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
@@ -17,7 +17,7 @@ use Illuminate\Support\Carbon;
  * @property string $question
  * @property int $created_by
  * @property int|null $correct_quiz_option_id
- * @property Carbon $created_at
+ * @property CarbonInterface $created_at
  */
 #[Fillable(['question'])]
 class Quiz extends Model

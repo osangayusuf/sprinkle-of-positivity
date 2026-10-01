@@ -5,6 +5,7 @@ namespace App\Http\Requests\Admin;
 use App\Models\Role;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\UploadedFile;
 
 class BulkSetDailyVersesRequest extends FormRequest
 {
@@ -33,5 +34,28 @@ class BulkSetDailyVersesRequest extends FormRequest
             'rows.*.image' => ['nullable', 'image', 'max:2048'],
             'file' => ['required_without:rows', 'file', 'mimes:csv,txt'],
         ];
+    }
+
+    /**
+     * The submitted grid rows, each paired with its optional image upload.
+     *
+     * @return array<int, array{date: string, reference: string, text: string, image: UploadedFile|null}>
+     */
+    public function verseRows(): array
+    {
+        $rows = [];
+
+        foreach (array_keys($this->array('rows')) as $key) {
+            $image = $this->file("rows.$key.image");
+
+            $rows[] = [
+                'date' => $this->string("rows.$key.date")->value(),
+                'reference' => $this->string("rows.$key.reference")->value(),
+                'text' => $this->string("rows.$key.text")->value(),
+                'image' => $image instanceof UploadedFile ? $image : null,
+            ];
+        }
+
+        return $rows;
     }
 }

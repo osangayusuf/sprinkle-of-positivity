@@ -9,6 +9,8 @@ use Illuminate\Http\UploadedFile;
 
 class SubmitInsight
 {
+    public function __construct(private StorePublicUpload $storePublicUpload) {}
+
     /**
      * Share a member's reflection on a group's verse.
      */
@@ -20,7 +22,7 @@ class SubmitInsight
         $insight->verseable_type = $verse->getMorphClass();
 
         if ($image) {
-            $insight->image_path = $image->store('insights', 'public');
+            $insight->image_path = $this->storePublicUpload->handle($image, 'insights');
         }
 
         $insight->save();

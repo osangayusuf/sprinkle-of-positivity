@@ -4,9 +4,9 @@ namespace App\Models;
 
 use App\Enums\GroupMembershipRole;
 use App\Enums\GroupMembershipStatus;
+use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\Pivot;
-use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
@@ -14,9 +14,9 @@ use Illuminate\Support\Carbon;
  * @property int $user_id
  * @property GroupMembershipRole $role
  * @property GroupMembershipStatus $status
- * @property Carbon|null $code_of_conduct_accepted_at
- * @property Carbon|null $applied_at
- * @property Carbon|null $decided_at
+ * @property CarbonInterface|null $code_of_conduct_accepted_at
+ * @property CarbonInterface|null $applied_at
+ * @property CarbonInterface|null $decided_at
  * @property int|null $decided_by
  */
 class GroupMembership extends Pivot
