@@ -155,7 +155,7 @@ function Nav() {
             </Link>
             <nav
                 aria-label="Main"
-                className="flex items-center gap-1 text-sm font-semibold sm:gap-3"
+                className="flex flex-wrap items-center justify-end gap-1 text-sm font-semibold sm:gap-3"
             >
                 <a
                     href="#activities"
@@ -168,6 +168,12 @@ function Nav() {
                     className="text-ink hover:text-primary focus-visible:ring-primary rounded-full px-3 py-3 outline-none focus-visible:ring-[3px]"
                 >
                     Give / Support
+                </Link>
+                <Link
+                    href={home()}
+                    className="text-ink hover:text-primary focus-visible:ring-primary rounded-full px-3 py-3 outline-none focus-visible:ring-[3px]"
+                >
+                    View as guest
                 </Link>
                 <Link
                     href={login()}
