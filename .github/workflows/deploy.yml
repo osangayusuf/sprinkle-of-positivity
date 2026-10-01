@@ -1,7 +1,9 @@
 name: deploy
 
-# Deploys main to cPanel over FTPS once the tests workflow passes on it, or
-# on demand from the Actions tab. FTP can only copy files, so the last step
+# Deploys main to cPanel over FTPS. Run it by hand from the Actions tab
+# (a dry run by default, which only logs in and lists what would change),
+# or set the repository variable AUTO_DEPLOY=true to deploy every time the
+# tests workflow passes on main. FTP can only copy files, so the last step
 # uploads `.deploy/revision`; the server's `schedule:run` cron then runs
 # `deploy:finish` (migrations + cache rebuild) once for that revision.
 
@@ -11,6 +13,11 @@ on:
     types: [completed]
     branches: [main]
   workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run: log in and list changes without uploading'
+        type: boolean
+        default: true
 
 permissions:
   contents: read
@@ -21,7 +28,9 @@ concurrency:
 
 jobs:
   deploy:
-    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    if: >-
+      github.event_name == 'workflow_dispatch'
+      || (vars.AUTO_DEPLOY == 'true' && github.event.workflow_run.conclusion == 'success')
     runs-on: ubuntu-latest
     environment: production
 
@@ -71,6 +80,7 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           port: ${{ vars.FTP_PORT || 21 }}
           protocol: ftps
+          dry-run: ${{ inputs.dry_run == true }}
           local-dir: ./
           server-dir: ${{ vars.FTP_SERVER_DIR || './' }}
           exclude: |
@@ -97,6 +107,7 @@ jobs:
             resources/css/**
 
       - name: Upload release marker
+        if: ${{ inputs.dry_run != true }}
         uses: SamKirkland/FTP-Deploy-Action@110f9186c050f71550953127052e77650219c287 # v4.4.0
         with:
           server: ${{ secrets.FTP_SERVER }}
