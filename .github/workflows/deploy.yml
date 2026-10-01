@@ -1,0 +1,109 @@
+name: deploy
+
+# Deploys main to cPanel over FTPS once the tests workflow passes on it, or
+# on demand from the Actions tab. FTP can only copy files, so the last step
+# uploads `.deploy/revision`; the server's `schedule:run` cron then runs
+# `deploy:finish` (migrations + cache rebuild) once for that revision.
+
+on:
+  workflow_run:
+    workflows: [tests]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+          persist-credentials: false
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2
+        with:
+          php-version: '8.4'
+          tools: composer:v2
+          coverage: none
+
+      - name: Setup Node
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install PHP dependencies
+        run: composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: Build frontend assets
+        env:
+          VITE_APP_NAME: ${{ vars.VITE_APP_NAME || 'Sprinkle of Positivity' }}
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+          npm ci
+          npm run build
+          rm .env
+
+      - name: Write release marker
+        run: |
+          mkdir -p .deploy
+          git rev-parse HEAD > .deploy/revision
+
+      - name: Upload application
+        uses: SamKirkland/FTP-Deploy-Action@110f9186c050f71550953127052e77650219c287 # v4.4.0
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          port: ${{ vars.FTP_PORT || 21 }}
+          protocol: ftps
+          local-dir: ./
+          server-dir: ${{ vars.FTP_SERVER_DIR || './' }}
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/node_modules/**
+            .deploy/**
+            .env
+            .env.*
+            .ai/**
+            .claude/**
+            .github/**
+            .mcp.json
+            boost.json
+            CLAUDE.md
+            design-reference/**
+            tests/**
+            storage/**
+            bootstrap/cache/**
+            database/*.sqlite
+            public/hot
+            public/storage
+            resources/js/**
+            resources/css/**
+
+      - name: Upload release marker
+        uses: SamKirkland/FTP-Deploy-Action@110f9186c050f71550953127052e77650219c287 # v4.4.0
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          port: ${{ vars.FTP_PORT || 21 }}
+          protocol: ftps
+          local-dir: ./.deploy/
+          server-dir: ${{ format('{0}.deploy/', vars.FTP_SERVER_DIR || './') }}
+          state-name: .ftp-deploy-marker-state.json
