@@ -8,6 +8,7 @@ import {
     Coffee,
     GraduationCap,
     Mail,
+    Menu,
     MessageCircle,
     Phone,
     Users,
@@ -15,6 +16,14 @@ import {
 import AppLogoIcon from '@/components/app-logo-icon';
 import Reveal from '@/components/landing/reveal';
 import { Sprinkle } from '@/components/landing/sprinkle';
+import {
+    Sheet,
+    SheetClose,
+    SheetContent,
+    SheetDescription,
+    SheetTitle,
+    SheetTrigger,
+} from '@/components/ui/sheet';
 import {
     accountabilityPartners,
     home,
@@ -147,6 +156,9 @@ function SectionLabel({
 }
 
 function Nav() {
+    const mobileLinkClass =
+        'hover:text-primary focus-visible:ring-primary rounded-md px-3 py-3 outline-none focus-visible:ring-[3px]';
+
     return (
         <header className="relative z-20 mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-5 md:px-8">
             <Link
@@ -162,17 +174,17 @@ function Nav() {
             </Link>
             <nav
                 aria-label="Main"
-                className="flex flex-wrap items-center justify-end gap-1 text-sm font-semibold sm:gap-3"
+                className="hidden items-center justify-end gap-3 text-sm font-semibold md:flex"
             >
                 <a
                     href="#activities"
-                    className="text-ink hover:text-primary focus-visible:ring-primary hidden rounded-full px-3 py-3 outline-none focus-visible:ring-[3px] sm:inline-block"
+                    className="text-ink hover:text-primary focus-visible:ring-primary rounded-full px-3 py-3 outline-none focus-visible:ring-[3px]"
                 >
                     Activities
                 </a>
                 <Link
                     href={accountabilityPartners()}
-                    className="text-ink hover:text-primary focus-visible:ring-primary hidden rounded-full px-3 py-3 outline-none focus-visible:ring-[3px] sm:inline-block"
+                    className="text-ink hover:text-primary focus-visible:ring-primary rounded-full px-3 py-3 outline-none focus-visible:ring-[3px]"
                 >
                     Accountability Partners
                 </Link>
@@ -201,6 +213,57 @@ function Nav() {
                     Join
                 </Link>
             </nav>
+            <Sheet>
+                <SheetTrigger asChild>
+                    <button
+                        type="button"
+                        aria-label="Open menu"
+                        className="text-ink hover:text-primary focus-visible:ring-primary flex size-11 items-center justify-center rounded-full outline-none focus-visible:ring-[3px] md:hidden"
+                    >
+                        <Menu className="size-6" aria-hidden="true" />
+                    </button>
+                </SheetTrigger>
+                <SheetContent
+                    side="right"
+                    className="bg-paper text-ink w-72 border-none"
+                >
+                    <SheetTitle className="sr-only">Menu</SheetTitle>
+                    <SheetDescription className="sr-only">
+                        Site navigation
+                    </SheetDescription>
+                    <nav
+                        aria-label="Mobile"
+                        className="font-display mt-14 flex flex-col gap-1 px-4 text-2xl font-semibold"
+                    >
+                        <SheetClose asChild>
+                            <a href="#activities" className={mobileLinkClass}>
+                                Activities
+                            </a>
+                        </SheetClose>
+                        <Link
+                            href={accountabilityPartners()}
+                            className={mobileLinkClass}
+                        >
+                            Accountability Partners
+                        </Link>
+                        <Link href={supportPage()} className={mobileLinkClass}>
+                            Give / Support
+                        </Link>
+                        <Link href={home()} className={mobileLinkClass}>
+                            View as guest
+                        </Link>
+                        <Link href={login()} className={mobileLinkClass}>
+                            Log in
+                        </Link>
+                        <Link
+                            href={register()}
+                            className="bg-ink text-paper hover:bg-primary focus-visible:ring-primary mt-4 rounded-full px-5 py-3 text-center text-base outline-none focus-visible:ring-[3px]"
+                        >
+                            Join
+                        </Link>
+                    </nav>
+                </SheetContent>
+            </Sheet>
         </header>
     );
 }
