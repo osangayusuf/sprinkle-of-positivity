@@ -27,3 +27,15 @@ test('anyone can see the support page', function () {
         ->assertOk()
         ->assertInertia(fn ($page) => $page->component('support'));
 });
+
+test('anyone can see the accountability partners gallery', function () {
+    $this->get(route('accountability-partners'))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->component('accountability-partners')
+            ->has('partners', fn ($partners) => $partners->first(fn ($partner) => $partner
+                ->has('name')
+                ->has('photo')
+            ))
+        );
+});

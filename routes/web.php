@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\HomeController;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -9,6 +10,17 @@ Route::get('/', function () {
 })->name('root');
 
 Route::get('testimonials', fn () => Inertia::render('testimonials'))->name('testimonials');
+Route::get('accountability-partners', function () {
+    $partners = collect(File::files(public_path('images/accountability-partners')))
+        ->map(fn ($file) => [
+            'name' => $file->getFilenameWithoutExtension(),
+            'photo' => '/images/accountability-partners/'.rawurlencode($file->getFilename()),
+        ])
+        ->sortBy('name', SORT_NATURAL | SORT_FLAG_CASE)
+        ->values();
+
+    return Inertia::render('accountability-partners', ['partners' => $partners]);
+})->name('accountability-partners');
 Route::get('support', fn () => Inertia::render('support'))->name('support');
 
 Route::middleware('onboarded')->group(function () {
