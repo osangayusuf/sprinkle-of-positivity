@@ -10,11 +10,18 @@ import {
     Mail,
     MessageCircle,
     Phone,
+    Users,
 } from 'lucide-react';
 import AppLogoIcon from '@/components/app-logo-icon';
 import Reveal from '@/components/landing/reveal';
 import { Sprinkle } from '@/components/landing/sprinkle';
-import { home, login, register, support as supportPage } from '@/routes';
+import {
+    accountabilityPartners,
+    home,
+    login,
+    register,
+    support as supportPage,
+} from '@/routes';
 
 /* -------------------------------------------------------------------------
  * Edit content here. Nothing below this block needs to change for copy,
@@ -163,6 +170,12 @@ function Nav() {
                 >
                     Activities
                 </a>
+                <Link
+                    href={accountabilityPartners()}
+                    className="text-ink hover:text-primary focus-visible:ring-primary hidden rounded-full px-3 py-3 outline-none focus-visible:ring-[3px] sm:inline-block"
+                >
+                    Accountability Partners
+                </Link>
                 <Link
                     href={supportPage()}
                     className="text-ink hover:text-primary focus-visible:ring-primary rounded-full px-3 py-3 outline-none focus-visible:ring-[3px]"
@@ -524,6 +537,18 @@ function Footer() {
                                 <Mail className="size-4" aria-hidden="true" />
                                 {contact.email}
                             </a>
+                        </li>
+                        <li>
+                            <Link
+                                href={accountabilityPartners()}
+                                className={linkClass}
+                            >
+                                <Users
+                                    className="size-4"
+                                    aria-hidden="true"
+                                />
+                                Accountability Partners
+                            </Link>
                         </li>
                         <li>
                             <Link href={supportPage()} className={linkClass}>
