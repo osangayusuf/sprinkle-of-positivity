@@ -51,12 +51,20 @@ export default function LeaderboardIndex({
             <div className="flex flex-col gap-4 px-4 py-4">
                 <PointsBadge points={myPoints} level={myLevel} />
 
-                <Link
-                    href="/leaderboard/levels"
-                    className="text-primary self-end text-sm font-semibold"
-                >
-                    View levels
-                </Link>
+                <div className="flex items-center justify-between">
+                    <Link
+                        href="/leaderboard/consistency"
+                        className="text-primary text-sm font-semibold"
+                    >
+                        Consistency
+                    </Link>
+                    <Link
+                        href="/leaderboard/levels"
+                        className="text-primary text-sm font-semibold"
+                    >
+                        View levels
+                    </Link>
+                </div>
 
                 <div className="flex flex-col">
                     {entries.map((entry) => (

@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
  * @property CarbonInterface|null $applied_at
  * @property CarbonInterface|null $decided_at
  * @property int|null $decided_by
+ * @property int|null $partner_id
  */
 class GroupMembership extends Pivot
 {
@@ -61,5 +62,15 @@ class GroupMembership extends Pivot
     public function decidedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'decided_by');
+    }
+
+    /**
+     * The accountability partner this participant is assigned to.
+     *
+     * @return BelongsTo<User, $this>
+     */
+    public function partner(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'partner_id');
     }
 }

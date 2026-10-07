@@ -20,7 +20,14 @@ type DashboardCard = {
 export default function AdminDashboard({
     counts,
 }: {
-    counts: { groups: number; users: number; activeListings: number };
+    counts: {
+        groups: number;
+        users: number;
+        activeListings: number;
+        partners: number;
+        pendingPartners: number;
+        resetsThisWeek: number;
+    };
 }) {
     const cards: DashboardCard[] = [
         {
@@ -62,8 +69,17 @@ export default function AdminDashboard({
             icon: Award,
         },
         {
+            title: 'Participants',
+            description: `Every participant's progress. ${counts.resetsThisWeek} restart(s) in the last 7 days`,
+            href: '/partner/participants',
+            icon: UsersIcon,
+        },
+        {
             title: 'Users',
-            description: 'View members and manage admin access',
+            description:
+                counts.pendingPartners > 0
+                    ? `${counts.pendingPartners} accountability partner(s) awaiting approval`
+                    : `${counts.partners} approved accountability partner(s)`,
             href: '/admin/users',
             icon: UsersIcon,
             count: counts.users,

@@ -9,7 +9,7 @@ use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
 
 #[Signature('certificates:issue')]
-#[Description('Issue certificates to members who completed every day of a finished challenge')]
+#[Description('Issue certificates to members who completed a full challenge length of days in a row')]
 class IssueCertificates extends Command
 {
     /**
@@ -23,10 +23,6 @@ class IssueCertificates extends Command
             ->whereNotNull('starts_on')
             ->whereNotNull('duration_days')
             ->each(function (Group $group) use ($issue, &$issued) {
-                if (! $group->challengeHasEnded()) {
-                    return;
-                }
-
                 foreach ($group->approvedMembers()->get() as $member) {
                     $existing = $group->certificates()->where('user_id', $member->id)->exists();
 

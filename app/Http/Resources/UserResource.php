@@ -21,7 +21,12 @@ class UserResource extends JsonResource
             'email' => $this->email,
             'avatar' => $this->avatar,
             'points' => $this->points,
-            'role' => $this->hasRole(Role::ADMIN) ? Role::ADMIN : Role::MEMBER,
+            'role' => match (true) {
+                $this->hasRole(Role::ADMIN) => Role::ADMIN,
+                $this->hasRole(Role::PARTNER) => Role::PARTNER,
+                default => Role::MEMBER,
+            },
+            'partner_status' => $this->partner_status?->value,
         ];
     }
 }

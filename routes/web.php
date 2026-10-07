@@ -28,6 +28,7 @@ Route::middleware('onboarded')->group(function () {
 });
 
 require __DIR__.'/onboarding.php';
+require __DIR__.'/partners.php';
 require __DIR__.'/groups.php';
 require __DIR__.'/admin.php';
 require __DIR__.'/notifications.php';

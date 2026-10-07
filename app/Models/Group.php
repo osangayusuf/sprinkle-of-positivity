@@ -61,6 +61,14 @@ class Group extends Model
     }
 
     /**
+     * @return HasMany<GroupVerse, $this>
+     */
+    public function verses(): HasMany
+    {
+        return $this->hasMany(GroupVerse::class);
+    }
+
+    /**
      * @return HasMany<Quiz, $this>
      */
     public function quizzes(): HasMany

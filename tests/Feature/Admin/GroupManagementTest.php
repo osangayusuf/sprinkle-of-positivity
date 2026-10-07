@@ -28,7 +28,7 @@ test('non-admins cannot edit, update, or delete a group', function () {
 
 test('admins can create a group and appoint a manager', function () {
     $admin = User::factory()->admin()->create();
-    $manager = User::factory()->create();
+    $manager = User::factory()->partner()->create();
     $this->actingAs($admin);
 
     $response = $this->post(route('admin.groups.store'), [
@@ -36,7 +36,7 @@ test('admins can create a group and appoint a manager', function () {
         'purpose' => 'A daily challenge to grow in faith together.',
         'duration_days' => 60,
         'starts_on' => today()->toDateString(),
-        'manager_id' => $manager->id,
+        'manager_ids' => [$manager->id],
     ]);
 
     $response->assertRedirect(route('admin.groups.index'));
@@ -64,7 +64,7 @@ test('admins can update a group\'s details and status', function () {
         'duration_days' => 30,
         'starts_on' => today()->toDateString(),
         'status' => GroupStatus::Archived->value,
-        'manager_id' => $manager->id,
+        'manager_ids' => [$manager->id],
     ]);
 
     $response->assertRedirect(route('admin.groups.index'));
@@ -79,14 +79,15 @@ test('admins can reassign a group\'s manager to an existing member', function ()
     $admin = User::factory()->admin()->create();
     $group = Group::factory()->create();
     $oldManager = createApprovedManager($group);
-    $newManager = createApprovedMember($group);
+    $newManager = User::factory()->partner()->create();
+    joinAsApprovedMember($group, $newManager);
     $this->actingAs($admin);
 
     $this->put(route('admin.groups.update', $group), [
         'name' => $group->name,
         'purpose' => $group->purpose,
         'status' => GroupStatus::Active->value,
-        'manager_id' => $newManager->id,
+        'manager_ids' => [$newManager->id],
     ])->assertRedirect(route('admin.groups.index'));
 
     expect($group->fresh()->managers()->pluck('users.id')->all())->toBe([$newManager->id]);
@@ -98,14 +99,14 @@ test('admins can reassign a group\'s manager to a user with no prior membership'
     $admin = User::factory()->admin()->create();
     $group = Group::factory()->create();
     $oldManager = createApprovedManager($group);
-    $newManager = User::factory()->create();
+    $newManager = User::factory()->partner()->create();
     $this->actingAs($admin);
 
     $this->put(route('admin.groups.update', $group), [
         'name' => $group->name,
         'purpose' => $group->purpose,
         'status' => GroupStatus::Active->value,
-        'manager_id' => $newManager->id,
+        'manager_ids' => [$newManager->id],
     ])->assertRedirect(route('admin.groups.index'));
 
     $newMembership = $group->memberships()->where('user_id', $newManager->id)->sole();
@@ -126,7 +127,7 @@ test('reassigning the manager to the current manager is a no-op', function () {
         'name' => $group->name,
         'purpose' => $group->purpose,
         'status' => GroupStatus::Active->value,
-        'manager_id' => $manager->id,
+        'manager_ids' => [$manager->id],
     ])->assertRedirect(route('admin.groups.index'));
 
     expect($group->memberships()->count())->toBe(1);
@@ -157,7 +158,7 @@ test('admins can create a private group', function () {
         'name' => 'Leaders Circle',
         'purpose' => 'For group leaders.',
         'is_private' => '1',
-        'manager_id' => User::factory()->create()->id,
+        'manager_ids' => [User::factory()->partner()->create()->id],
     ])->assertRedirect(route('admin.groups.index'));
 
     expect(Group::query()->sole()->is_private)->toBeTrue();
@@ -172,7 +173,7 @@ test('admins can make a private group public by unticking the private box', func
         'name' => $group->name,
         'purpose' => $group->purpose,
         'status' => GroupStatus::Active->value,
-        'manager_id' => $manager->id,
+        'manager_ids' => [$manager->id],
     ])->assertRedirect(route('admin.groups.index'));
 
     expect($group->refresh()->is_private)->toBeFalse();

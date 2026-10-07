@@ -64,7 +64,9 @@ function createApprovedManager(Group $group): User
  */
 function createApprovedMember(Group $group, GroupMembershipRole $role = GroupMembershipRole::Member): User
 {
-    $user = User::factory()->create();
+    $user = $role === GroupMembershipRole::Manager
+        ? User::factory()->partner()->create()
+        : User::factory()->create();
 
     $membership = new GroupMembership;
     $membership->group_id = $group->id;

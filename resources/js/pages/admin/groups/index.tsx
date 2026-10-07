@@ -68,6 +68,18 @@ export default function AdminGroupsIndex({ groups }: { groups: Group[] }) {
                                                 </Link>
                                             </Button>
 
+                                            <Button
+                                                asChild
+                                                variant="outline"
+                                                size="sm"
+                                            >
+                                                <Link
+                                                    href={`/admin/groups/${group.id}/assignments`}
+                                                >
+                                                    Partners
+                                                </Link>
+                                            </Button>
+
                                             <Dialog>
                                                 <DialogTrigger asChild>
                                                     <Button

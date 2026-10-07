@@ -135,6 +135,8 @@ export type ChallengeProgress = {
     current_streak: number;
     longest_streak: number;
     completed_today: boolean;
+    run_day: number;
+    reset_count: number;
     required_days: number[];
     missing_days: number[];
     eligible: boolean;

@@ -54,3 +54,35 @@ test('a finished challenge counts the run that reached its last day', function (
 
     expect($result['current_streak'])->toBe(3);
 });
+
+test('days without a verse are skipped instead of breaking the run', function () {
+    $start = Carbon::parse('2026-03-01');
+    $dates = collect([1, 3, 4])->map(fn (int $day) => $start->copy()->addDays($day - 1));
+
+    $result = (new StreakCalculator)->calculate($dates, $start, 10, $start->copy()->addDays(4), requiredDays: [1, 3, 4, 5]);
+
+    expect($result['current_streak'])->toBe(3)
+        ->and($result['longest_span'])->toBe(4)
+        ->and($result['reset_days'])->toBe([]);
+});
+
+test('a missed required day resets the run and records the day', function () {
+    $start = Carbon::parse('2026-03-01');
+    $dates = collect([1, 2, 4])->map(fn (int $day) => $start->copy()->addDays($day - 1));
+
+    $result = (new StreakCalculator)->calculate($dates, $start, 10, $start->copy()->addDays(4));
+
+    expect($result['reset_days'])->toBe([3])
+        ->and($result['current_streak'])->toBe(1)
+        ->and($result['longest_streak'])->toBe(2);
+});
+
+test('missing days before the forgiveness day never reset a run', function () {
+    $start = Carbon::parse('2026-03-01');
+    $dates = collect([1, 2, 4, 5])->map(fn (int $day) => $start->copy()->addDays($day - 1));
+
+    $result = (new StreakCalculator)->calculate($dates, $start, 10, $start->copy()->addDays(5), forgiveBeforeDay: 4);
+
+    expect($result['reset_days'])->toBe([])
+        ->and($result['current_streak'])->toBe(4);
+});

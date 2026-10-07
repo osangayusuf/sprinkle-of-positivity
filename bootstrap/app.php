@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\EnsureOnboardingIsComplete;
+use App\Http\Middleware\EnsurePartnerIsApproved;
 use App\Http\Middleware\HandleAppearance;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\RecordPageVisit;
@@ -26,6 +27,7 @@ return Application::configure(basePath: dirname(__DIR__))
             HandleInertiaRequests::class,
             AddLinkHeadersForPreloadedAssets::class,
             RecordPageVisit::class,
+            EnsurePartnerIsApproved::class,
         ]);
 
         $middleware->alias([
@@ -42,6 +44,8 @@ return Application::configure(basePath: dirname(__DIR__))
             ->withoutOverlapping();
 
         $schedule->command('certificates:issue')->dailyAt('01:00');
+        $schedule->command('progress:record-resets')->dailyAt('00:05');
+        $schedule->command('reminders:send')->dailyAt(config('challenge.reminder_time'));
 
         // Migrations and cache rebuilds after an FTP deploy (see FinishDeploy).
         $schedule->command('deploy:finish')->everyMinute()->withoutOverlapping();

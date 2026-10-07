@@ -5,6 +5,7 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Enums\GroupMembershipRole;
 use App\Enums\GroupMembershipStatus;
+use App\Enums\PartnerStatus;
 use Carbon\CarbonInterface;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -35,6 +36,8 @@ use NotificationChannels\WebPush\HasPushSubscriptions;
  * @property array<int, string>|null $goals
  * @property int $points
  * @property CarbonInterface|null $onboarding_completed_at
+ * @property PartnerStatus|null $partner_status
+ * @property CarbonInterface|null $partner_decided_at
  * @property string|null $two_factor_secret
  * @property string|null $two_factor_recovery_codes
  * @property CarbonInterface|null $two_factor_confirmed_at
@@ -71,6 +74,8 @@ class User extends Authenticatable implements PasskeyUser
             'birthday_month' => 'integer',
             'goals' => 'array',
             'onboarding_completed_at' => 'datetime',
+            'partner_status' => PartnerStatus::class,
+            'partner_decided_at' => 'datetime',
         ];
     }
 
@@ -103,6 +108,34 @@ class User extends Authenticatable implements PasskeyUser
     public function hasRole(string $role): bool
     {
         return $this->roles->contains('name', $role);
+    }
+
+    /**
+     * Whether the user signed up as an accountability partner, approved or not.
+     */
+    public function isPartner(): bool
+    {
+        return $this->hasRole(Role::PARTNER);
+    }
+
+    /**
+     * Whether the user is an accountability partner an admin has approved.
+     */
+    public function isApprovedPartner(): bool
+    {
+        return $this->isPartner() && $this->partner_status === PartnerStatus::Approved;
+    }
+
+    /**
+     * The accountability partner assigned to this user in the given group.
+     */
+    public function partnerIn(Group $group): ?User
+    {
+        $partnerId = $this->groupMemberships()
+            ->where('group_id', $group->id)
+            ->value('partner_id');
+
+        return $partnerId ? User::query()->find($partnerId) : null;
     }
 
     /**
