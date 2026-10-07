@@ -27,6 +27,9 @@ type Props = {
     insights: Insight[];
     quizzes: Quiz[];
     progress: ChallengeProgress | null;
+    viewingDate: string;
+    isToday: boolean;
+    pastDays: { date: string; reference: string; insights_count: number }[];
 };
 
 type Tab = 'insights' | 'qa';
@@ -39,9 +42,17 @@ export default function VerseShow({
     insights,
     quizzes,
     progress,
+    viewingDate,
+    isToday,
+    pastDays,
 }: Props) {
     const { auth } = usePage<{ auth: Auth }>().props;
     const [tab, setTab] = useState<Tab>('insights');
+
+    const dateLabel = new Date(`${viewingDate}T00:00:00`).toLocaleDateString(
+        undefined,
+        { weekday: 'long', day: 'numeric', month: 'long' },
+    );
 
     const hasChallenge =
         group.current_day !== null &&
@@ -50,7 +61,9 @@ export default function VerseShow({
 
     return (
         <>
-            <Head title={`${group.name} — Today's verse`} />
+            <Head
+                title={`${group.name} — ${isToday ? "Today's verse" : dateLabel}`}
+            />
             <PageHeader title={group.name} backHref={`/groups/${group.slug}`} />
 
             <div className="flex flex-col gap-6 px-4 py-6">
@@ -60,18 +73,37 @@ export default function VerseShow({
                         totalDays={group.duration_days as number}
                         startsOn={group.starts_on as string}
                         progress={progress}
+                        groupSlug={group.slug}
+                        selectedDate={viewingDate}
                     />
                 )}
 
-                {verse ? (
-                    <VerseCard verse={verse} label="Today's verse" />
-                ) : (
-                    <div className="bg-muted text-muted-foreground rounded-2xl p-6 text-center text-sm">
-                        No verse has been set for today yet.
+                {!isToday && (
+                    <div className="bg-muted flex items-center justify-between gap-3 rounded-xl px-4 py-3 text-sm">
+                        <span>Viewing {dateLabel}</span>
+                        <Link
+                            href={`/groups/${group.slug}/verse`}
+                            className="text-primary font-semibold"
+                        >
+                            Back to today
+                        </Link>
                     </div>
                 )}
 
-                {canManage && (
+                {verse ? (
+                    <VerseCard
+                        verse={verse}
+                        label={isToday ? "Today's verse" : 'Verse of the day'}
+                    />
+                ) : (
+                    <div className="bg-muted text-muted-foreground rounded-2xl p-6 text-center text-sm">
+                        {isToday
+                            ? 'No verse has been set for today yet.'
+                            : 'No verse was set for this day.'}
+                    </div>
+                )}
+
+                {canManage && isToday && (
                     <Button
                         asChild
                         variant="outline"
@@ -149,7 +181,7 @@ export default function VerseShow({
 
                     {tab === 'qa' && (
                         <div className="flex flex-col">
-                            {canManage && (
+                            {canManage && isToday && (
                                 <QuizComposer groupSlug={group.slug} />
                             )}
 
@@ -173,6 +205,43 @@ export default function VerseShow({
                             )}
                         </div>
                     )}
+                </div>
+            )}
+
+            {pastDays.length > 0 && (
+                <div className="mt-8 px-4 pb-8">
+                    <h2 className="mb-3 text-base font-semibold">Past days</h2>
+                    <div className="divide-border border-border divide-y rounded-xl border">
+                        {pastDays.map((day) => (
+                            <Link
+                                key={day.date}
+                                href={`/groups/${group.slug}/verse?date=${day.date}`}
+                                className={cn(
+                                    'flex items-center justify-between gap-3 px-4 py-3 text-sm',
+                                    day.date === viewingDate &&
+                                        'bg-primary/10 text-primary',
+                                )}
+                            >
+                                <span className="min-w-0">
+                                    <span className="block font-semibold">
+                                        {new Date(
+                                            `${day.date}T00:00:00`,
+                                        ).toLocaleDateString(undefined, {
+                                            day: 'numeric',
+                                            month: 'short',
+                                        })}
+                                    </span>
+                                    <span className="text-muted-foreground block truncate text-xs">
+                                        {day.reference}
+                                    </span>
+                                </span>
+                                <span className="text-muted-foreground shrink-0 text-xs">
+                                    {day.insights_count} insight
+                                    {day.insights_count === 1 ? '' : 's'}
+                                </span>
+                            </Link>
+                        ))}
+                    </div>
                 </div>
             )}
         </>

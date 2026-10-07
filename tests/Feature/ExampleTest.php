@@ -33,9 +33,9 @@ test('anyone can see the accountability partners gallery', function () {
         ->assertOk()
         ->assertInertia(fn ($page) => $page
             ->component('accountability-partners')
-            ->has('partners', fn ($partners) => $partners->first(fn ($partner) => $partner
+            ->has('partners.0', fn ($partner) => $partner
                 ->has('name')
                 ->has('photo')
-            ))
+            )
         );
 });
