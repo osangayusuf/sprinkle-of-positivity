@@ -1,6 +1,6 @@
-import { Head, Link } from "@inertiajs/react";
-import { ArrowLeft } from "lucide-react";
-import Reveal from "@/components/landing/reveal";
+import { Head, Link } from '@inertiajs/react';
+import { ArrowLeft } from 'lucide-react';
+import Reveal from '@/components/landing/reveal';
 
 type Partner = {
     name: string;

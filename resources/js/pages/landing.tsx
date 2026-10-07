@@ -606,10 +606,7 @@ function Footer() {
                                 href={accountabilityPartners()}
                                 className={linkClass}
                             >
-                                <Users
-                                    className="size-4"
-                                    aria-hidden="true"
-                                />
+                                <Users className="size-4" aria-hidden="true" />
                                 Accountability Partners
                             </Link>
                         </li>
