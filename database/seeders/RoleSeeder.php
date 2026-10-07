@@ -12,7 +12,7 @@ class RoleSeeder extends Seeder
      */
     public function run(): void
     {
-        collect([Role::ADMIN, Role::MEMBER])->each(
+        collect([Role::ADMIN, Role::MEMBER, Role::PARTNER])->each(
             fn (string $name) => Role::query()->firstOrCreate(['name' => $name])
         );
     }

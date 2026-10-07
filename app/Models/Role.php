@@ -22,6 +22,8 @@ class Role extends Model
 
     public const MEMBER = 'member';
 
+    public const PARTNER = 'partner';
+
     /**
      * @return BelongsToMany<User, $this>
      */

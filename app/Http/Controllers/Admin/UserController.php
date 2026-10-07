@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Enums\PartnerStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\UpdateUserRoleRequest;
 use App\Http\Resources\UserResource;
@@ -29,7 +30,7 @@ class UserController extends Controller
     }
 
     /**
-     * Promote or demote a user between the platform's two global roles.
+     * Promote or demote a user between the platform's global roles.
      */
     public function updateRole(UpdateUserRoleRequest $request, User $user): RedirectResponse
     {
@@ -41,8 +42,24 @@ class UserController extends Controller
             ]);
         }
 
-        $roleId = Role::query()->where('name', $role)->value('id');
+        if ($role !== Role::PARTNER && $user->managedGroups()->exists()) {
+            throw ValidationException::withMessages([
+                'role' => __('Remove this partner from the groups they manage first.'),
+            ]);
+        }
+
+        $roleId = Role::query()->firstOrCreate(['name' => $role])->id;
         $user->roles()->sync([$roleId]);
+
+        if ($role === Role::PARTNER) {
+            $user->partner_status = PartnerStatus::Approved;
+            $user->partner_decided_at = now();
+        } else {
+            $user->partner_status = null;
+            $user->partner_decided_at = null;
+        }
+
+        $user->save();
 
         Inertia::flash('toast', ['type' => 'success', 'message' => __('Role updated.')]);
 

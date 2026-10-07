@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Actions\AssignParticipant;
 use App\Actions\StorePublicUpload;
 use App\Enums\GroupMembershipRole;
 use App\Enums\GroupMembershipStatus;
 use App\Enums\GroupStatus;
+use App\Enums\PartnerStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreGroupRequest;
 use App\Http\Requests\Admin\UpdateGroupRequest;
@@ -13,6 +15,7 @@ use App\Http\Resources\GroupResource;
 use App\Models\Group;
 use App\Models\GroupMembership;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
@@ -20,6 +23,8 @@ use Inertia\Response;
 
 class GroupController extends Controller
 {
+    public function __construct(private AssignParticipant $assignParticipant) {}
+
     /**
      * List every group on the platform.
      */
@@ -42,12 +47,12 @@ class GroupController extends Controller
         $this->authorize('create', Group::class);
 
         return Inertia::render('admin/groups/create', [
-            'users' => User::query()->orderBy('name')->get(['id', 'name', 'email']),
+            'users' => $this->approvedPartners(),
         ]);
     }
 
     /**
-     * Create a group and appoint its manager.
+     * Create a group and appoint its accountability partners.
      */
     public function store(StoreGroupRequest $request, StorePublicUpload $storePublicUpload): RedirectResponse
     {
@@ -62,15 +67,7 @@ class GroupController extends Controller
 
         $group->save();
 
-        $membership = new GroupMembership;
-        $membership->group_id = $group->id;
-        $membership->user_id = $request->integer('manager_id');
-        $membership->role = GroupMembershipRole::Manager;
-        $membership->status = GroupMembershipStatus::Approved;
-        $membership->applied_at = now();
-        $membership->decided_at = now();
-        $membership->decided_by = $request->user()->id;
-        $membership->save();
+        $this->syncManagers($group, $request->array('manager_ids'), $request->user());
 
         Inertia::flash('toast', ['type' => 'success', 'message' => __('Group created.')]);
 
@@ -86,8 +83,8 @@ class GroupController extends Controller
 
         return Inertia::render('admin/groups/edit', [
             'group' => new GroupResource($group),
-            'users' => User::query()->orderBy('name')->get(['id', 'name', 'email']),
-            'managerId' => $group->managers()->value('users.id'),
+            'users' => $this->approvedPartners(),
+            'managerIds' => $group->managers()->pluck('users.id'),
         ]);
     }
 
@@ -106,7 +103,7 @@ class GroupController extends Controller
 
         $group->save();
 
-        $this->reassignManager($group, $request->integer('manager_id'), $request->user());
+        $this->syncManagers($group, $request->array('manager_ids'), $request->user());
 
         Inertia::flash('toast', ['type' => 'success', 'message' => __('Group updated.')]);
 
@@ -114,41 +111,65 @@ class GroupController extends Controller
     }
 
     /**
-     * Move the "manager" role to the given user, demoting the current
-     * manager to a regular member. A no-op if they're already the manager.
+     * Make exactly the given accountability partners the group's managers.
+     * Removed managers become regular members and their participants are
+     * handed to the remaining partners; any unassigned participants are
+     * assigned to a partner.
+     *
+     * @param  array<int, int|string>  $managerIds
      */
-    private function reassignManager(Group $group, int $managerId, User $actingAdmin): void
+    private function syncManagers(Group $group, array $managerIds, User $actingAdmin): void
     {
-        $currentManager = $group->managers()->first();
+        $managerIds = array_map('intval', $managerIds);
 
-        if ($currentManager && $currentManager->id === $managerId) {
-            return;
+        $group->managers()->get()
+            ->reject(fn (User $manager) => in_array($manager->id, $managerIds, true))
+            ->each(function (User $manager) use ($group) {
+                $manager->pivot->role = GroupMembershipRole::Member;
+                $manager->pivot->save();
+
+                $group->memberships()->where('partner_id', $manager->id)->update(['partner_id' => null]);
+            });
+
+        foreach ($managerIds as $managerId) {
+            $membership = $group->memberships()->where('user_id', $managerId)->first() ?? new GroupMembership;
+
+            if ($membership->exists && $membership->role === GroupMembershipRole::Manager && $membership->status === GroupMembershipStatus::Approved) {
+                continue;
+            }
+
+            $membership->group_id = $group->id;
+            $membership->user_id = $managerId;
+            $membership->role = GroupMembershipRole::Manager;
+            $membership->status = GroupMembershipStatus::Approved;
+            $membership->partner_id = null;
+            $membership->applied_at ??= now();
+            $membership->decided_at = now();
+            $membership->decided_by = $actingAdmin->id;
+            $membership->save();
         }
 
-        if ($currentManager) {
-            $currentManager->pivot->role = GroupMembershipRole::Member;
-            $currentManager->pivot->save();
-        }
+        $group->memberships()
+            ->with(['user', 'group'])
+            ->where('role', GroupMembershipRole::Member->value)
+            ->where('status', GroupMembershipStatus::Approved->value)
+            ->whereNull('partner_id')
+            ->get()
+            ->each(fn (GroupMembership $membership) => $this->assignParticipant->handle($membership));
+    }
 
-        $newManagerMembership = $group->memberships()->where('user_id', $managerId)->first();
-
-        if ($newManagerMembership) {
-            $newManagerMembership->role = GroupMembershipRole::Manager;
-            $newManagerMembership->status = GroupMembershipStatus::Approved;
-            $newManagerMembership->save();
-
-            return;
-        }
-
-        $membership = new GroupMembership;
-        $membership->group_id = $group->id;
-        $membership->user_id = $managerId;
-        $membership->role = GroupMembershipRole::Manager;
-        $membership->status = GroupMembershipStatus::Approved;
-        $membership->applied_at = now();
-        $membership->decided_at = now();
-        $membership->decided_by = $actingAdmin->id;
-        $membership->save();
+    /**
+     * Accountability partners an admin has approved, the only users who can
+     * manage a group.
+     *
+     * @return Collection<int, User>
+     */
+    private function approvedPartners(): Collection
+    {
+        return User::query()
+            ->where('partner_status', PartnerStatus::Approved->value)
+            ->orderBy('name')
+            ->get(['id', 'name', 'email']);
     }
 
     /**

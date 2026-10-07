@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\PartnerStatus;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -65,6 +66,31 @@ class UserFactory extends Factory
     {
         return $this->afterCreating(function (User $user) {
             $user->roles()->attach(Role::query()->firstOrCreate(['name' => Role::ADMIN]));
+        });
+    }
+
+    /**
+     * Indicate that the user is an admin-approved accountability partner.
+     */
+    public function partner(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'partner_status' => PartnerStatus::Approved,
+            'partner_decided_at' => now(),
+        ])->afterCreating(function (User $user) {
+            $user->roles()->attach(Role::query()->firstOrCreate(['name' => Role::PARTNER]));
+        });
+    }
+
+    /**
+     * Indicate that the user signed up as a partner and awaits approval.
+     */
+    public function pendingPartner(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'partner_status' => PartnerStatus::Pending,
+        ])->afterCreating(function (User $user) {
+            $user->roles()->attach(Role::query()->firstOrCreate(['name' => Role::PARTNER]));
         });
     }
 

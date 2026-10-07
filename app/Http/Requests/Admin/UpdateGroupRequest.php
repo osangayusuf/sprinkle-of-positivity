@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Admin;
 
 use App\Enums\GroupStatus;
+use App\Enums\PartnerStatus;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -31,7 +32,8 @@ class UpdateGroupRequest extends FormRequest
             'starts_on' => ['nullable', 'date'],
             'status' => ['required', Rule::enum(GroupStatus::class)],
             'is_private' => ['boolean'],
-            'manager_id' => ['required', 'integer', 'exists:users,id'],
+            'manager_ids' => ['required', 'array', 'min:1'],
+            'manager_ids.*' => ['integer', 'distinct', Rule::exists('users', 'id')->where('partner_status', PartnerStatus::Approved->value)],
             'cover_image' => ['nullable', 'image', 'max:2048'],
         ];
     }

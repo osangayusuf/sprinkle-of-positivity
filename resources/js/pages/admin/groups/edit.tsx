@@ -20,10 +20,10 @@ import type { Group } from '@/types/models';
 type Props = {
     group: Group;
     users: { id: number; name: string; email: string }[];
-    managerId: number | null;
+    managerIds: number[];
 };
 
-export default function AdminGroupsEdit({ group, users, managerId }: Props) {
+export default function AdminGroupsEdit({ group, users, managerIds }: Props) {
     return (
         <>
             <Head title={`Edit ${group.name}`} />
@@ -101,30 +101,42 @@ export default function AdminGroupsEdit({ group, users, managerId }: Props) {
                             </div>
 
                             <div className="grid gap-2">
-                                <Label htmlFor="manager_id">Manager</Label>
-                                <Select
-                                    name="manager_id"
-                                    defaultValue={
-                                        managerId
-                                            ? String(managerId)
-                                            : undefined
-                                    }
-                                >
-                                    <SelectTrigger id="manager_id">
-                                        <SelectValue placeholder="Select a manager" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {users.map((user) => (
-                                            <SelectItem
-                                                key={user.id}
+                                <Label>Accountability partners</Label>
+                                <p className="text-muted-foreground text-sm">
+                                    Only approved accountability partners can
+                                    manage a group. New participants are shared
+                                    between the partners you pick.
+                                </p>
+                                <div className="grid gap-2 rounded-lg border p-3">
+                                    {users.map((user) => (
+                                        <div
+                                            key={user.id}
+                                            className="flex items-center gap-3"
+                                        >
+                                            <Checkbox
+                                                id={`manager_${user.id}`}
+                                                name="manager_ids[]"
                                                 value={String(user.id)}
+                                                defaultChecked={managerIds.includes(
+                                                    user.id,
+                                                )}
+                                            />
+                                            <Label
+                                                htmlFor={`manager_${user.id}`}
+                                                className="font-normal"
                                             >
                                                 {user.name} ({user.email})
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                                <InputError message={errors.manager_id} />
+                                            </Label>
+                                        </div>
+                                    ))}
+                                    {users.length === 0 && (
+                                        <p className="text-muted-foreground text-sm">
+                                            No approved partners yet. Approve
+                                            one from the Users page first.
+                                        </p>
+                                    )}
+                                </div>
+                                <InputError message={errors.manager_ids} />
                             </div>
 
                             <div className="grid gap-2">

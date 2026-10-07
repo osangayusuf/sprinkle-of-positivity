@@ -16,6 +16,7 @@ const MOBILE_SHELL_PAGE_PREFIXES = [
     'verses/',
     'insights/',
     'leaderboard/',
+    'partner/',
     'notifications/',
     'profile',
     'marketplace/',

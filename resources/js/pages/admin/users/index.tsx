@@ -7,7 +7,8 @@ type AdminUser = {
     name: string;
     email: string;
     points: number;
-    role: 'admin' | 'member';
+    role: 'admin' | 'member' | 'partner';
+    partner_status: 'pending' | 'approved' | 'rejected' | null;
 };
 
 export default function AdminUsersIndex({ users }: { users: AdminUser[] }) {
@@ -15,6 +16,14 @@ export default function AdminUsersIndex({ users }: { users: AdminUser[] }) {
         router.put(
             UserController.updateRole.url({ user: user.id }),
             { role },
+            { preserveScroll: true },
+        );
+    }
+
+    function decidePartner(user: AdminUser, decision: string) {
+        router.put(
+            `/admin/users/${user.id}/partner`,
+            { decision },
             { preserveScroll: true },
         );
     }
@@ -27,7 +36,7 @@ export default function AdminUsersIndex({ users }: { users: AdminUser[] }) {
                 <Heading
                     variant="small"
                     title="Users"
-                    description="View members and manage admin access"
+                    description="View members, manage roles and approve accountability partners"
                 />
 
                 <div className="overflow-x-auto rounded-lg border">
@@ -59,8 +68,47 @@ export default function AdminUsersIndex({ users }: { users: AdminUser[] }) {
                                             <option value="member">
                                                 Member
                                             </option>
+                                            <option value="partner">
+                                                Accountability partner
+                                            </option>
                                             <option value="admin">Admin</option>
                                         </select>
+                                        {user.partner_status === 'pending' && (
+                                            <span className="ml-3 inline-flex items-center gap-2">
+                                                <span className="text-xs text-amber-600">
+                                                    Awaiting approval
+                                                </span>
+                                                <button
+                                                    type="button"
+                                                    className="text-primary text-xs font-semibold"
+                                                    onClick={() =>
+                                                        decidePartner(
+                                                            user,
+                                                            'approved',
+                                                        )
+                                                    }
+                                                >
+                                                    Approve
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    className="text-destructive text-xs font-semibold"
+                                                    onClick={() =>
+                                                        decidePartner(
+                                                            user,
+                                                            'rejected',
+                                                        )
+                                                    }
+                                                >
+                                                    Reject
+                                                </button>
+                                            </span>
+                                        )}
+                                        {user.partner_status === 'rejected' && (
+                                            <span className="text-destructive ml-3 text-xs">
+                                                Rejected
+                                            </span>
+                                        )}
                                     </td>
                                 </tr>
                             ))}

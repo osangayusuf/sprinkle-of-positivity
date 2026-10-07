@@ -27,7 +27,10 @@ export function StreakTracker({
         <div>
             <div className="flex items-baseline justify-between gap-3">
                 <p className="text-sm font-semibold">
-                    Day {currentDay}/{totalDays}
+                    {progress
+                        ? `Your day ${progress.run_day}`
+                        : `Day ${currentDay}`}
+                    /{totalDays}
                 </p>
                 {progress && (
                     <p className="text-muted-foreground text-xs">
@@ -38,6 +41,8 @@ export function StreakTracker({
                         <span className="text-foreground font-semibold">
                             {progress.longest_streak}
                         </span>
+                        {progress.reset_count > 0 &&
+                            ` · ${progress.reset_count} restart${progress.reset_count === 1 ? '' : 's'}`}
                     </p>
                 )}
             </div>

@@ -42,6 +42,7 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $request->user(),
                 'isAdmin' => $request->user()?->hasRole(Role::ADMIN) ?? false,
+                'isPartner' => $request->user()?->isApprovedPartner() ?? false,
             ],
             'unreadNotificationsCount' => $request->user()?->unreadNotifications()->count() ?? 0,
             'vapidPublicKey' => config('webpush.vapid.public_key'),

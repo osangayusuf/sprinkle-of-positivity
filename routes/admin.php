@@ -2,12 +2,14 @@
 
 use App\Http\Controllers\Admin\AnalyticsController;
 use App\Http\Controllers\Admin\AnnouncementController;
+use App\Http\Controllers\Admin\AssignmentController;
 use App\Http\Controllers\Admin\CertificateController;
 use App\Http\Controllers\Admin\DailyVerseBulkController;
 use App\Http\Controllers\Admin\DailyVerseController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\GroupController;
 use App\Http\Controllers\Admin\MarketplaceController;
+use App\Http\Controllers\Admin\PartnerController;
 use App\Http\Controllers\Admin\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -24,6 +26,9 @@ Route::middleware(['auth', 'verified', 'onboarded', 'can:access-admin'])
         Route::get('groups/{group}/edit', [GroupController::class, 'edit'])->name('groups.edit');
         Route::put('groups/{group}', [GroupController::class, 'update'])->name('groups.update');
         Route::delete('groups/{group}', [GroupController::class, 'destroy'])->name('groups.destroy');
+
+        Route::get('groups/{group}/assignments', [AssignmentController::class, 'index'])->name('groups.assignments.index');
+        Route::put('groups/{group}/assignments/{membership}', [AssignmentController::class, 'update'])->name('groups.assignments.update');
 
         Route::get('daily-verse/history', [DailyVerseController::class, 'history'])->name('daily-verse.history');
         Route::get('daily-verse/bulk', [DailyVerseBulkController::class, 'edit'])->name('daily-verse.bulk.edit');
@@ -49,5 +54,6 @@ Route::middleware(['auth', 'verified', 'onboarded', 'can:access-admin'])
         Route::patch('certificates/{certificate}/name', [CertificateController::class, 'updateName'])->name('certificates.update-name');
 
         Route::get('users', [UserController::class, 'index'])->name('users.index');
+        Route::put('users/{user}/partner', [PartnerController::class, 'update'])->name('users.update-partner');
         Route::put('users/{user}/role', [UserController::class, 'updateRole'])->name('users.update-role');
     });

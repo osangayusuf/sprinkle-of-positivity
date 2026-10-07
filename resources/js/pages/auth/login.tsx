@@ -97,6 +97,12 @@ export default function Login({ status, canResetPassword }: Props) {
                             <TextLink href={register()} tabIndex={5}>
                                 Sign up
                             </TextLink>
+                            <span className="mt-1 block">
+                                Accountability partner?{' '}
+                                <TextLink href="/partners/register">
+                                    Sign up here
+                                </TextLink>
+                            </span>
                         </div>
                     </>
                 )}

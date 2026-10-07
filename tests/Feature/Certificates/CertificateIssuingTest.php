@@ -22,7 +22,7 @@ test('the verse page exposes the member\'s streak progress', function () {
             ->where('progress.current_streak', 2));
 });
 
-test('a member who completed every day of a finished challenge is eligible', function () {
+test('a member who completed every day of the challenge is eligible', function () {
     $group = challengeGroup(durationDays: 3, startedDaysAgo: 5);
     $user = User::factory()->create();
     joinAsApprovedMember($group, $user);
@@ -57,7 +57,7 @@ test('days the manager never set a verse for are not required', function () {
     expect(app(ChallengeProgress::class)->forMember($group, $user)['eligible'])->toBeTrue();
 });
 
-test('nobody is eligible before the challenge has ended', function () {
+test('a member is eligible as soon as their run reaches the challenge length', function () {
     $group = challengeGroup(durationDays: 3, startedDaysAgo: 2);
     $user = User::factory()->create();
     joinAsApprovedMember($group, $user);
@@ -66,7 +66,22 @@ test('nobody is eligible before the challenge has ended', function () {
         completeDay($group, $user, $day);
     }
 
-    expect(app(ChallengeProgress::class)->forMember($group, $user)['eligible'])->toBeFalse();
+    expect(app(ChallengeProgress::class)->forMember($group, $user)['eligible'])->toBeTrue();
+});
+
+test('a member who restarted after a missed day is not eligible until a full new run', function () {
+    $group = challengeGroup(durationDays: 4, startedDaysAgo: 5);
+    $user = User::factory()->create();
+    joinAsApprovedMember($group, $user);
+    completeDay($group, $user, 1);
+    completeDay($group, $user, 2);
+    completeDay($group, $user, 4);
+
+    $progress = app(ChallengeProgress::class)->forMember($group, $user);
+
+    expect($progress['eligible'])->toBeFalse()
+        ->and($progress['reset_days'])->toBe([3])
+        ->and($progress['current_streak'])->toBe(1);
 });
 
 test('issuing a certificate is idempotent and notifies the member once', function () {
@@ -97,7 +112,7 @@ test('the system does not issue to an ineligible member', function () {
         ->and(Certificate::query()->count())->toBe(0);
 });
 
-test('the issue command only certifies approved members of finished challenges', function () {
+test('the issue command only certifies approved members who completed a full run', function () {
     Notification::fake();
     $finished = challengeGroup(durationDays: 2, startedDaysAgo: 4);
     $running = challengeGroup(durationDays: 2, startedDaysAgo: 1);

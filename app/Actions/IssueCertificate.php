@@ -16,8 +16,8 @@ class IssueCertificate
      * Issue a member's certificate for a group's challenge. Idempotent: an
      * existing certificate, including a revoked one, is returned untouched.
      *
-     * Without `$issuedBy` the system only issues when the member completed
-     * every required day of a finished challenge. An admin passes themself
+     * Without `$issuedBy` the system only issues when the member completed a
+     * full challenge's worth of days in a row. An admin passes themself
      * and a reason to override that check.
      */
     public function handle(Group $group, User $member, ?User $issuedBy = null, ?string $overrideReason = null): ?Certificate
@@ -44,7 +44,7 @@ class IssueCertificate
         $certificate->group_id = $group->id;
         $certificate->code = Certificate::generateCode();
         $certificate->duration_days = (int) $group->duration_days;
-        $certificate->year = (int) ($group->challengeEndsOn() ?? now())->format('Y');
+        $certificate->year = (int) now()->format('Y');
         $certificate->issued_at = now();
         $certificate->issued_by = $issuedBy?->id;
         $certificate->override_reason = $overrideReason;

@@ -1,5 +1,5 @@
 import { Head, Link, usePage } from '@inertiajs/react';
-import { Bell, BookOpenText, ShieldCheck } from 'lucide-react';
+import { Bell, BookOpenText, ShieldCheck, Users } from 'lucide-react';
 import { GroupCard } from '@/components/group-card';
 import { MarketplaceBannerCard } from '@/components/marketplace-banner-card';
 import { Button } from '@/components/ui/button';
@@ -54,6 +54,15 @@ export default function HomeIndex({
                 </div>
                 {auth.user ? (
                     <div className="flex items-center gap-2">
+                        {auth.isPartner && (
+                            <Link
+                                href="/partner/participants"
+                                className="bg-muted text-foreground flex size-10 items-center justify-center rounded-full"
+                                aria-label="My participants"
+                            >
+                                <Users className="size-5" />
+                            </Link>
+                        )}
                         {auth.isAdmin && (
                             <Link
                                 href="/admin/dashboard"

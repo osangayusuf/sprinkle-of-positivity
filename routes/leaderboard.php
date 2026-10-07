@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'verified', 'onboarded'])->group(function () {
     Route::get('leaderboard', [LeaderboardController::class, 'index'])->name('leaderboard.index');
+    Route::get('leaderboard/consistency', [LeaderboardController::class, 'consistency'])->name('leaderboard.consistency');
     Route::get('leaderboard/levels', [LeaderboardController::class, 'levels'])->name('leaderboard.levels');
 
     Route::get('profile', [ProfileController::class, 'show'])->name('profile.show');

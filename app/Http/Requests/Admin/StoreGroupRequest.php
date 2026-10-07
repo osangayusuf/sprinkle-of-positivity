@@ -2,9 +2,11 @@
 
 namespace App\Http\Requests\Admin;
 
+use App\Enums\PartnerStatus;
 use App\Models\Group;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreGroupRequest extends FormRequest
 {
@@ -29,7 +31,8 @@ class StoreGroupRequest extends FormRequest
             'duration_days' => ['nullable', 'integer', 'min:1', 'max:1000'],
             'starts_on' => ['nullable', 'date'],
             'is_private' => ['boolean'],
-            'manager_id' => ['required', 'integer', 'exists:users,id'],
+            'manager_ids' => ['required', 'array', 'min:1'],
+            'manager_ids.*' => ['integer', 'distinct', Rule::exists('users', 'id')->where('partner_status', PartnerStatus::Approved->value)],
             'cover_image' => ['nullable', 'image', 'max:2048'],
         ];
     }

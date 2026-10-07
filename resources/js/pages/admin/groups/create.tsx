@@ -6,13 +6,6 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
 import { Spinner } from '@/components/ui/spinner';
 import { Textarea } from '@/components/ui/textarea';
 
@@ -29,7 +22,7 @@ export default function AdminGroupsCreate({ users }: Props) {
                 <Heading
                     variant="small"
                     title="New group"
-                    description="Create a group and appoint its manager"
+                    description="Create a group and appoint its accountability partners"
                 />
 
                 <Form
@@ -86,23 +79,39 @@ export default function AdminGroupsCreate({ users }: Props) {
                             </div>
 
                             <div className="grid gap-2">
-                                <Label htmlFor="manager_id">Manager</Label>
-                                <Select name="manager_id">
-                                    <SelectTrigger id="manager_id">
-                                        <SelectValue placeholder="Select a manager" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {users.map((user) => (
-                                            <SelectItem
-                                                key={user.id}
+                                <Label>Accountability partners</Label>
+                                <p className="text-muted-foreground text-sm">
+                                    Only approved accountability partners can
+                                    manage a group. New participants are shared
+                                    between the partners you pick.
+                                </p>
+                                <div className="grid gap-2 rounded-lg border p-3">
+                                    {users.map((user) => (
+                                        <div
+                                            key={user.id}
+                                            className="flex items-center gap-3"
+                                        >
+                                            <Checkbox
+                                                id={`manager_${user.id}`}
+                                                name="manager_ids[]"
                                                 value={String(user.id)}
+                                            />
+                                            <Label
+                                                htmlFor={`manager_${user.id}`}
+                                                className="font-normal"
                                             >
                                                 {user.name} ({user.email})
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                                <InputError message={errors.manager_id} />
+                                            </Label>
+                                        </div>
+                                    ))}
+                                    {users.length === 0 && (
+                                        <p className="text-muted-foreground text-sm">
+                                            No approved partners yet. Approve
+                                            one from the Users page first.
+                                        </p>
+                                    )}
+                                </div>
+                                <InputError message={errors.manager_ids} />
                             </div>
 
                             <div className="flex items-start gap-3">
