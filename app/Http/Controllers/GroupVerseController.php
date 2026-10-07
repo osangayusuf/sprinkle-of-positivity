@@ -11,8 +11,11 @@ use App\Http\Resources\VerseResource;
 use App\Models\Group;
 use App\Models\GroupVerse;
 use App\Services\ChallengeProgress;
+use Carbon\CarbonInterface;
+use Carbon\Exceptions\InvalidFormatException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -20,8 +23,8 @@ use Inertia\Response;
 class GroupVerseController extends Controller
 {
     /**
-     * Show the group's verse for today (or an empty state if the manager
-     * hasn't set one yet).
+     * Show the group's verse for today, or for an earlier day via `?date=`
+     * (an empty state if no verse was set for it).
      */
     public function show(Request $request, Group $group, ChallengeProgress $challengeProgress): Response|RedirectResponse
     {
@@ -30,10 +33,12 @@ class GroupVerseController extends Controller
         }
 
         $user = $request->user();
+        $date = $this->requestedDate($request);
+        $isToday = $date->isSameDay(today());
 
         $verse = GroupVerse::query()
             ->where('group_id', $group->id)
-            ->whereDate('date', today())
+            ->whereDate('date', $date)
             ->first();
 
         $insights = $verse
@@ -48,11 +53,47 @@ class GroupVerseController extends Controller
             'group' => new GroupResource($group),
             'verse' => $verse ? new VerseResource($verse) : null,
             'canManage' => $user?->can('manage', $group) ?? false,
-            'canParticipate' => $user?->can('participate', $group) ?? false,
+            'canParticipate' => $isToday && ($user?->can('participate', $group) ?? false),
+            'viewingDate' => $date->toDateString(),
+            'isToday' => $isToday,
+            'pastDays' => GroupVerse::query()
+                ->where('group_id', $group->id)
+                ->whereDate('date', '<=', today())
+                ->withCount('insights')
+                ->orderByDesc('date')
+                ->limit(120)
+                ->get()
+                ->map(fn (GroupVerse $past) => [
+                    'date' => $past->date->toDateString(),
+                    'reference' => $past->reference,
+                    'insights_count' => $past->insights_count,
+                ]),
             'insights' => InsightResource::collection($insights),
             'quizzes' => QuizResource::collection($quizzes),
             'progress' => $user ? $challengeProgress->forMember($group, $user) : null,
         ]);
+    }
+
+    /**
+     * The day being viewed: a past date from `?date=`, otherwise today.
+     * Future and malformed dates fall back to today.
+     */
+    private function requestedDate(Request $request): CarbonInterface
+    {
+        $requested = $request->query('date');
+
+        if (is_string($requested) && preg_match('/^\d{4}-\d{2}-\d{2}$/', $requested)) {
+            try {
+                $date = Carbon::createFromFormat('Y-m-d', $requested)->startOfDay();
+
+                if ($date->lte(today())) {
+                    return $date;
+                }
+            } catch (InvalidFormatException) {
+            }
+        }
+
+        return today();
     }
 
     /**

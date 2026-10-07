@@ -1,3 +1,4 @@
+import { Link } from '@inertiajs/react';
 import { Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { ChallengeProgress } from '@/types/models';
@@ -9,11 +10,15 @@ export function StreakTracker({
     totalDays,
     startsOn,
     progress,
+    groupSlug,
+    selectedDate,
 }: {
     currentDay: number;
     totalDays: number;
     startsOn: string;
     progress?: ChallengeProgress | null;
+    groupSlug?: string;
+    selectedDate?: string;
 }) {
     const windowSize = Math.min(6, totalDays);
     const start = Math.max(
@@ -54,17 +59,17 @@ export function StreakTracker({
                     );
                     const isCurrent = day === currentDay;
                     const isDone = progress?.completed_days.includes(day);
-
-                    return (
-                        <div
-                            key={day}
-                            className={cn(
-                                'flex flex-1 flex-col items-center rounded-xl border px-2 py-2 text-xs',
-                                isCurrent
-                                    ? 'border-primary text-primary'
-                                    : 'border-border text-muted-foreground',
-                            )}
-                        >
+                    const isoDate = date.toISOString().slice(0, 10);
+                    const isSelected = selectedDate === isoDate;
+                    const tileClass = cn(
+                        'flex flex-1 flex-col items-center rounded-xl border px-2 py-2 text-xs',
+                        isCurrent || isSelected
+                            ? 'border-primary text-primary'
+                            : 'border-border text-muted-foreground',
+                        isSelected && 'bg-primary/10',
+                    );
+                    const content = (
+                        <>
                             <span className="flex items-center gap-1 font-semibold">
                                 {day}
                                 {isDone && (
@@ -80,6 +85,25 @@ export function StreakTracker({
                                     month: 'short',
                                 })}
                             </span>
+                        </>
+                    );
+
+                    return groupSlug && day <= currentDay ? (
+                        <Link
+                            key={day}
+                            href={
+                                day === currentDay
+                                    ? `/groups/${groupSlug}/verse`
+                                    : `/groups/${groupSlug}/verse?date=${isoDate}`
+                            }
+                            className={tileClass}
+                            aria-label={`View ${isoDate}`}
+                        >
+                            {content}
+                        </Link>
+                    ) : (
+                        <div key={day} className={tileClass}>
+                            {content}
                         </div>
                     );
                 })}

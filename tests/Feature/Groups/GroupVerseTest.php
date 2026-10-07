@@ -84,3 +84,55 @@ test('setting the group verse again the same day updates it instead of duplicati
 
     expect(GroupVerse::query()->where('group_id', $group->id)->count())->toBe(1);
 });
+
+test('the verse page shows an earlier day\'s verse and insights from the date in the URL', function () {
+    $group = challengeGroup(durationDays: 5, startedDaysAgo: 3);
+    $manager = createApprovedManager($group);
+    $member = createApprovedMember($group);
+    completeDay($group, $member, 1);
+    $date = $group->starts_on->toDateString();
+
+    $this->actingAs($manager)
+        ->get(route('groups.verse.show', ['group' => $group, 'date' => $date]))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->where('viewingDate', $date)
+            ->where('isToday', false)
+            ->where('verse.date', $date)
+            ->has('insights', 1)
+            ->where('canParticipate', false));
+});
+
+test('the verse page lists past days with their insight counts, newest first', function () {
+    $group = challengeGroup(durationDays: 5, startedDaysAgo: 3);
+    $member = createApprovedMember($group);
+    completeDay($group, $member, 1);
+
+    $this->actingAs($member)
+        ->get(route('groups.verse.show', $group))
+        ->assertInertia(fn ($page) => $page
+            ->where('isToday', true)
+            ->has('pastDays', 4)
+            ->where('pastDays.0.date', today()->toDateString())
+            ->where('pastDays.3.date', $group->starts_on->toDateString())
+            ->where('pastDays.3.insights_count', 1));
+});
+
+test('future and malformed dates fall back to today', function () {
+    $group = challengeGroup(durationDays: 5, startedDaysAgo: 3);
+    $user = User::factory()->create();
+
+    foreach ([today()->addDay()->toDateString(), 'not-a-date', '2026-13-45'] as $date) {
+        $this->actingAs($user)
+            ->get(route('groups.verse.show', ['group' => $group, 'date' => $date]))
+            ->assertOk()
+            ->assertInertia(fn ($page) => $page->where('isToday', true));
+    }
+});
+
+test('past days of a private group stay hidden from non-members', function () {
+    $group = Group::factory()->private()->create(['duration_days' => 5, 'starts_on' => today()->subDays(2)]);
+
+    $this->get(route('groups.verse.show', ['group' => $group, 'date' => today()->subDay()->toDateString()]))
+        ->assertRedirect(route('groups.show', $group));
+});
