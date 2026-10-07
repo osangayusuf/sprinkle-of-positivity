@@ -52,7 +52,7 @@ class ParticipantController extends Controller
             return [
                 'id' => $membership->id,
                 'user' => ['id' => $membership->user->id, 'name' => $membership->user->name, 'avatar' => $membership->user->avatar],
-                'group' => ['id' => $membership->group->id, 'name' => $membership->group->name, 'duration_days' => $membership->group->duration_days],
+                'group' => ['id' => $membership->group->id, 'name' => $membership->group->name, 'slug' => $membership->group->slug, 'duration_days' => $membership->group->duration_days],
                 'partner' => $membership->partner ? ['id' => $membership->partner->id, 'name' => $membership->partner->name] : null,
                 'status' => $memberProgress['status'] ?? 'lagging',
                 'run_day' => $memberProgress['run_day'] ?? 1,
