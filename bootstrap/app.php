@@ -45,7 +45,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $schedule->command('certificates:issue')->dailyAt('01:00');
         $schedule->command('progress:record-resets')->dailyAt('00:05');
-        $schedule->command('reminders:send')->dailyAt(config('challenge.reminder_time'));
+        $schedule->command('reminders:send')->dailyAt(config('challenge.reminder_time') ?? '18:00');
 
         // Migrations and cache rebuilds after an FTP deploy (see FinishDeploy).
         $schedule->command('deploy:finish')->everyMinute()->withoutOverlapping();
