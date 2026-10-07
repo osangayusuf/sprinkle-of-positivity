@@ -1,4 +1,4 @@
-import { Form, Head } from '@inertiajs/react';
+import { Form, Head, Link } from '@inertiajs/react';
 import GroupApplicationController from '@/actions/App/Http/Controllers/GroupApplicationController';
 import { PageHeader } from '@/components/page-header';
 import { Button } from '@/components/ui/button';
@@ -130,23 +130,38 @@ export default function GroupManage({
                                 </div>
                             </div>
                             {member.role !== 'manager' && (
-                                <Form
-                                    {...GroupApplicationController.destroy.form(
-                                        {
-                                            group: group.slug,
-                                            membership: member.membership_id,
-                                        },
-                                    )}
-                                >
+                                <div className="flex shrink-0 items-center gap-2">
                                     <Button
-                                        type="submit"
+                                        asChild
                                         variant="outline"
                                         size="sm"
                                         className="rounded-full"
                                     >
-                                        Remove
+                                        <Link
+                                            href={`/groups/${group.slug}/members/${member.user_id}/insights`}
+                                        >
+                                            Insights
+                                        </Link>
                                     </Button>
-                                </Form>
+                                    <Form
+                                        {...GroupApplicationController.destroy.form(
+                                            {
+                                                group: group.slug,
+                                                membership:
+                                                    member.membership_id,
+                                            },
+                                        )}
+                                    >
+                                        <Button
+                                            type="submit"
+                                            variant="outline"
+                                            size="sm"
+                                            className="rounded-full"
+                                        >
+                                            Remove
+                                        </Button>
+                                    </Form>
+                                </div>
                             )}
                         </div>
                     ))}

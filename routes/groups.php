@@ -7,6 +7,7 @@ use App\Http\Controllers\GroupController;
 use App\Http\Controllers\GroupManagementController;
 use App\Http\Controllers\GroupVerseController;
 use App\Http\Controllers\InsightController;
+use App\Http\Controllers\MemberInsightController;
 use App\Http\Controllers\QuizController;
 use App\Http\Controllers\QuizResponseController;
 use App\Http\Controllers\ReactionController;
@@ -23,6 +24,7 @@ Route::middleware(['auth', 'verified', 'onboarded'])->group(function () {
     Route::get('groups/{group:slug}/verse/edit', [GroupVerseController::class, 'edit'])->name('groups.verse.edit');
     Route::put('groups/{group:slug}/verse', [GroupVerseController::class, 'update'])->name('groups.verse.update');
 
+    Route::get('groups/{group:slug}/members/{user}/insights', [MemberInsightController::class, 'index'])->name('groups.members.insights');
     Route::get('groups/{group:slug}/insights/create', [InsightController::class, 'create'])->name('groups.insights.create');
     Route::post('groups/{group:slug}/insights', [InsightController::class, 'store'])->name('groups.insights.store');
     Route::post('groups/{group:slug}/insights/{insight}/comments', [CommentController::class, 'store'])->name('groups.insights.comments.store');

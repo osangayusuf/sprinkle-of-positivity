@@ -1,5 +1,5 @@
 import { Head, Link, router } from '@inertiajs/react';
-import { BellRing, UserMinus } from 'lucide-react';
+import { BellRing, BookOpenText, UserMinus } from 'lucide-react';
 import { useState } from 'react';
 import { PageHeader } from '@/components/page-header';
 import { Button } from '@/components/ui/button';
@@ -12,7 +12,7 @@ type Status = 'on_track' | 'at_risk' | 'lagging';
 type Participant = {
     id: number;
     user: { id: number; name: string; avatar: string | null };
-    group: { id: number; name: string; duration_days: number };
+    group: { id: number; name: string; slug: string; duration_days: number };
     partner: { id: number; name: string } | null;
     status: Status;
     run_day: number;
@@ -206,6 +206,14 @@ export default function PartnerParticipants({
                             </div>
                         ) : (
                             <div className="flex gap-2">
+                                <Button asChild size="sm" variant="outline">
+                                    <Link
+                                        href={`/groups/${participant.group.slug}/members/${participant.user.id}/insights`}
+                                    >
+                                        <BookOpenText className="size-4" />
+                                        Insights
+                                    </Link>
+                                </Button>
                                 <Button
                                     type="button"
                                     size="sm"
