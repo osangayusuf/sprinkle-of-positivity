@@ -61,6 +61,20 @@ export default function GroupChat({
         return () => window.removeEventListener('scroll', onScroll);
     }, []);
 
+    // Open at the newest message. Arriving through an Inertia link resets the
+    // scroll position just after the first render, so scroll again once that
+    // has happened.
+    useEffect(() => {
+        const scrollToBottom = () =>
+            bottomRef.current?.scrollIntoView({ block: 'end' });
+
+        scrollToBottom();
+
+        const timer = window.setTimeout(scrollToBottom, 100);
+
+        return () => window.clearTimeout(timer);
+    }, []);
+
     // Jump to the newest message on arrival, unless the reader has scrolled
     // up to read history.
     useEffect(() => {
