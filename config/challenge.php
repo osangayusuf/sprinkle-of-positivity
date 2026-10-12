@@ -27,4 +27,16 @@ return [
 
     'reminder_time' => env('CHALLENGE_REMINDER_TIME', '18:00'),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Past days window
+    |--------------------------------------------------------------------------
+    |
+    | How many months back a group's verse page lists earlier days (and their
+    | insights) to open.
+    |
+    */
+
+    'history_months' => (int) env('CHALLENGE_HISTORY_MONTHS', 6),
+
 ];

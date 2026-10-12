@@ -1,5 +1,5 @@
 import { Head, Link, usePage } from '@inertiajs/react';
-import { Plus } from 'lucide-react';
+import { ChevronDown, Plus } from 'lucide-react';
 import { useState } from 'react';
 import { InsightCard } from '@/components/insight-card';
 import { PageHeader } from '@/components/page-header';
@@ -209,41 +209,110 @@ export default function VerseShow({
             )}
 
             {pastDays.length > 0 && (
-                <div className="mt-8 px-4 pb-8">
-                    <h2 className="mb-3 text-base font-semibold">Past days</h2>
-                    <div className="divide-border border-border divide-y rounded-xl border">
-                        {pastDays.map((day) => (
-                            <Link
-                                key={day.date}
-                                href={`/groups/${group.slug}/verse?date=${day.date}`}
-                                className={cn(
-                                    'flex items-center justify-between gap-3 px-4 py-3 text-sm',
-                                    day.date === viewingDate &&
-                                        'bg-primary/10 text-primary',
-                                )}
-                            >
-                                <span className="min-w-0">
-                                    <span className="block font-semibold">
-                                        {new Date(
-                                            `${day.date}T00:00:00`,
-                                        ).toLocaleDateString(undefined, {
-                                            day: 'numeric',
-                                            month: 'short',
-                                        })}
-                                    </span>
-                                    <span className="text-muted-foreground block truncate text-xs">
-                                        {day.reference}
-                                    </span>
-                                </span>
-                                <span className="text-muted-foreground shrink-0 text-xs">
-                                    {day.insights_count} insight
-                                    {day.insights_count === 1 ? '' : 's'}
-                                </span>
-                            </Link>
-                        ))}
-                    </div>
-                </div>
+                <PastDays
+                    days={pastDays}
+                    groupSlug={group.slug}
+                    viewingDate={viewingDate}
+                />
             )}
         </>
+    );
+}
+
+type PastDay = Props['pastDays'][number];
+
+function monthKey(date: string): string {
+    return date.slice(0, 7);
+}
+
+/**
+ * Earlier days with their insight counts, grouped by month so up to six
+ * months of history stays scannable. The latest month and the month being
+ * viewed start open.
+ */
+function PastDays({
+    days,
+    groupSlug,
+    viewingDate,
+}: {
+    days: PastDay[];
+    groupSlug: string;
+    viewingDate: string;
+}) {
+    const months = new Map<string, PastDay[]>();
+
+    for (const day of days) {
+        months.set(monthKey(day.date), [
+            ...(months.get(monthKey(day.date)) ?? []),
+            day,
+        ]);
+    }
+
+    const latestMonth = monthKey(days[0].date);
+
+    return (
+        <div className="mt-8 px-4 pb-8">
+            <h2 className="mb-3 text-base font-semibold">Past days</h2>
+            <div className="flex flex-col gap-3">
+                {Array.from(months.entries()).map(([month, monthDays]) => (
+                    <details
+                        key={month}
+                        open={
+                            month === latestMonth ||
+                            month === monthKey(viewingDate)
+                        }
+                        className="border-border group rounded-xl border"
+                    >
+                        <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 text-sm font-semibold">
+                            <span>
+                                {new Date(
+                                    `${month}-01T00:00:00`,
+                                ).toLocaleDateString(undefined, {
+                                    month: 'long',
+                                    year: 'numeric',
+                                })}
+                            </span>
+                            <span className="text-muted-foreground flex items-center gap-2 text-xs font-normal">
+                                {monthDays.length} day
+                                {monthDays.length === 1 ? '' : 's'}
+                                <ChevronDown className="size-4 transition-transform group-open:rotate-180" />
+                            </span>
+                        </summary>
+                        <div className="divide-border border-border divide-y border-t">
+                            {monthDays.map((day) => (
+                                <Link
+                                    key={day.date}
+                                    href={`/groups/${groupSlug}/verse?date=${day.date}`}
+                                    className={cn(
+                                        'flex items-center justify-between gap-3 px-4 py-3 text-sm',
+                                        day.date === viewingDate &&
+                                            'bg-primary/10 text-primary',
+                                    )}
+                                >
+                                    <span className="min-w-0">
+                                        <span className="block font-semibold">
+                                            {new Date(
+                                                `${day.date}T00:00:00`,
+                                            ).toLocaleDateString(undefined, {
+                                                weekday: 'short',
+                                                day: 'numeric',
+                                                month: 'short',
+                                            })}
+                                        </span>
+                                        <span className="text-muted-foreground block truncate text-xs">
+                                            {day.reference}
+                                        </span>
+                                    </span>
+                                    <span className="text-muted-foreground shrink-0 text-xs">
+                                        {day.insights_count} insight
+                                        {day.insights_count === 1 ? '' : 's'}
+                                    </span>
+                                </Link>
+                            ))}
+                        </div>
+                    </details>
+                ))}
+            </div>
+        </div>
     );
 }

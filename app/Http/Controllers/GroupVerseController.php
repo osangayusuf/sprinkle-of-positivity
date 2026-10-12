@@ -59,9 +59,9 @@ class GroupVerseController extends Controller
             'pastDays' => GroupVerse::query()
                 ->where('group_id', $group->id)
                 ->whereDate('date', '<=', today())
+                ->whereDate('date', '>=', today()->subMonths(config('challenge.history_months')))
                 ->withCount('insights')
                 ->orderByDesc('date')
-                ->limit(120)
                 ->get()
                 ->map(fn (GroupVerse $past) => [
                     'date' => $past->date->toDateString(),
