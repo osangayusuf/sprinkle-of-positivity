@@ -1,8 +1,10 @@
 <?php
 
+use App\Http\Controllers\BibleCatalogController;
 use App\Http\Controllers\BibleVerseLookupController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\GroupApplicationController;
+use App\Http\Controllers\GroupChatController;
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\GroupManagementController;
 use App\Http\Controllers\GroupVerseController;
@@ -21,6 +23,10 @@ Route::middleware(['auth', 'verified', 'onboarded'])->group(function () {
     Route::patch('groups/{group:slug}/applications/{membership}', [GroupApplicationController::class, 'update'])->name('groups.applications.update');
     Route::delete('groups/{group:slug}/members/{membership}', [GroupApplicationController::class, 'destroy'])->name('groups.members.destroy');
 
+    Route::get('groups/{group:slug}/chat', [GroupChatController::class, 'show'])->name('groups.chat.show');
+    Route::post('groups/{group:slug}/chat', [GroupChatController::class, 'store'])->middleware('throttle:30,1')->name('groups.chat.store');
+    Route::delete('groups/{group:slug}/chat/{message}', [GroupChatController::class, 'destroy'])->name('groups.chat.destroy');
+
     Route::get('groups/{group:slug}/verse/edit', [GroupVerseController::class, 'edit'])->name('groups.verse.edit');
     Route::put('groups/{group:slug}/verse', [GroupVerseController::class, 'update'])->name('groups.verse.update');
 
@@ -35,9 +41,13 @@ Route::middleware(['auth', 'verified', 'onboarded'])->group(function () {
     Route::get('groups/{group:slug}/quizzes/{quiz}/edit', [QuizController::class, 'edit'])->name('groups.quizzes.edit');
     Route::put('groups/{group:slug}/quizzes/{quiz}', [QuizController::class, 'update'])->name('groups.quizzes.update');
     Route::delete('groups/{group:slug}/quizzes/{quiz}', [QuizController::class, 'destroy'])->name('groups.quizzes.destroy');
+    Route::patch('groups/{group:slug}/quizzes/{quiz}/close', [QuizController::class, 'close'])->name('groups.quizzes.close');
+    Route::patch('groups/{group:slug}/quizzes/{quiz}/reopen', [QuizController::class, 'reopen'])->name('groups.quizzes.reopen');
     Route::post('groups/{group:slug}/quizzes/{quiz}/responses', [QuizResponseController::class, 'store'])->name('groups.quizzes.responses.store');
 
     Route::get('bible-verse-lookup', BibleVerseLookupController::class)->name('bible-verse-lookup');
+    Route::get('bible/versions', [BibleCatalogController::class, 'versions'])->name('bible.versions');
+    Route::get('bible/versions/{version}/books', [BibleCatalogController::class, 'books'])->whereNumber('version')->name('bible.books');
 });
 
 // Read-only pages open to guests. Declared after the authenticated routes so

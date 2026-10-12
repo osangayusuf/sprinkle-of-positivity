@@ -11,11 +11,15 @@ class QuizResponseObserver
     public function __construct(private AwardPoints $awardPoints) {}
 
     /**
-     * Award points for answering a quiz, plus a bonus when the quiz has a
+     * Award points for answering a quiz (never a poll), plus a bonus when the quiz has a
      * correct answer set and the member got it right.
      */
     public function created(QuizResponse $response): void
     {
+        if ($response->quiz->isPoll()) {
+            return;
+        }
+
         $this->awardPoints->handle($response->user, 5, PointsLedgerEntry::REASON_QUIZ_PARTICIPATED, $response);
 
         $quiz = $response->quiz;

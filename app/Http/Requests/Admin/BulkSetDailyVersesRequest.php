@@ -31,6 +31,8 @@ class BulkSetDailyVersesRequest extends FormRequest
             'rows.*.date' => ['required_with:rows', 'date'],
             'rows.*.reference' => ['required_with:rows', 'string', 'max:255'],
             'rows.*.text' => ['required_with:rows', 'string'],
+            'rows.*.translation' => ['nullable', 'string', 'max:32'],
+            'rows.*.copyright' => ['nullable', 'string', 'max:255'],
             'rows.*.image' => ['nullable', 'image', 'max:2048'],
             'file' => ['required_without:rows', 'file', 'mimes:csv,txt'],
         ];
@@ -39,7 +41,7 @@ class BulkSetDailyVersesRequest extends FormRequest
     /**
      * The submitted grid rows, each paired with its optional image upload.
      *
-     * @return array<int, array{date: string, reference: string, text: string, image: UploadedFile|null}>
+     * @return array<int, array{date: string, reference: string, text: string, translation: string|null, copyright: string|null, image: UploadedFile|null}>
      */
     public function verseRows(): array
     {
@@ -52,6 +54,8 @@ class BulkSetDailyVersesRequest extends FormRequest
                 'date' => $this->string("rows.$key.date")->value(),
                 'reference' => $this->string("rows.$key.reference")->value(),
                 'text' => $this->string("rows.$key.text")->value(),
+                'translation' => $this->input("rows.$key.translation"),
+                'copyright' => $this->input("rows.$key.copyright"),
                 'image' => $image instanceof UploadedFile ? $image : null,
             ];
         }

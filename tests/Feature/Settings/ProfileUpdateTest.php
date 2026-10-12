@@ -83,3 +83,90 @@ test('correct password must be provided to delete account', function () {
 
     expect($user->fresh())->not->toBeNull();
 });
+
+test('the details collected at onboarding can be updated from settings', function () {
+    $user = User::factory()->create([
+        'whatsapp_number' => '+2348000000000',
+        'goals' => ['Know the Bible better'],
+        'birthday_day' => 20,
+        'birthday_month' => 1,
+    ]);
+
+    $this->actingAs($user)
+        ->patch(route('profile.update'), [
+            'name' => $user->name,
+            'email' => $user->email,
+            'whatsapp_number' => '+2348111111111',
+            'goals' => ['Get closer to God', 'Build a daily habit'],
+            'birthday_day' => 5,
+            'birthday_month' => 11,
+        ])
+        ->assertSessionHasNoErrors();
+
+    expect($user->refresh())
+        ->whatsapp_number->toBe('+2348111111111')
+        ->goals->toBe(['Get closer to God', 'Build a daily habit'])
+        ->birthday_day->toBe(5)
+        ->birthday_month->toBe(11);
+});
+
+test('the birthday can be cleared', function () {
+    $user = User::factory()->create(['birthday_day' => 20, 'birthday_month' => 1]);
+
+    $this->actingAs($user)
+        ->patch(route('profile.update'), [
+            'name' => $user->name,
+            'email' => $user->email,
+            'birthday_day' => '',
+            'birthday_month' => '',
+        ])
+        ->assertSessionHasNoErrors();
+
+    expect($user->refresh())->birthday_day->toBeNull()->birthday_month->toBeNull();
+});
+
+test('onboarding details are left alone when the form does not send them', function () {
+    $user = User::factory()->create([
+        'whatsapp_number' => '+2348000000000',
+        'goals' => ['Know the Bible better'],
+        'birthday_day' => 20,
+        'birthday_month' => 1,
+    ]);
+
+    $this->actingAs($user)
+        ->patch(route('profile.update'), ['name' => 'New Name', 'email' => $user->email])
+        ->assertSessionHasNoErrors();
+
+    expect($user->refresh())
+        ->whatsapp_number->toBe('+2348000000000')
+        ->goals->toBe(['Know the Bible better'])
+        ->birthday_day->toBe(20);
+});
+
+test('an existing WhatsApp number cannot be blanked out', function () {
+    $user = User::factory()->create(['whatsapp_number' => '+2348000000000']);
+
+    $this->actingAs($user)
+        ->patch(route('profile.update'), [
+            'name' => $user->name,
+            'email' => $user->email,
+            'whatsapp_number' => '',
+        ])
+        ->assertSessionHasErrors('whatsapp_number');
+
+    expect($user->refresh()->whatsapp_number)->toBe('+2348000000000');
+});
+
+test('profile details are validated', function () {
+    $user = User::factory()->create();
+
+    $this->actingAs($user)
+        ->patch(route('profile.update'), [
+            'name' => $user->name,
+            'email' => $user->email,
+            'goals' => [],
+            'birthday_day' => 32,
+            'birthday_month' => 13,
+        ])
+        ->assertSessionHasErrors(['birthday_day', 'birthday_month']);
+});

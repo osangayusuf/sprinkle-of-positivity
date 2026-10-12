@@ -48,6 +48,8 @@ class DailyVerseController extends Controller
         $verse->date = $resolvedDate;
         $verse->reference = $request->string('reference')->value();
         $verse->text = $request->string('text')->value();
+        $verse->translation = $request->validated('translation');
+        $verse->copyright = $request->validated('copyright');
         $verse->created_by = $request->user()->id;
 
         if ($request->hasFile('image')) {

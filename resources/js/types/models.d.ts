@@ -40,6 +40,8 @@ export type Verse = {
     date: string;
     reference: string;
     text: string;
+    translation: string | null;
+    copyright: string | null;
     image_url: string | null;
 };
 
@@ -78,6 +80,8 @@ export type Comment = {
 export type QuizOption = {
     id: number;
     label: string;
+    /** Poll vote count; null while results are hidden. */
+    votes?: number | null;
 };
 
 export type Notification = {
@@ -94,10 +98,26 @@ export type Quiz = {
     created_by_name: string;
     created_by_avatar: string | null;
     created_at: string;
+    type: 'quiz' | 'poll';
+    closed: boolean;
     options: QuizOption[];
     responses_count: number;
     my_response_option_id: number | null;
     correct_quiz_option_id: number | null;
+};
+
+export type ChatMessage = {
+    id: number;
+    body: string;
+    created_at: string;
+    author: {
+        id: number;
+        name: string;
+        avatar: string | null;
+        is_manager: boolean;
+    };
+    mine: boolean;
+    can_delete: boolean;
 };
 
 export type LeaderboardEntry = {

@@ -35,6 +35,22 @@ test('a manager can set the group verse for today', function () {
     expect($verse->created_by)->toBe($manager->id);
 });
 
+test('the translation and copyright chosen in the picker are stored with the group verse', function () {
+    $group = Group::factory()->create();
+    $this->actingAs(createApprovedManager($group));
+
+    $this->put(route('groups.verse.update', $group), [
+        'reference' => 'Joshua 2:1',
+        'text' => 'Then Joshua son of Nun secretly sent two spies...',
+        'translation' => 'BSB',
+        'copyright' => 'Public Domain',
+    ])->assertRedirect();
+
+    $verse = GroupVerse::query()->sole();
+    expect($verse->translation)->toBe('BSB');
+    expect($verse->copyright)->toBe('Public Domain');
+});
+
 test('a manager can attach an image when setting the group verse', function () {
     Storage::fake('public');
     $group = Group::factory()->create();
@@ -116,6 +132,40 @@ test('the verse page lists past days with their insight counts, newest first', f
             ->where('pastDays.0.date', today()->toDateString())
             ->where('pastDays.3.date', $group->starts_on->toDateString())
             ->where('pastDays.3.insights_count', 1));
+});
+
+test('the past days list reaches back six months and no further', function () {
+    $group = challengeGroup(durationDays: 5, startedDaysAgo: 3);
+    $member = createApprovedMember($group);
+
+    $inside = today()->subMonths(6);
+    $outside = today()->subMonths(6)->subDay();
+
+    foreach ([$inside, $outside, today()->subMonths(5)] as $date) {
+        GroupVerse::factory()->create(['group_id' => $group->id, 'date' => $date]);
+    }
+
+    $this->actingAs($member)
+        ->get(route('groups.verse.show', $group))
+        ->assertInertia(function ($page) use ($inside, $outside) {
+            $dates = collect($page->toArray()['props']['pastDays'])->pluck('date');
+
+            expect($dates)->toContain($inside->toDateString())
+                ->not->toContain($outside->toDateString());
+        });
+});
+
+test('the past days list is not cut off at 120 days', function () {
+    $group = challengeGroup(durationDays: 5, startedDaysAgo: 3);
+    $member = createApprovedMember($group);
+
+    foreach (range(10, 169) as $daysAgo) {
+        GroupVerse::factory()->create(['group_id' => $group->id, 'date' => today()->subDays($daysAgo)]);
+    }
+
+    $this->actingAs($member)
+        ->get(route('groups.verse.show', $group))
+        ->assertInertia(fn ($page) => $page->has('pastDays', 160 + 4));
 });
 
 test('future and malformed dates fall back to today', function () {

@@ -46,7 +46,7 @@ class GroupVerseController extends Controller
             : collect();
 
         $quizzes = $verse
-            ? $verse->quizzes()->with(['creator', 'options', 'responses'])->latest()->get()
+            ? $verse->quizzes()->with(['group', 'creator', 'options', 'responses'])->latest()->get()
             : collect();
 
         return Inertia::render('verses/show', [
@@ -59,9 +59,9 @@ class GroupVerseController extends Controller
             'pastDays' => GroupVerse::query()
                 ->where('group_id', $group->id)
                 ->whereDate('date', '<=', today())
+                ->whereDate('date', '>=', today()->subMonths(config('challenge.history_months')))
                 ->withCount('insights')
                 ->orderByDesc('date')
-                ->limit(120)
                 ->get()
                 ->map(fn (GroupVerse $past) => [
                     'date' => $past->date->toDateString(),
@@ -125,6 +125,8 @@ class GroupVerseController extends Controller
             $request->string('reference')->value(),
             $request->string('text')->value(),
             image: $request->file('image'),
+            translation: $request->validated('translation'),
+            copyright: $request->validated('copyright'),
         );
 
         Inertia::flash('toast', ['type' => 'success', 'message' => __("Today's verse was updated.")]);

@@ -55,6 +55,7 @@ class GroupController extends Controller
                 'status' => $membership->status->value,
             ] : null,
             'canManage' => $user?->can('manage', $group) ?? false,
+            'canChat' => $user?->can('participate', $group) ?? false,
             'canViewContent' => Gate::forUser($user)->allows('viewContent', $group),
         ]);
     }

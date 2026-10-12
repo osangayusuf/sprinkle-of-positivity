@@ -127,6 +127,18 @@ class User extends Authenticatable implements PasskeyUser
     }
 
     /**
+     * Whether the user can apply to become an accountability partner:
+     * anyone who isn't an admin, already a partner, or already waiting on a
+     * decision. A declined applicant may apply again.
+     */
+    public function canApplyAsPartner(): bool
+    {
+        return ! $this->hasRole(Role::ADMIN)
+            && ! $this->isPartner()
+            && $this->partner_status !== PartnerStatus::Pending;
+    }
+
+    /**
      * The accountability partner assigned to this user in the given group.
      */
     public function partnerIn(Group $group): ?User

@@ -27,4 +27,12 @@ class QuizFactory extends Factory
             'created_by' => User::factory(),
         ];
     }
+
+    /**
+     * Indicate that the quiz is a poll: no correct answer, votes only.
+     */
+    public function poll(): static
+    {
+        return $this->state(fn () => ['type' => Quiz::TYPE_POLL]);
+    }
 }

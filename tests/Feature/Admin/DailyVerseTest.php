@@ -35,6 +35,21 @@ test('admins can set the global daily verse', function () {
     expect($verse->created_by)->toBe($admin->id);
 });
 
+test('the translation and copyright chosen in the picker are stored with the global verse', function () {
+    $this->actingAs(User::factory()->admin()->create());
+
+    $this->put(route('admin.daily-verse.update'), [
+        'reference' => 'John 3:16',
+        'text' => 'For God so loved the world...',
+        'translation' => 'BSB',
+        'copyright' => 'Public Domain',
+    ])->assertRedirect();
+
+    $verse = DailyVerse::query()->sole();
+    expect($verse->translation)->toBe('BSB');
+    expect($verse->copyright)->toBe('Public Domain');
+});
+
 test('admins can attach an image when setting the global verse', function () {
     Storage::fake('public');
     $admin = User::factory()->admin()->create();

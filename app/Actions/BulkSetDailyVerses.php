@@ -14,7 +14,7 @@ class BulkSetDailyVerses
     /**
      * Set (or update) the global daily verse for each of the given dates.
      *
-     * @param  array<int, array{date: string, reference: string, text: string, image?: ?UploadedFile}>  $rows
+     * @param  array<int, array{date: string, reference: string, text: string, translation?: ?string, copyright?: ?string, image?: ?UploadedFile}>  $rows
      */
     public function handle(array $rows, User $author): int
     {
@@ -28,6 +28,8 @@ class BulkSetDailyVerses
             $verse->date = $date;
             $verse->reference = $row['reference'];
             $verse->text = $row['text'];
+            $verse->translation = $row['translation'] ?? null;
+            $verse->copyright = $row['copyright'] ?? null;
             $verse->created_by = $author->id;
 
             if (! empty($row['image'])) {

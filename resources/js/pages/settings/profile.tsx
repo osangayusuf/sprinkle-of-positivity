@@ -1,6 +1,7 @@
 import type { FormComponentRef } from '@inertiajs/core';
 import { Form, Head, Link, usePage } from '@inertiajs/react';
-import { useRef } from 'react';
+import { Check } from 'lucide-react';
+import { useRef, useState } from 'react';
 import AvatarController from '@/actions/App/Http/Controllers/Settings/AvatarController';
 import ProfileController from '@/actions/App/Http/Controllers/Settings/ProfileController';
 import DeleteUser from '@/components/delete-user';
@@ -11,10 +12,14 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
 import { UserAvatar } from '@/components/user-avatar';
+import { GOAL_OPTIONS, MONTHS } from '@/lib/profile-options';
+import { cn } from '@/lib/utils';
 import { send } from '@/routes/verification';
 import type { AuthenticatedAuth } from '@/types';
 
 const fieldClassName = 'bg-muted h-12 rounded-xl border-transparent px-4';
+const selectClassName =
+    'bg-muted h-12 w-full rounded-xl border-transparent px-4 text-sm outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50';
 
 export default function Profile({
     mustVerifyEmail,
@@ -24,6 +29,19 @@ export default function Profile({
     status?: string;
 }) {
     const { auth } = usePage<{ auth: AuthenticatedAuth }>().props;
+    const [goals, setGoals] = useState<string[]>(auth.user.goals ?? []);
+
+    // Keep at least one goal selected: an empty selection isn't sent, so
+    // letting it be cleared would look saved when nothing changed.
+    function toggleGoal(goal: string) {
+        setGoals((current) =>
+            current.includes(goal)
+                ? current.length > 1
+                    ? current.filter((g) => g !== goal)
+                    : current
+                : [...current, goal],
+        );
+    }
 
     return (
         <>
@@ -67,6 +85,105 @@ export default function Profile({
                                     placeholder="Email address"
                                 />
                                 <InputError message={errors.email} />
+                            </div>
+
+                            <div className="grid gap-2">
+                                <Label htmlFor="whatsapp_number">
+                                    WhatsApp number
+                                </Label>
+                                <Input
+                                    id="whatsapp_number"
+                                    type="tel"
+                                    className={fieldClassName}
+                                    defaultValue={
+                                        auth.user.whatsapp_number ?? ''
+                                    }
+                                    name="whatsapp_number"
+                                    autoComplete="tel"
+                                    placeholder="Phone number"
+                                />
+                                <InputError message={errors.whatsapp_number} />
+                            </div>
+
+                            <div className="grid gap-2">
+                                <Label>Birthday</Label>
+                                <div className="flex gap-3">
+                                    <select
+                                        name="birthday_day"
+                                        aria-label="Birthday day"
+                                        defaultValue={
+                                            auth.user.birthday_day ?? ''
+                                        }
+                                        className={selectClassName}
+                                    >
+                                        <option value="">Day</option>
+                                        {Array.from(
+                                            { length: 31 },
+                                            (_, i) => i + 1,
+                                        ).map((day) => (
+                                            <option key={day} value={day}>
+                                                {day}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    <select
+                                        name="birthday_month"
+                                        aria-label="Birthday month"
+                                        defaultValue={
+                                            auth.user.birthday_month ?? ''
+                                        }
+                                        className={selectClassName}
+                                    >
+                                        <option value="">Month</option>
+                                        {MONTHS.map((month, i) => (
+                                            <option key={month} value={i + 1}>
+                                                {month}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <InputError message={errors.birthday_day} />
+                                <InputError message={errors.birthday_month} />
+                            </div>
+
+                            <div className="grid gap-2">
+                                <Label>Goals</Label>
+                                <div className="flex flex-col gap-2">
+                                    {GOAL_OPTIONS.map((goal) => {
+                                        const selected = goals.includes(goal);
+
+                                        return (
+                                            <button
+                                                key={goal}
+                                                type="button"
+                                                aria-pressed={selected}
+                                                onClick={() => toggleGoal(goal)}
+                                                className={cn(
+                                                    'flex h-12 items-center justify-between rounded-full px-5 text-left text-sm font-semibold',
+                                                    selected
+                                                        ? 'bg-primary-tint text-primary-tint-foreground'
+                                                        : 'bg-muted text-foreground',
+                                                )}
+                                            >
+                                                {goal}
+                                                {selected && (
+                                                    <span className="bg-primary text-primary-foreground flex size-5 items-center justify-center rounded-full">
+                                                        <Check className="size-3.5" />
+                                                    </span>
+                                                )}
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                                {goals.map((goal) => (
+                                    <input
+                                        key={goal}
+                                        type="hidden"
+                                        name="goals[]"
+                                        value={goal}
+                                    />
+                                ))}
+                                <InputError message={errors.goals} />
                             </div>
 
                             {mustVerifyEmail &&

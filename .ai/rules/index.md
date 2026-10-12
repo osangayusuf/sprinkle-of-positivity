@@ -11,7 +11,9 @@ Before planning or editing, find the row whose globs match the file's path and r
 | vite.config.ts | .ai/rules/general.md |
 | app/Policies/GroupPolicy.php,app/Http/Requests/Groups/*.php | .ai/rules/groups.md |
 | resources/js/**/*.tsx | .ai/rules/js.md |
+| resources/js/lib/progress-width.ts | .ai/rules/lib.md |
 | app/Policies/GroupPolicy.php | .ai/rules/policies.md |
+| app/Models/Quiz.php,app/Observers/QuizResponseObserver.php,app/Actions/RespondToQuiz.php,app/Http/Resources/QuizResource.php | .ai/rules/resources.md |
 | app/Services/ChallengeProgress.php,app/Services/StreakCalculator.php | .ai/rules/services-services.md |
 | app/Services/ChallengeProgress.php, app/Services/SiteAnalytics.php | .ai/rules/services.md |
 | tests/**/*.php | .ai/rules/tests.md |

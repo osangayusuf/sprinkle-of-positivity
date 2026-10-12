@@ -9,11 +9,32 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
 import { Textarea } from '@/components/ui/textarea';
+import { VersePicker } from '@/components/verse-picker';
+import type { VerseFields } from '@/components/verse-picker';
 
 const MIN_ROWS = 1;
 
+type Row = { id: number; fields: VerseFields };
+
+function blankRow(id: number): Row {
+    return {
+        id,
+        fields: { reference: '', text: '', translation: '', copyright: '' },
+    };
+}
+
 export default function AdminDailyVerseBulk() {
-    const [rowIds, setRowIds] = useState([0]);
+    const [rows, setRows] = useState<Row[]>([blankRow(0)]);
+
+    function updateRow(id: number, patch: Partial<VerseFields>) {
+        setRows((current) =>
+            current.map((row) =>
+                row.id === id
+                    ? { ...row, fields: { ...row.fields, ...patch } }
+                    : row,
+            ),
+        );
+    }
 
     return (
         <>
@@ -33,13 +54,13 @@ export default function AdminDailyVerseBulk() {
                         {...DailyVerseBulkController.store.form()}
                         encType="multipart/form-data"
                         resetOnSuccess
-                        onSuccess={() => setRowIds([0])}
+                        onSuccess={() => setRows([blankRow(0)])}
                         className="space-y-6"
                     >
                         {({ processing, errors }) => (
                             <>
                                 <div className="space-y-4">
-                                    {rowIds.map((id, index) => (
+                                    {rows.map(({ id, fields }, index) => (
                                         <div
                                             key={id}
                                             className="grid gap-3 rounded-lg border p-4"
@@ -48,15 +69,15 @@ export default function AdminDailyVerseBulk() {
                                                 <p className="text-muted-foreground text-xs font-medium">
                                                     Row {index + 1}
                                                 </p>
-                                                {rowIds.length > MIN_ROWS && (
+                                                {rows.length > MIN_ROWS && (
                                                     <button
                                                         type="button"
                                                         aria-label="Remove row"
                                                         onClick={() =>
-                                                            setRowIds((ids) =>
-                                                                ids.filter(
-                                                                    (i) =>
-                                                                        i !==
+                                                            setRows((current) =>
+                                                                current.filter(
+                                                                    (row) =>
+                                                                        row.id !==
                                                                         id,
                                                                 ),
                                                             )
@@ -68,35 +89,30 @@ export default function AdminDailyVerseBulk() {
                                                 )}
                                             </div>
 
-                                            <div className="grid grid-cols-2 gap-3">
-                                                <div className="grid gap-2">
-                                                    <Label
-                                                        htmlFor={`date-${id}`}
-                                                    >
-                                                        Date
-                                                    </Label>
-                                                    <Input
-                                                        id={`date-${id}`}
-                                                        name={`rows[${id}][date]`}
-                                                        type="date"
-                                                        required
-                                                    />
-                                                </div>
-
-                                                <div className="grid gap-2">
-                                                    <Label
-                                                        htmlFor={`reference-${id}`}
-                                                    >
-                                                        Reference
-                                                    </Label>
-                                                    <Input
-                                                        id={`reference-${id}`}
-                                                        name={`rows[${id}][reference]`}
-                                                        placeholder="John 3:16"
-                                                        required
-                                                    />
-                                                </div>
+                                            <div className="grid gap-2">
+                                                <Label htmlFor={`date-${id}`}>
+                                                    Date
+                                                </Label>
+                                                <Input
+                                                    id={`date-${id}`}
+                                                    name={`rows[${id}][date]`}
+                                                    type="date"
+                                                    required
+                                                />
                                             </div>
+
+                                            <VersePicker
+                                                value={fields}
+                                                onChange={(patch) =>
+                                                    updateRow(id, patch)
+                                                }
+                                                idPrefix={`row-${id}-`}
+                                                names={{
+                                                    reference: `rows[${id}][reference]`,
+                                                    translation: `rows[${id}][translation]`,
+                                                    copyright: `rows[${id}][copyright]`,
+                                                }}
+                                            />
 
                                             <div className="grid gap-2">
                                                 <Label htmlFor={`text-${id}`}>
@@ -105,6 +121,13 @@ export default function AdminDailyVerseBulk() {
                                                 <Textarea
                                                     id={`text-${id}`}
                                                     name={`rows[${id}][text]`}
+                                                    value={fields.text}
+                                                    onChange={(e) =>
+                                                        updateRow(id, {
+                                                            text: e.target
+                                                                .value,
+                                                        })
+                                                    }
                                                     rows={3}
                                                     required
                                                 />
@@ -128,9 +151,12 @@ export default function AdminDailyVerseBulk() {
                                     <button
                                         type="button"
                                         onClick={() =>
-                                            setRowIds((ids) => [
-                                                ...ids,
-                                                (ids.at(-1) ?? 0) + 1,
+                                            setRows((current) => [
+                                                ...current,
+                                                blankRow(
+                                                    (current.at(-1)?.id ?? 0) +
+                                                        1,
+                                                ),
                                             ])
                                         }
                                         className="border-border text-primary flex w-full items-center justify-center gap-2 rounded-lg border border-dashed py-3 text-sm font-semibold"

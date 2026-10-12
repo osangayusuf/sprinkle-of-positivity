@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Partner\ParticipantController;
+use App\Http\Controllers\Partner\PartnerApplicationController;
 use App\Http\Controllers\Partner\PartnerRegistrationController;
 use Illuminate\Support\Facades\Route;
 
@@ -16,6 +17,7 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::middleware(['auth', 'verified', 'onboarded'])->group(function () {
+    Route::post('partner/apply', [PartnerApplicationController::class, 'store'])->name('partner.apply');
     Route::get('partner/participants', [ParticipantController::class, 'index'])->name('partner.participants');
     Route::post('partner/participants/{membership}/nudge', [ParticipantController::class, 'nudge'])->name('partner.participants.nudge');
     Route::post('partner/participants/{membership}/reject', [ParticipantController::class, 'reject'])->name('partner.participants.reject');

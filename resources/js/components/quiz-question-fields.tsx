@@ -17,18 +17,21 @@ type OptionDefault = { id: number; label: string };
  * isn't controlled from outside.
  */
 export function QuizQuestionFields({
+    type = 'quiz',
     defaultQuestion = '',
     defaultOptions,
     defaultCorrectIndex,
     errors,
     inputClassName = 'bg-background rounded-xl border-transparent px-4',
 }: {
+    type?: 'quiz' | 'poll';
     defaultQuestion?: string;
     defaultOptions?: OptionDefault[];
     defaultCorrectIndex?: number;
     errors: Partial<Record<string, string>>;
     inputClassName?: string;
 }) {
+    const isPoll = type === 'poll';
     const [optionIds, setOptionIds] = useState(
         defaultOptions?.length ? defaultOptions.map((_, i) => i) : [0, 1],
     );
@@ -36,7 +39,9 @@ export function QuizQuestionFields({
     return (
         <>
             <div className="grid gap-2">
-                <Label htmlFor="question">Question</Label>
+                <Label htmlFor="question">
+                    {isPoll ? 'Poll question' : 'Question'}
+                </Label>
                 <Textarea
                     id="question"
                     name="question"
@@ -50,22 +55,26 @@ export function QuizQuestionFields({
 
             <div className="grid gap-2">
                 <Label>
-                    Answer options{' '}
-                    <span className="text-muted-foreground font-normal">
-                        (select the correct one)
-                    </span>
+                    {isPoll ? 'Poll options' : 'Answer options'}{' '}
+                    {!isPoll && (
+                        <span className="text-muted-foreground font-normal">
+                            (select the correct one)
+                        </span>
+                    )}
                 </Label>
                 {optionIds.map((id, index) => (
                     <div key={id} className="flex items-center gap-2">
-                        <input
-                            type="radio"
-                            name="correct_index"
-                            value={index}
-                            required
-                            defaultChecked={defaultCorrectIndex === index}
-                            aria-label={`Option ${index + 1} is correct`}
-                            className="accent-primary size-4 shrink-0"
-                        />
+                        {!isPoll && (
+                            <input
+                                type="radio"
+                                name="correct_index"
+                                value={index}
+                                required
+                                defaultChecked={defaultCorrectIndex === index}
+                                aria-label={`Option ${index + 1} is correct`}
+                                className="accent-primary size-4 shrink-0"
+                            />
+                        )}
                         <Input
                             name="options[]"
                             defaultValue={defaultOptions?.[index]?.label}

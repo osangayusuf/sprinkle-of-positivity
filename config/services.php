@@ -35,4 +35,11 @@ return [
         ],
     ],
 
+    'youversion' => [
+        'key' => env('YOUVERSION_APP_KEY'),
+        'base_url' => env('YOUVERSION_BASE_URL', 'https://api.youversion.com/v1'),
+        'default_version' => (int) env('YOUVERSION_DEFAULT_VERSION', 3034),
+        'languages' => ['en'],
+    ],
+
 ];

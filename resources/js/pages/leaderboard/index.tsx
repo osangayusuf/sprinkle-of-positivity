@@ -2,37 +2,11 @@ import { Head, Link } from '@inertiajs/react';
 import { PageHeader } from '@/components/page-header';
 import { PointsBadge } from '@/components/points-badge';
 import { UserAvatar } from '@/components/user-avatar';
+import { progressWidthClass } from '@/lib/progress-width';
 import { cn } from '@/lib/utils';
 import type { LeaderboardEntry } from '@/types/models';
 
 const MEDALS: Record<number, string> = { 1: '🥇', 2: '🥈', 3: '🥉' };
-
-// Tailwind can't statically discover a class built from an interpolated
-// number (e.g. `w-[${n}%]`), so progress snaps to the nearest of these
-// fixed, fully-literal width utilities instead.
-const WIDTH_STEPS = [
-    'w-0',
-    'w-1/12',
-    'w-2/12',
-    'w-3/12',
-    'w-4/12',
-    'w-5/12',
-    'w-6/12',
-    'w-7/12',
-    'w-8/12',
-    'w-9/12',
-    'w-10/12',
-    'w-11/12',
-    'w-full',
-];
-
-function progressWidthClass(progress: number): string {
-    const step = Math.round(
-        Math.min(1, Math.max(0, progress)) * (WIDTH_STEPS.length - 1),
-    );
-
-    return WIDTH_STEPS[step];
-}
 
 export default function LeaderboardIndex({
     entries,

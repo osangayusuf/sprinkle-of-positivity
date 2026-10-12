@@ -18,7 +18,7 @@ use Inertia\Response;
 class QuizController extends Controller
 {
     /**
-     * A manager posts a Q&A question for today's group verse.
+     * A manager posts a Q&A question or a poll for today's group verse.
      */
     public function store(StoreQuizRequest $request, Group $group, CreateQuiz $action): RedirectResponse
     {
@@ -32,10 +32,11 @@ class QuizController extends Controller
             $request->user(),
             $request->string('question')->value(),
             $request->array('options'),
-            $request->integer('correct_index'),
+            $request->isPoll() ? null : $request->integer('correct_index'),
+            $request->isPoll() ? Quiz::TYPE_POLL : Quiz::TYPE_QUIZ,
         );
 
-        Inertia::flash('toast', ['type' => 'success', 'message' => __('Question posted.')]);
+        Inertia::flash('toast', ['type' => 'success', 'message' => $request->isPoll() ? __('Poll posted.') : __('Question posted.')]);
 
         return back();
     }
@@ -54,6 +55,7 @@ class QuizController extends Controller
             'group' => new GroupResource($group),
             'quiz' => [
                 'id' => $quiz->id,
+                'type' => $quiz->type,
                 'question' => $quiz->question,
                 'options' => $quiz->options()->orderBy('position')->get(['id', 'label', 'position']),
                 'correct_quiz_option_id' => $quiz->correct_quiz_option_id,
@@ -72,12 +74,42 @@ class QuizController extends Controller
             $quiz,
             $request->string('question')->value(),
             $request->array('options'),
-            $request->integer('correct_index'),
+            $quiz->isPoll() ? null : $request->integer('correct_index'),
         );
 
-        Inertia::flash('toast', ['type' => 'success', 'message' => __('Question updated.')]);
+        Inertia::flash('toast', ['type' => 'success', 'message' => $quiz->isPoll() ? __('Poll updated.') : __('Question updated.')]);
 
         return to_route('groups.verse.show', $group);
+    }
+
+    /**
+     * Close a poll so no more votes (or changed votes) are accepted; the
+     * results become visible to everyone.
+     */
+    public function close(Group $group, Quiz $quiz): RedirectResponse
+    {
+        return $this->setPollClosed($group, $quiz, closed: true);
+    }
+
+    /**
+     * Reopen a closed poll for voting.
+     */
+    public function reopen(Group $group, Quiz $quiz): RedirectResponse
+    {
+        return $this->setPollClosed($group, $quiz, closed: false);
+    }
+
+    private function setPollClosed(Group $group, Quiz $quiz, bool $closed): RedirectResponse
+    {
+        $this->authorize('manage', $group);
+        abort_unless($quiz->group_id === $group->id && $quiz->isPoll(), 404);
+
+        $quiz->closed_at = $closed ? now() : null;
+        $quiz->save();
+
+        Inertia::flash('toast', ['type' => 'success', 'message' => $closed ? __('Poll closed.') : __('Poll reopened.')]);
+
+        return back();
     }
 
     /**

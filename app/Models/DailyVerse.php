@@ -14,6 +14,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property CarbonInterface $date
  * @property string $reference
  * @property string $text
+ * @property string|null $translation
+ * @property string|null $copyright
  * @property string|null $image_path
  * @property int $created_by
  */
