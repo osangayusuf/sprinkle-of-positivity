@@ -14,34 +14,12 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { Spinner } from '@/components/ui/spinner';
+import { GOAL_OPTIONS, MONTHS } from '@/lib/profile-options';
 import { cn } from '@/lib/utils';
 
 const STEPS = ['name', 'whatsapp', 'goals', 'birthday'] as const;
 
 type Step = (typeof STEPS)[number];
-
-const GOAL_OPTIONS = [
-    'Know the Bible better',
-    'Get closer to God',
-    'Grow in community',
-    'Build a daily habit',
-    'Deepen my faith',
-];
-
-const MONTHS = [
-    'January',
-    'February',
-    'March',
-    'April',
-    'May',
-    'June',
-    'July',
-    'August',
-    'September',
-    'October',
-    'November',
-    'December',
-];
 
 const STEP_FIELDS: Record<Step, string[]> = {
     name: ['name'],

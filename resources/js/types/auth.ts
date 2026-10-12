@@ -5,6 +5,10 @@ export type User = {
     avatar: string | null;
     email_verified_at: string | null;
     two_factor_enabled?: boolean;
+    whatsapp_number: string | null;
+    goals: string[] | null;
+    birthday_day: number | null;
+    birthday_month: number | null;
     created_at: string;
     updated_at: string;
     [key: string]: unknown;
