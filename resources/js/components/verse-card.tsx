@@ -20,7 +20,7 @@ export function VerseCard({
                 className={
                     verse.image_url
                         ? 'absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent'
-                        : 'from-heading absolute inset-0 bg-gradient-to-b to-black'
+                        : 'absolute inset-0 bg-gradient-to-b from-[oklch(0.213_0.103_269.66)] to-black'
                 }
             />
             <div className="relative">
