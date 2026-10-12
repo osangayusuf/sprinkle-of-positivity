@@ -35,6 +35,22 @@ test('a manager can set the group verse for today', function () {
     expect($verse->created_by)->toBe($manager->id);
 });
 
+test('the translation and copyright chosen in the picker are stored with the group verse', function () {
+    $group = Group::factory()->create();
+    $this->actingAs(createApprovedManager($group));
+
+    $this->put(route('groups.verse.update', $group), [
+        'reference' => 'Joshua 2:1',
+        'text' => 'Then Joshua son of Nun secretly sent two spies...',
+        'translation' => 'BSB',
+        'copyright' => 'Public Domain',
+    ])->assertRedirect();
+
+    $verse = GroupVerse::query()->sole();
+    expect($verse->translation)->toBe('BSB');
+    expect($verse->copyright)->toBe('Public Domain');
+});
+
 test('a manager can attach an image when setting the group verse', function () {
     Storage::fake('public');
     $group = Group::factory()->create();

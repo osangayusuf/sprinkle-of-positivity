@@ -36,6 +36,24 @@ test('admins can bulk-set several verses at once from a grid of rows', function 
     expect(DailyVerse::query()->whereDate('date', today())->sole()->reference)->toBe('John 3:16');
 });
 
+test('a grid row stores its translation and copyright', function () {
+    $this->actingAs(User::factory()->admin()->create());
+
+    $this->post(route('admin.daily-verse.bulk.store'), [
+        'rows' => [[
+            'date' => today()->toDateString(),
+            'reference' => 'John 3:16',
+            'text' => 'First.',
+            'translation' => 'BSB',
+            'copyright' => 'Public Domain',
+        ]],
+    ])->assertRedirect();
+
+    $verse = DailyVerse::query()->sole();
+    expect($verse->translation)->toBe('BSB');
+    expect($verse->copyright)->toBe('Public Domain');
+});
+
 test('bulk-setting a date that already has a verse updates it instead of duplicating', function () {
     $admin = User::factory()->admin()->create();
     $this->actingAs($admin);

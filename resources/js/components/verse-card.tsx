@@ -26,10 +26,16 @@ export function VerseCard({
             <div className="relative">
                 <p className="text-xs text-white/70">
                     {label} • {verse.reference}
+                    {verse.translation && ` (${verse.translation})`}
                 </p>
                 <p className="mt-2 text-lg leading-snug font-semibold">
                     &ldquo;{verse.text}&rdquo;
                 </p>
+                {verse.copyright && (
+                    <p className="mt-2 text-[10px] text-white/60">
+                        {verse.copyright}
+                    </p>
+                )}
             </div>
         </div>
     );

@@ -26,6 +26,8 @@ class VerseResource extends JsonResource
             'date' => $this->date->toDateString(),
             'reference' => $this->reference,
             'text' => $this->text,
+            'translation' => $this->translation,
+            'copyright' => $this->copyright,
             'image_url' => $this->image_path
                 ? Storage::disk('public')->url($this->image_path)
                 : null,

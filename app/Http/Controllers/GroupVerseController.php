@@ -125,6 +125,8 @@ class GroupVerseController extends Controller
             $request->string('reference')->value(),
             $request->string('text')->value(),
             image: $request->file('image'),
+            translation: $request->validated('translation'),
+            copyright: $request->validated('copyright'),
         );
 
         Inertia::flash('toast', ['type' => 'success', 'message' => __("Today's verse was updated.")]);

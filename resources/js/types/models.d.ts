@@ -40,6 +40,8 @@ export type Verse = {
     date: string;
     reference: string;
     text: string;
+    translation: string | null;
+    copyright: string | null;
     image_url: string | null;
 };
 

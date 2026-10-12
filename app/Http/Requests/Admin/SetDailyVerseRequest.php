@@ -26,6 +26,8 @@ class SetDailyVerseRequest extends FormRequest
         return [
             'reference' => ['required', 'string', 'max:255'],
             'text' => ['required', 'string'],
+            'translation' => ['nullable', 'string', 'max:32'],
+            'copyright' => ['nullable', 'string', 'max:255'],
             'image' => ['nullable', 'image', 'max:2048'],
         ];
     }

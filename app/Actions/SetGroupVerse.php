@@ -16,7 +16,7 @@ class SetGroupVerse
      * Set (or update) a group's verse for the given date — defaults to
      * today, since that's the only day a manager can ever post for.
      */
-    public function handle(Group $group, User $author, string $reference, string $text, ?Carbon $date = null, ?UploadedFile $image = null): GroupVerse
+    public function handle(Group $group, User $author, string $reference, string $text, ?Carbon $date = null, ?UploadedFile $image = null, ?string $translation = null, ?string $copyright = null): GroupVerse
     {
         $date ??= today();
 
@@ -29,6 +29,8 @@ class SetGroupVerse
         $verse->date = $date;
         $verse->reference = $reference;
         $verse->text = $text;
+        $verse->translation = $translation;
+        $verse->copyright = $copyright;
         $verse->created_by = $author->id;
 
         if ($image) {
