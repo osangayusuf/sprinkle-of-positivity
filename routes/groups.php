@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\BibleCatalogController;
 use App\Http\Controllers\BibleVerseLookupController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\GroupApplicationController;
@@ -38,6 +39,8 @@ Route::middleware(['auth', 'verified', 'onboarded'])->group(function () {
     Route::post('groups/{group:slug}/quizzes/{quiz}/responses', [QuizResponseController::class, 'store'])->name('groups.quizzes.responses.store');
 
     Route::get('bible-verse-lookup', BibleVerseLookupController::class)->name('bible-verse-lookup');
+    Route::get('bible/versions', [BibleCatalogController::class, 'versions'])->name('bible.versions');
+    Route::get('bible/versions/{version}/books', [BibleCatalogController::class, 'books'])->whereNumber('version')->name('bible.books');
 });
 
 // Read-only pages open to guests. Declared after the authenticated routes so
