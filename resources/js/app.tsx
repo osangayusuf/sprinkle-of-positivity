@@ -32,6 +32,7 @@ void createInertiaApp({
             case name === 'landing':
             case name === 'testimonials':
             case name === 'support':
+            case name === 'manual':
             case name === 'accountability-partners':
             case name === 'certificates/show':
             case name.startsWith('onboarding/'):
