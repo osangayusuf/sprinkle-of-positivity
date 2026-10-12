@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\ManualController;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -21,6 +22,7 @@ Route::get('accountability-partners', function () {
 
     return Inertia::render('accountability-partners', ['partners' => $partners]);
 })->name('accountability-partners');
+Route::get('manual', ManualController::class)->name('manual');
 Route::get('support', fn () => Inertia::render('support'))->name('support');
 
 Route::middleware('onboarded')->group(function () {

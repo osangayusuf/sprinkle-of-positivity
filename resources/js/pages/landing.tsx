@@ -1,6 +1,7 @@
 import { Head, Link } from '@inertiajs/react';
 import {
     ArrowUpRight,
+    BookOpenText,
     CalendarDays,
     Flame,
     HandHeart,
@@ -28,6 +29,7 @@ import {
     accountabilityPartners,
     home,
     login,
+    manual,
     register,
     support as supportPage,
 } from '@/routes';
@@ -617,6 +619,15 @@ function Footer() {
                                     aria-hidden="true"
                                 />
                                 Give / Support
+                            </Link>
+                        </li>
+                        <li>
+                            <Link href={manual()} className={linkClass}>
+                                <BookOpenText
+                                    className="size-4"
+                                    aria-hidden="true"
+                                />
+                                User manual
                             </Link>
                         </li>
                     </ul>
