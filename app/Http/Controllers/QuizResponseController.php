@@ -13,7 +13,7 @@ use Inertia\Inertia;
 class QuizResponseController extends Controller
 {
     /**
-     * A member answers a group's Q&A question.
+     * A member answers a group's Q&A question or votes in a poll.
      */
     public function store(RespondToQuizRequest $request, Group $group, Quiz $quiz, RespondToQuiz $action): RedirectResponse
     {
@@ -22,6 +22,12 @@ class QuizResponseController extends Controller
         $option = QuizOption::query()->findOrFail($request->integer('quiz_option_id'));
 
         $action->handle($quiz, $request->user(), $option);
+
+        if ($quiz->isPoll()) {
+            Inertia::flash('toast', ['type' => 'success', 'message' => __('Vote saved.')]);
+
+            return back();
+        }
 
         $isCorrect = $quiz->correct_quiz_option_id !== null && $quiz->correct_quiz_option_id === $option->id;
 

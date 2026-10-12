@@ -122,7 +122,7 @@ export default function VerseShow({
                         {(
                             [
                                 ['insights', 'Bible Study Insights'],
-                                ['qa', 'Q&A'],
+                                ['qa', 'Q&A & Polls'],
                             ] as [Tab, string][]
                         ).map(([value, label]) => (
                             <button
@@ -187,7 +187,7 @@ export default function VerseShow({
 
                             {quizzes.length === 0 ? (
                                 <p className="text-muted-foreground py-10 text-center text-sm">
-                                    No questions have been posted yet.
+                                    No questions or polls have been posted yet.
                                 </p>
                             ) : (
                                 <div className="divide-border divide-y">
@@ -199,6 +199,8 @@ export default function VerseShow({
                                             canManage={canManage}
                                             editUrl={`/groups/${group.slug}/quizzes/${quiz.id}/edit`}
                                             deleteUrl={`/groups/${group.slug}/quizzes/${quiz.id}`}
+                                            closeUrl={`/groups/${group.slug}/quizzes/${quiz.id}/close`}
+                                            reopenUrl={`/groups/${group.slug}/quizzes/${quiz.id}/reopen`}
                                         />
                                     ))}
                                 </div>

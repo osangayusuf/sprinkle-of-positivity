@@ -36,6 +36,8 @@ Route::middleware(['auth', 'verified', 'onboarded'])->group(function () {
     Route::get('groups/{group:slug}/quizzes/{quiz}/edit', [QuizController::class, 'edit'])->name('groups.quizzes.edit');
     Route::put('groups/{group:slug}/quizzes/{quiz}', [QuizController::class, 'update'])->name('groups.quizzes.update');
     Route::delete('groups/{group:slug}/quizzes/{quiz}', [QuizController::class, 'destroy'])->name('groups.quizzes.destroy');
+    Route::patch('groups/{group:slug}/quizzes/{quiz}/close', [QuizController::class, 'close'])->name('groups.quizzes.close');
+    Route::patch('groups/{group:slug}/quizzes/{quiz}/reopen', [QuizController::class, 'reopen'])->name('groups.quizzes.reopen');
     Route::post('groups/{group:slug}/quizzes/{quiz}/responses', [QuizResponseController::class, 'store'])->name('groups.quizzes.responses.store');
 
     Route::get('bible-verse-lookup', BibleVerseLookupController::class)->name('bible-verse-lookup');

@@ -18,8 +18,18 @@ class QuizResource extends JsonResource
             ->firstWhere('user_id', $request->user()?->id)
             ?->quiz_option_id;
 
+        // Poll results stay hidden until the member has voted, the poll is
+        // closed, or they manage the group, so they don't sway the vote.
+        $showResults = $this->isPoll() && (
+            $myResponseOptionId !== null
+            || $this->isClosed()
+            || ($request->user()?->can('manage', $this->group) ?? false)
+        );
+
         return [
             'id' => $this->id,
+            'type' => $this->type,
+            'closed' => $this->isClosed(),
             'question' => $this->question,
             'created_by_name' => $this->creator->name,
             'created_by_avatar' => $this->creator->avatar,
@@ -27,6 +37,9 @@ class QuizResource extends JsonResource
             'options' => $this->options->map(fn ($option) => [
                 'id' => $option->id,
                 'label' => $option->label,
+                'votes' => $showResults
+                    ? $this->responses->where('quiz_option_id', $option->id)->count()
+                    : null,
             ]),
             'responses_count' => $this->responses->count(),
             'my_response_option_id' => $myResponseOptionId,

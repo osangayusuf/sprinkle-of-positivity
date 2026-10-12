@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/dialog';
 import { useGuestRedirect } from '@/hooks/use-guest-redirect';
 import { formatRelativeTime } from '@/lib/format';
+import { progressWidthClass } from '@/lib/progress-width';
 import { cn } from '@/lib/utils';
 import type { Quiz } from '@/types/models';
 
@@ -22,20 +23,34 @@ export function QuizCard({
     canManage = false,
     editUrl,
     deleteUrl,
+    closeUrl,
+    reopenUrl,
 }: {
     quiz: Quiz;
     respondUrl: string;
     canManage?: boolean;
     editUrl?: string;
     deleteUrl?: string;
+    closeUrl?: string;
+    reopenUrl?: string;
 }) {
+    const isPoll = quiz.type === 'poll';
+    const noun = isPoll ? 'poll' : 'question';
     const answered = quiz.my_response_option_id !== null;
     const hasResponses = quiz.responses_count > 0;
+    // A quiz is answered once; a poll vote can change until it is closed.
+    const locked = isPoll ? quiz.closed : answered;
+    const showResults = isPoll && quiz.options.some((o) => o.votes != null);
+    const totalVotes = quiz.options.reduce((sum, o) => sum + (o.votes ?? 0), 0);
 
     const redirectGuest = useGuestRedirect();
 
     function respond(optionId: number) {
-        if (answered || redirectGuest()) {
+        if (locked || quiz.my_response_option_id === optionId) {
+            return;
+        }
+
+        if (redirectGuest()) {
             return;
         }
 
@@ -68,7 +83,7 @@ export function QuizCard({
                         {!hasResponses && editUrl && (
                             <Link
                                 href={editUrl}
-                                aria-label="Edit question"
+                                aria-label={`Edit ${noun}`}
                                 className="text-muted-foreground"
                             >
                                 <Pencil className="size-4" />
@@ -80,7 +95,7 @@ export function QuizCard({
                                 <DialogTrigger asChild>
                                     <button
                                         type="button"
-                                        aria-label="Delete question"
+                                        aria-label={`Delete ${noun}`}
                                         className="text-muted-foreground"
                                     >
                                         <Trash2 className="size-4" />
@@ -88,11 +103,13 @@ export function QuizCard({
                                 </DialogTrigger>
                                 <DialogContent>
                                     <DialogTitle>
-                                        Delete this question?
+                                        Delete this {noun}?
                                     </DialogTitle>
                                     <DialogDescription>
                                         {hasResponses
-                                            ? 'Members have already answered this question — deleting it will also reverse the points they earned from it. This cannot be undone.'
+                                            ? isPoll
+                                                ? 'Members have already voted in this poll — deleting it removes their votes. This cannot be undone.'
+                                                : 'Members have already answered this question — deleting it will also reverse the points they earned from it. This cannot be undone.'
                                             : 'This cannot be undone.'}
                                     </DialogDescription>
 
@@ -111,7 +128,7 @@ export function QuizCard({
                                                 type="submit"
                                                 variant="destructive"
                                             >
-                                                Delete question
+                                                Delete {noun}
                                             </Button>
                                         </Form>
                                     </DialogFooter>
@@ -129,6 +146,49 @@ export function QuizCard({
             <div className="flex flex-col gap-2">
                 {quiz.options.map((option) => {
                     const selected = quiz.my_response_option_id === option.id;
+                    const votes = option.votes ?? 0;
+                    const share = totalVotes > 0 ? votes / totalVotes : 0;
+
+                    if (isPoll) {
+                        return (
+                            <button
+                                key={option.id}
+                                type="button"
+                                disabled={locked}
+                                aria-pressed={selected}
+                                onClick={() => respond(option.id)}
+                                className={cn(
+                                    'border-border relative overflow-hidden rounded-xl border px-4 py-3 text-left text-sm font-medium',
+                                    selected
+                                        ? 'border-primary text-primary-tint-foreground'
+                                        : 'text-foreground',
+                                    locked && !selected && 'opacity-80',
+                                )}
+                            >
+                                {showResults && (
+                                    <span
+                                        aria-hidden="true"
+                                        className={cn(
+                                            'absolute inset-y-0 left-0',
+                                            selected
+                                                ? 'bg-primary-tint'
+                                                : 'bg-muted',
+                                            progressWidthClass(share),
+                                        )}
+                                    />
+                                )}
+                                <span className="relative flex items-center justify-between gap-3">
+                                    <span>{option.label}</span>
+                                    {showResults && (
+                                        <span className="text-muted-foreground shrink-0 text-xs">
+                                            {Math.round(share * 100)}% · {votes}
+                                        </span>
+                                    )}
+                                </span>
+                            </button>
+                        );
+                    }
+
                     const isCorrect = quiz.correct_quiz_option_id === option.id;
                     const isWrongPick = answered && selected && !isCorrect;
 
@@ -158,6 +218,40 @@ export function QuizCard({
                     );
                 })}
             </div>
+
+            {isPoll && (
+                <div className="text-muted-foreground flex flex-wrap items-center justify-between gap-2 text-xs">
+                    <span>
+                        {quiz.responses_count} vote
+                        {quiz.responses_count === 1 ? '' : 's'}
+                        {quiz.closed
+                            ? ' · Closed'
+                            : answered
+                              ? ' · Tap another option to change your vote'
+                              : !showResults
+                                ? ' · Results show after you vote'
+                                : ''}
+                    </span>
+
+                    {canManage && (quiz.closed ? reopenUrl : closeUrl) && (
+                        <button
+                            type="button"
+                            onClick={() =>
+                                router.patch(
+                                    (quiz.closed
+                                        ? reopenUrl
+                                        : closeUrl) as string,
+                                    {},
+                                    { preserveScroll: true },
+                                )
+                            }
+                            className="text-primary font-semibold"
+                        >
+                            {quiz.closed ? 'Reopen poll' : 'Close poll'}
+                        </button>
+                    )}
+                </div>
+            )}
         </div>
     );
 }

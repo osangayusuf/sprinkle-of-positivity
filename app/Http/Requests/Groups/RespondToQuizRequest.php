@@ -21,6 +21,11 @@ class RespondToQuizRequest extends FormRequest
         /** @var Quiz $quiz */
         $quiz = $this->route('quiz');
 
+        // A poll vote can be changed until a manager closes the poll.
+        if ($quiz->isPoll()) {
+            return ! $quiz->isClosed();
+        }
+
         return ! $quiz->responses()->where('user_id', $this->user()->id)->exists();
     }
 

@@ -10,6 +10,7 @@ type QuizOption = { id: number; label: string; position: number };
 
 type EditableQuiz = {
     id: number;
+    type: 'quiz' | 'poll';
     question: string;
     options: QuizOption[];
     correct_quiz_option_id: number | null;
@@ -22,15 +23,17 @@ export default function QuizEdit({
     group: Group;
     quiz: EditableQuiz;
 }) {
+    const isPoll = quiz.type === 'poll';
+    const noun = isPoll ? 'poll' : 'question';
     const correctIndex = quiz.options.findIndex(
         (option) => option.id === quiz.correct_quiz_option_id,
     );
 
     return (
         <>
-            <Head title={`Edit question — ${group.name}`} />
+            <Head title={`Edit ${noun} — ${group.name}`} />
             <PageHeader
-                title="Edit question"
+                title={isPoll ? 'Edit poll' : 'Edit question'}
                 backHref={`/groups/${group.slug}/verse`}
             />
 
@@ -45,6 +48,7 @@ export default function QuizEdit({
                     {({ processing, errors }) => (
                         <>
                             <QuizQuestionFields
+                                type={quiz.type}
                                 defaultQuestion={quiz.question}
                                 defaultOptions={quiz.options}
                                 defaultCorrectIndex={

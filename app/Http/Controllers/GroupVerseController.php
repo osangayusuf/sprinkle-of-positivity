@@ -46,7 +46,7 @@ class GroupVerseController extends Controller
             : collect();
 
         $quizzes = $verse
-            ? $verse->quizzes()->with(['creator', 'options', 'responses'])->latest()->get()
+            ? $verse->quizzes()->with(['group', 'creator', 'options', 'responses'])->latest()->get()
             : collect();
 
         return Inertia::render('verses/show', [

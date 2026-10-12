@@ -37,10 +37,21 @@ class UpdateQuizRequest extends FormRequest
             'options' => ['required', 'array', 'min:2', 'max:6'],
             'options.*' => ['required', 'string', 'max:255'],
             'correct_index' => [
-                'required',
+                Rule::requiredIf(! $this->isPoll()),
+                'nullable',
                 'integer',
                 Rule::in(range(0, count($this->input('options', [])) - 1)),
             ],
         ];
+    }
+
+    /**
+     * Whether the quiz being edited is a poll, which has no correct answer.
+     */
+    public function isPoll(): bool
+    {
+        $quiz = $this->route('quiz');
+
+        return $quiz instanceof Quiz && $quiz->isPoll();
     }
 }
