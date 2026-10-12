@@ -4,6 +4,7 @@ use App\Http\Controllers\BibleCatalogController;
 use App\Http\Controllers\BibleVerseLookupController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\GroupApplicationController;
+use App\Http\Controllers\GroupChatController;
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\GroupManagementController;
 use App\Http\Controllers\GroupVerseController;
@@ -21,6 +22,10 @@ Route::middleware(['auth', 'verified', 'onboarded'])->group(function () {
     Route::get('groups/{group:slug}/manage', [GroupManagementController::class, 'edit'])->name('groups.manage');
     Route::patch('groups/{group:slug}/applications/{membership}', [GroupApplicationController::class, 'update'])->name('groups.applications.update');
     Route::delete('groups/{group:slug}/members/{membership}', [GroupApplicationController::class, 'destroy'])->name('groups.members.destroy');
+
+    Route::get('groups/{group:slug}/chat', [GroupChatController::class, 'show'])->name('groups.chat.show');
+    Route::post('groups/{group:slug}/chat', [GroupChatController::class, 'store'])->middleware('throttle:30,1')->name('groups.chat.store');
+    Route::delete('groups/{group:slug}/chat/{message}', [GroupChatController::class, 'destroy'])->name('groups.chat.destroy');
 
     Route::get('groups/{group:slug}/verse/edit', [GroupVerseController::class, 'edit'])->name('groups.verse.edit');
     Route::put('groups/{group:slug}/verse', [GroupVerseController::class, 'update'])->name('groups.verse.update');

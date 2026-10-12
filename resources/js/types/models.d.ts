@@ -106,6 +106,20 @@ export type Quiz = {
     correct_quiz_option_id: number | null;
 };
 
+export type ChatMessage = {
+    id: number;
+    body: string;
+    created_at: string;
+    author: {
+        id: number;
+        name: string;
+        avatar: string | null;
+        is_manager: boolean;
+    };
+    mine: boolean;
+    can_delete: boolean;
+};
+
 export type LeaderboardEntry = {
     rank: number;
     id: number;

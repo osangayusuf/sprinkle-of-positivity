@@ -1,5 +1,5 @@
 import { Head, Link, usePage } from '@inertiajs/react';
-import { ChevronLeft, Lock, MoreVertical } from 'lucide-react';
+import { ChevronLeft, Lock, MessageCircle, MoreVertical } from 'lucide-react';
 import { SignInPrompt } from '@/components/sign-in-prompt';
 import { Button } from '@/components/ui/button';
 import type { Auth } from '@/types/auth';
@@ -10,6 +10,7 @@ type Props = {
     membership: GroupMembershipInfo | null;
     canManage: boolean;
     canViewContent: boolean;
+    canChat: boolean;
 };
 
 export default function GroupShow({
@@ -17,6 +18,7 @@ export default function GroupShow({
     membership,
     canManage,
     canViewContent,
+    canChat,
 }: Props) {
     const { auth } = usePage<{ auth: Auth }>().props;
 
@@ -95,6 +97,19 @@ export default function GroupShow({
                         <div className="bg-muted text-muted-foreground rounded-full px-5 py-4 text-center text-sm font-semibold">
                             Application pending approval
                         </div>
+                    )}
+
+                    {canChat && (
+                        <Button
+                            asChild
+                            variant="outline"
+                            className="h-14 w-full rounded-full text-base"
+                        >
+                            <Link href={`/groups/${group.slug}/chat`}>
+                                <MessageCircle className="size-5" />
+                                Group chat
+                            </Link>
+                        </Button>
                     )}
 
                     {canViewContent ? (
