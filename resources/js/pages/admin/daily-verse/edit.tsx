@@ -8,7 +8,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
 import { Textarea } from '@/components/ui/textarea';
-import { bibleVerseLookup } from '@/routes';
+import { VersePicker } from '@/components/verse-picker';
+import type { VerseFields } from '@/components/verse-picker';
 import type { Verse } from '@/types/models';
 
 function todayDateString(): string {
@@ -22,31 +23,17 @@ export default function AdminDailyVerseEdit({
     verse: Verse | null;
     date: string;
 }) {
-    const [reference, setReference] = useState(verse?.reference ?? '');
-    const [text, setText] = useState(verse?.text ?? '');
-    const [looking, setLooking] = useState(false);
+    const [fields, setFields] = useState<VerseFields>({
+        reference: verse?.reference ?? '',
+        text: verse?.text ?? '',
+        translation: verse?.translation ?? '',
+        copyright: verse?.copyright ?? '',
+    });
     const today = todayDateString();
     const isToday = date === today;
 
-    async function lookUp() {
-        if (!reference.trim()) {
-            return;
-        }
-
-        setLooking(true);
-
-        try {
-            const response = await fetch(
-                bibleVerseLookup.url({ query: { reference } }),
-            );
-            const data: { text: string | null } = await response.json();
-
-            if (data.text) {
-                setText(data.text);
-            }
-        } finally {
-            setLooking(false);
-        }
+    function updateFields(patch: Partial<VerseFields>) {
+        setFields((current) => ({ ...current, ...patch }));
     }
 
     function changeDate(newDate: string) {
@@ -106,40 +93,21 @@ export default function AdminDailyVerseEdit({
                 >
                     {({ processing, errors }) => (
                         <>
-                            <div className="grid gap-2">
-                                <Label htmlFor="reference">Reference</Label>
-                                <div className="flex gap-2">
-                                    <Input
-                                        id="reference"
-                                        name="reference"
-                                        value={reference}
-                                        onChange={(e) =>
-                                            setReference(e.target.value)
-                                        }
-                                        placeholder="John 3:16"
-                                        required
-                                    />
-                                    <Button
-                                        type="button"
-                                        variant="outline"
-                                        disabled={looking}
-                                        onClick={lookUp}
-                                        className="shrink-0"
-                                    >
-                                        {looking && <Spinner />}
-                                        Look up
-                                    </Button>
-                                </div>
-                                <InputError message={errors.reference} />
-                            </div>
+                            <VersePicker
+                                value={fields}
+                                onChange={updateFields}
+                                errors={errors}
+                            />
 
                             <div className="grid gap-2">
                                 <Label htmlFor="text">Verse text</Label>
                                 <Textarea
                                     id="text"
                                     name="text"
-                                    value={text}
-                                    onChange={(e) => setText(e.target.value)}
+                                    value={fields.text}
+                                    onChange={(e) =>
+                                        updateFields({ text: e.target.value })
+                                    }
                                     required
                                     rows={6}
                                 />
