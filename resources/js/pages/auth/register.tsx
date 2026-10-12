@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
 import { login } from '@/routes';
+import { register as registerPartner } from '@/routes/partner';
 import { store } from '@/routes/register';
 
 type Props = {
@@ -106,6 +107,12 @@ export default function Register({ passwordRules }: Props) {
                             <TextLink href={login()} tabIndex={6}>
                                 Log in
                             </TextLink>
+                            <span className="mt-1 block">
+                                Accountability partner?{' '}
+                                <TextLink href={registerPartner()}>
+                                    Sign up here
+                                </TextLink>
+                            </span>
                         </div>
                     </>
                 )}

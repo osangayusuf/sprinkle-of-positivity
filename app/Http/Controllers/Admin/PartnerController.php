@@ -19,7 +19,7 @@ class PartnerController extends Controller
     public function update(Request $request, User $user, DecidePartnerApplication $action): RedirectResponse
     {
         $this->authorize('access-admin');
-        abort_unless($user->isPartner(), 404);
+        abort_unless($user->isPartner() || $user->partner_status !== null, 404);
 
         $decision = $request->validate([
             'decision' => ['required', Rule::in([PartnerStatus::Approved->value, PartnerStatus::Rejected->value])],

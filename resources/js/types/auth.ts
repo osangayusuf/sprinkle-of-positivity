@@ -9,6 +9,7 @@ export type User = {
     goals: string[] | null;
     birthday_day: number | null;
     birthday_month: number | null;
+    partner_status: 'pending' | 'approved' | 'rejected' | null;
     created_at: string;
     updated_at: string;
     [key: string]: unknown;
@@ -18,6 +19,7 @@ export type Auth = {
     user: User | null;
     isAdmin: boolean;
     isPartner: boolean;
+    canApplyAsPartner: boolean;
 };
 
 /**

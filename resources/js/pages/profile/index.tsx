@@ -3,6 +3,7 @@ import {
     Award,
     Bell,
     ChevronRight,
+    HeartHandshake,
     LogOut,
     User as UserIcon,
 } from 'lucide-react';
@@ -11,6 +12,7 @@ import { PointsBadge } from '@/components/points-badge';
 import { UserAvatar } from '@/components/user-avatar';
 import { usePushSubscription } from '@/hooks/use-push-subscription';
 import { logout } from '@/routes';
+import { apply } from '@/routes/partner';
 import { edit } from '@/routes/profile';
 import type { AuthenticatedAuth } from '@/types/auth';
 
@@ -82,6 +84,43 @@ export default function ProfileIndex({
                         </span>
                         <ChevronRight className="text-muted-foreground size-4" />
                     </Link>
+
+                    {auth.canApplyAsPartner && (
+                        <Link
+                            href={apply()}
+                            as="button"
+                            className="flex w-full items-center gap-3 px-4 py-3 text-left"
+                        >
+                            <HeartHandshake className="text-muted-foreground size-4" />
+                            <span className="flex-1">
+                                <span className="block text-sm font-medium">
+                                    Become an accountability partner
+                                </span>
+                                <span className="text-muted-foreground block text-xs">
+                                    {auth.user.partner_status === 'rejected'
+                                        ? 'Your last application was declined. You can apply again.'
+                                        : 'An admin reviews every application.'}
+                                </span>
+                            </span>
+                            <ChevronRight className="text-muted-foreground size-4" />
+                        </Link>
+                    )}
+
+                    {auth.user.partner_status === 'pending' &&
+                        !auth.isPartner && (
+                            <div className="flex items-center gap-3 px-4 py-3">
+                                <HeartHandshake className="text-muted-foreground size-4" />
+                                <span className="flex-1">
+                                    <span className="block text-sm font-medium">
+                                        Partner application pending
+                                    </span>
+                                    <span className="text-muted-foreground block text-xs">
+                                        We'll notify you once an admin has
+                                        decided.
+                                    </span>
+                                </span>
+                            </div>
+                        )}
 
                     {push.supported && (
                         <button
