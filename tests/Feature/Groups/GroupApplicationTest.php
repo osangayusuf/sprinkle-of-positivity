@@ -163,3 +163,29 @@ test('a membership from another group cannot be decided through this group', fun
         ])
         ->assertNotFound();
 });
+
+test('an admin does not need to join and can manage any group', function () {
+    $admin = User::factory()->admin()->create();
+    $group = Group::factory()->create();
+    $this->actingAs($admin);
+
+    $this->post(route('groups.apply', $group), ['code_of_conduct_agreed' => true])->assertForbidden();
+    $this->get(route('groups.manage', $group))->assertOk();
+    $this->get(route('groups.chat.show', $group))->assertOk();
+});
+
+test('an admin who is not the group manager can approve, reject, and remove members', function () {
+    $admin = User::factory()->admin()->create();
+    $group = Group::factory()->create();
+    $pending = pendingApplicant($group);
+    $other = pendingApplicant($group);
+    $this->actingAs($admin);
+
+    $this->patch(route('groups.applications.update', [$group, $pending]), ['decision' => 'approved'])->assertRedirect();
+    $this->patch(route('groups.applications.update', [$group, $other]), ['decision' => 'rejected'])->assertRedirect();
+    expect($pending->fresh()->status)->toBe(GroupMembershipStatus::Approved)
+        ->and($other->fresh()->status)->toBe(GroupMembershipStatus::Rejected);
+
+    $this->delete(route('groups.members.destroy', [$group, $pending]))->assertRedirect();
+    expect($pending->fresh()->status)->toBe(GroupMembershipStatus::Removed);
+});

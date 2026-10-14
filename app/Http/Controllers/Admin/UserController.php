@@ -30,7 +30,9 @@ class UserController extends Controller
     }
 
     /**
-     * Promote or demote a user between the platform's global roles.
+     * Promote or demote a user between the platform's global roles. An admin
+     * can also keep the accountability partner role (`also_partner`) so one
+     * account does both jobs.
      */
     public function updateRole(UpdateUserRoleRequest $request, User $user): RedirectResponse
     {
@@ -42,16 +44,21 @@ class UserController extends Controller
             ]);
         }
 
-        if ($role !== Role::PARTNER && $user->managedGroups()->exists()) {
+        $alsoPartner = $role === Role::ADMIN && $request->boolean('also_partner');
+        $isPartner = $role === Role::PARTNER || $alsoPartner;
+
+        if (! $isPartner && $user->managedGroups()->exists()) {
             throw ValidationException::withMessages([
                 'role' => __('Remove this partner from the groups they manage first.'),
             ]);
         }
 
-        $roleId = Role::query()->firstOrCreate(['name' => $role])->id;
-        $user->roles()->sync([$roleId]);
+        $roleNames = $alsoPartner ? [Role::ADMIN, Role::PARTNER] : [$role];
+        $user->roles()->sync(
+            collect($roleNames)->map(fn (string $name) => Role::query()->firstOrCreate(['name' => $name])->id)->all()
+        );
 
-        if ($role === Role::PARTNER) {
+        if ($isPartner) {
             $user->partner_status = PartnerStatus::Approved;
             $user->partner_decided_at = now();
         } else {

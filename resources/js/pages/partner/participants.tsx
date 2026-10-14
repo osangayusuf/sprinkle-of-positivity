@@ -225,19 +225,15 @@ export default function PartnerParticipants({
                                     <BellRing className="size-4" />
                                     Nudge
                                 </Button>
-                                {!isAdmin && (
-                                    <Button
-                                        type="button"
-                                        size="sm"
-                                        variant="ghost"
-                                        onClick={() =>
-                                            setRejecting(participant.id)
-                                        }
-                                    >
-                                        <UserMinus className="size-4" />
-                                        Reassign
-                                    </Button>
-                                )}
+                                <Button
+                                    type="button"
+                                    size="sm"
+                                    variant="ghost"
+                                    onClick={() => setRejecting(participant.id)}
+                                >
+                                    <UserMinus className="size-4" />
+                                    Reassign
+                                </Button>
                             </div>
                         )}
                     </div>

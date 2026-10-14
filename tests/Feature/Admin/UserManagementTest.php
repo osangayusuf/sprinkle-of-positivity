@@ -62,3 +62,29 @@ test('an admin cannot demote themselves', function () {
 
     expect($admin->fresh()->hasRole(Role::ADMIN))->toBeTrue();
 });
+
+test('an admin can also be an approved accountability partner', function () {
+    $admin = User::factory()->admin()->create();
+    $this->actingAs($admin);
+
+    $this->put(route('admin.users.update-role', $admin), [
+        'role' => Role::ADMIN,
+        'also_partner' => true,
+    ])->assertRedirect();
+
+    $admin = $admin->fresh();
+    expect($admin->hasRole(Role::ADMIN))->toBeTrue()
+        ->and($admin->isApprovedPartner())->toBeTrue();
+});
+
+test('an admin cannot drop the partner role while managing groups', function () {
+    $admin = User::factory()->admin()->create();
+    $this->actingAs($admin);
+    $this->put(route('admin.users.update-role', $admin), ['role' => Role::ADMIN, 'also_partner' => true]);
+    $this->post(route('admin.groups.store'), [
+        'name' => 'Mine', 'purpose' => 'Test', 'manager_ids' => [$admin->id],
+    ])->assertRedirect();
+
+    $this->put(route('admin.users.update-role', $admin), ['role' => Role::ADMIN, 'also_partner' => false])
+        ->assertInvalid('role');
+});

@@ -178,3 +178,30 @@ test('admins can make a private group public by unticking the private box', func
 
     expect($group->refresh()->is_private)->toBeFalse();
 });
+
+test('an admin who is also a partner can be appointed to a group and is auto-assigned participants', function () {
+    $admin = User::factory()->admin()->partner()->create();
+    $this->actingAs($admin);
+
+    $this->post(route('admin.groups.store'), [
+        'name' => 'Admin led', 'purpose' => 'Test', 'manager_ids' => [$admin->id],
+    ])->assertRedirect(route('admin.groups.index'));
+
+    $group = Group::query()->sole();
+    expect($group->managers()->pluck('users.id')->all())->toBe([$admin->id]);
+
+    $membership = joinAsApprovedMember($group, User::factory()->create());
+    expect($membership->fresh()->partner_id)->toBe($admin->id);
+});
+
+test('an admin who has not opted in as a partner is not offered as a partner', function () {
+    $admin = User::factory()->admin()->create();
+    $this->actingAs($admin);
+
+    $this->get(route('admin.groups.create'))
+        ->assertInertia(fn ($page) => $page->has('users', 0));
+
+    $this->post(route('admin.groups.store'), [
+        'name' => 'X', 'purpose' => 'Test', 'manager_ids' => [$admin->id],
+    ])->assertInvalid('manager_ids.0');
+});
