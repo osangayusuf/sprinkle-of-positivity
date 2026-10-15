@@ -1,5 +1,6 @@
 <?php
 
+use App\Actions\DecideGroupApplication;
 use App\Enums\GroupMembershipRole;
 use App\Enums\GroupMembershipStatus;
 use App\Enums\GroupStatus;
@@ -190,7 +191,12 @@ test('an admin who is also a partner can be appointed to a group and is auto-ass
     $group = Group::query()->sole();
     expect($group->managers()->pluck('users.id')->all())->toBe([$admin->id]);
 
-    $membership = joinAsApprovedMember($group, User::factory()->create());
+    $applicant = User::factory()->create();
+    $applicant->groups()->attach($group->id, ['role' => 'member', 'status' => 'pending', 'applied_at' => now()]);
+    $membership = $applicant->groupMemberships()->where('group_id', $group->id)->sole();
+
+    app(DecideGroupApplication::class)->handle($membership, GroupMembershipStatus::Approved, $admin);
+
     expect($membership->fresh()->partner_id)->toBe($admin->id);
 });
 
