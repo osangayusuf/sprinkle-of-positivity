@@ -69,10 +69,15 @@ class GroupPolicy
 
     /**
      * A user can apply to join if they don't already have a membership
-     * record (pending, approved, or otherwise) for this group.
+     * record (pending, approved, or otherwise) for this group. Platform
+     * admins never apply: they already have full access to every group.
      */
     public function join(User $user, Group $group): bool
     {
+        if ($user->hasRole(Role::ADMIN)) {
+            return false;
+        }
+
         return ! $user->groupMemberships->contains('group_id', $group->id);
     }
 

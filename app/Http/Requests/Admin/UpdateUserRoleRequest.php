@@ -26,6 +26,7 @@ class UpdateUserRoleRequest extends FormRequest
     {
         return [
             'role' => ['required', 'string', Rule::in([Role::ADMIN, Role::MEMBER, Role::PARTNER])],
+            'also_partner' => ['boolean'],
         ];
     }
 }

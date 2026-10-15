@@ -96,26 +96,27 @@ class ParticipantController extends Controller
     }
 
     /**
-     * Decline a participant so they move to another partner.
+     * Decline a participant so they move to another partner. An admin can
+     * decline on behalf of the participant's current partner.
      */
     public function reject(Request $request, GroupMembership $membership, RejectAssignment $action): RedirectResponse
     {
-        $this->authorizeOwnParticipant($request->user(), $membership, adminAllowed: false);
+        $this->authorizeOwnParticipant($request->user(), $membership);
 
         $request->validate(['reason' => ['required', 'string', 'max:500']]);
 
-        $action->handle($membership, $request->user());
+        $action->handle($membership, $membership->partner ?? $request->user());
 
         Inertia::flash('toast', ['type' => 'success', 'message' => __('Participant moved to another partner.')]);
 
         return back();
     }
 
-    private function authorizeOwnParticipant(User $user, GroupMembership $membership, bool $adminAllowed = true): void
+    private function authorizeOwnParticipant(User $user, GroupMembership $membership): void
     {
         $isOwn = $user->isApprovedPartner() && $membership->partner_id === $user->id;
 
-        abort_unless($isOwn || ($adminAllowed && $user->hasRole(Role::ADMIN)), 403);
+        abort_unless($isOwn || $user->hasRole(Role::ADMIN), 403);
     }
 
     /**

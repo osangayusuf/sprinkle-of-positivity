@@ -82,7 +82,7 @@ export default function GroupShow({
                         <SignInPrompt message="Log in or create an account to join this group." />
                     )}
 
-                    {auth.user && membership === null && (
+                    {auth.user && !auth.isAdmin && membership === null && (
                         <Button
                             asChild
                             className="h-14 w-full rounded-full text-base"

@@ -214,3 +214,19 @@ test('adding a partner to a group places participants who had none', function ()
 
     expect($waiting->fresh()->partner_id)->toBeIn([$existing->id, $newPartner->id]);
 });
+
+test('an admin can decline a participant on behalf of their partner', function () {
+    $admin = User::factory()->admin()->create();
+    $group = Group::factory()->create();
+    $first = createApprovedManager($group);
+    $second = createApprovedManager($group);
+    $membership = joinAsApprovedMember($group, User::factory()->create());
+    $membership->partner_id = $first->id;
+    $membership->save();
+
+    $this->actingAs($admin)
+        ->post(route('partner.participants.reject', $membership), ['reason' => 'Rebalancing.'])
+        ->assertRedirect();
+
+    expect($membership->fresh()->partner_id)->toBe($second->id);
+});

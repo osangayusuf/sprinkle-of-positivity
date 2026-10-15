@@ -8,14 +8,19 @@ type AdminUser = {
     email: string;
     points: number;
     role: 'admin' | 'member' | 'partner';
+    is_partner: boolean;
     partner_status: 'pending' | 'approved' | 'rejected' | null;
 };
 
 export default function AdminUsersIndex({ users }: { users: AdminUser[] }) {
-    function changeRole(user: AdminUser, role: string) {
+    function changeRole(
+        user: AdminUser,
+        role: string,
+        alsoPartner = user.is_partner,
+    ) {
         router.put(
             UserController.updateRole.url({ user: user.id }),
-            { role },
+            { role, also_partner: role === 'admin' && alsoPartner },
             { preserveScroll: true },
         );
     }
@@ -73,6 +78,22 @@ export default function AdminUsersIndex({ users }: { users: AdminUser[] }) {
                                             </option>
                                             <option value="admin">Admin</option>
                                         </select>
+                                        {user.role === 'admin' && (
+                                            <label className="ml-3 inline-flex items-center gap-2 text-xs">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={user.is_partner}
+                                                    onChange={(e) =>
+                                                        changeRole(
+                                                            user,
+                                                            'admin',
+                                                            e.target.checked,
+                                                        )
+                                                    }
+                                                />
+                                                Also an accountability partner
+                                            </label>
+                                        )}
                                         {user.partner_status === 'pending' && (
                                             <span className="ml-3 inline-flex items-center gap-2">
                                                 <span className="text-xs text-amber-600">
