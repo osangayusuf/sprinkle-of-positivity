@@ -24,9 +24,10 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property CarbonInterface|null $starts_on
  * @property GroupStatus $status
  * @property bool $is_private
+ * @property bool $shows_insights
  * @property int $created_by
  */
-#[Fillable(['name', 'slug', 'purpose', 'cover_image_path', 'duration_days', 'starts_on', 'is_private'])]
+#[Fillable(['name', 'slug', 'purpose', 'cover_image_path', 'duration_days', 'starts_on', 'is_private', 'shows_insights'])]
 class Group extends Model
 {
     /** @use HasFactory<GroupFactory> */
@@ -41,6 +42,7 @@ class Group extends Model
             'status' => GroupStatus::class,
             'starts_on' => 'date',
             'is_private' => 'boolean',
+            'shows_insights' => 'boolean',
         ];
     }
 

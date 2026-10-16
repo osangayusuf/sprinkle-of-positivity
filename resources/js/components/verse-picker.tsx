@@ -1,12 +1,12 @@
-import { useEffect, useRef, useState } from 'react';
-import InputError from '@/components/input-error';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Spinner } from '@/components/ui/spinner';
-import { bibleVerseLookup } from '@/routes';
-import { books as booksRoute, versions as versionsRoute } from '@/routes/bible';
-import { cn } from '@/lib/utils';
+import { useEffect, useRef, useState } from "react";
+import InputError from "@/components/input-error";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Spinner } from "@/components/ui/spinner";
+import { bibleVerseLookup } from "@/routes";
+import { books as booksRoute, versions as versionsRoute } from "@/routes/bible";
+import { cn } from "@/lib/utils";
 
 export type VerseFields = {
     reference: string;
@@ -23,13 +23,13 @@ type Lookup = {
     reference: string | null;
     translation: string | null;
     copyright: string | null;
-    source: 'youversion' | 'fallback' | null;
+    source: "youversion" | "fallback" | null;
 };
 
-type Notice = { tone: 'info' | 'warning'; message: string };
+type Notice = { tone: "info" | "warning"; message: string };
 
 const selectClassName =
-    'border-input bg-background h-10 w-full min-w-0 rounded-md border px-2 text-sm outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50';
+    "border-input bg-background h-10 w-full min-w-0 rounded-md border px-2 text-sm outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50";
 
 /**
  * Catalog responses rarely change, so share one request per URL between
@@ -41,10 +41,10 @@ function fetchCatalog<T>(url: string): Promise<T> {
     let request = catalogRequests.get(url);
 
     if (!request) {
-        request = fetch(url, { headers: { Accept: 'application/json' } })
+        request = fetch(url, { headers: { Accept: "application/json" } })
             .then((response) => {
                 if (!response.ok) {
-                    throw new Error('Catalog request failed');
+                    throw new Error("Catalog request failed");
                 }
 
                 return response.json();
@@ -69,18 +69,21 @@ function range(from: number, to: number): number[] {
 
 /**
  * Pick a Bible passage from version / book / chapter / verse selects and
- * prefill the verse text. When the YouVersion catalog can't be loaded it
- * degrades to a free-text reference with the same "Look up" button.
+ * prefill the verse text. Choosing just a book and chapter is enough: the
+ * reference becomes e.g. "Hosea 12" and the verse text stays empty, for
+ * readings where members pick their own verses. When the YouVersion catalog
+ * can't be loaded it degrades to a free-text reference with the same "Look
+ * up" button.
  */
 export function VersePicker({
     value,
     onChange,
     names = {
-        reference: 'reference',
-        translation: 'translation',
-        copyright: 'copyright',
+        reference: "reference",
+        translation: "translation",
+        copyright: "copyright",
     },
-    idPrefix = '',
+    idPrefix = "",
     errors = {},
     fieldClassName,
 }: {
@@ -94,7 +97,7 @@ export function VersePicker({
     const [versions, setVersions] = useState<Version[] | null>(null);
     const [books, setBooks] = useState<Book[]>([]);
     const [versionId, setVersionId] = useState<number | null>(null);
-    const [bookId, setBookId] = useState('');
+    const [bookId, setBookId] = useState("");
     const [chapter, setChapter] = useState(0);
     const [verseStart, setVerseStart] = useState(0);
     const [verseEnd, setVerseEnd] = useState(0);
@@ -172,7 +175,7 @@ export function VersePicker({
         try {
             const response = await fetch(
                 bibleVerseLookup.url({ query: { reference, ...query } }),
-                { headers: { Accept: 'application/json' } },
+                { headers: { Accept: "application/json" } },
             );
             const data: Lookup = await response.json();
 
@@ -181,9 +184,9 @@ export function VersePicker({
             }
 
             if (!data.text) {
-                onChange({ reference, translation: '', copyright: '' });
+                onChange({ reference, translation: "", copyright: "" });
                 setNotice({
-                    tone: 'warning',
+                    tone: "warning",
                     message:
                         "Couldn't fetch that passage. You can type the verse text in yourself.",
                 });
@@ -194,13 +197,13 @@ export function VersePicker({
             onChange({
                 reference: data.reference || reference,
                 text: data.text,
-                translation: data.translation ?? '',
-                copyright: data.copyright ?? '',
+                translation: data.translation ?? "",
+                copyright: data.copyright ?? "",
             });
 
-            if (data.source === 'fallback') {
+            if (data.source === "fallback") {
                 setNotice({
-                    tone: 'warning',
+                    tone: "warning",
                     message:
                         "Couldn't use the selected version, so this is a public-domain translation. No translation credit is saved.",
                 });
@@ -208,7 +211,7 @@ export function VersePicker({
         } catch {
             if (requestId === latestRequest.current) {
                 setNotice({
-                    tone: 'warning',
+                    tone: "warning",
                     message:
                         "Couldn't fetch that passage. You can type the verse text in yourself.",
                 });
@@ -234,7 +237,7 @@ export function VersePicker({
 
         const hasRange = next.verseEnd > next.verseStart;
         const reference = `${selected.title} ${next.chapter}:${next.verseStart}${
-            hasRange ? `-${next.verseEnd}` : ''
+            hasRange ? `-${next.verseEnd}` : ""
         }`;
 
         void lookUp(
@@ -256,10 +259,30 @@ export function VersePicker({
         setVerseEnd(0);
     }
 
+    /**
+     * A whole chapter is a complete selection on its own: invalidate any
+     * in-flight verse lookup and clear the previous passage's text.
+     */
+    function selectWholeChapter(number: number) {
+        latestRequest.current++;
+        setLooking(false);
+        setNotice(null);
+
+        if (book && number) {
+            onChange({
+                reference: `${book.title} ${number}`,
+                text: "",
+                translation: "",
+                copyright: "",
+            });
+        }
+    }
+
     function pickChapter(number: number) {
         setChapter(number);
         setVerseStart(0);
         setVerseEnd(0);
+        selectWholeChapter(number);
     }
 
     function pickVerseStart(number: number) {
@@ -267,6 +290,13 @@ export function VersePicker({
 
         setVerseStart(number);
         setVerseEnd(end);
+
+        if (number === 0) {
+            selectWholeChapter(chapter);
+
+            return;
+        }
+
         lookUpSelection({ bookId, chapter, verseStart: number, verseEnd: end });
     }
 
@@ -278,7 +308,7 @@ export function VersePicker({
     function pickVersion(id: number) {
         setVersionId(id);
         setBooks([]);
-        pickBook('');
+        pickBook("");
     }
 
     return (
@@ -300,7 +330,7 @@ export function VersePicker({
                         <Label htmlFor={`${idPrefix}version`}>Version</Label>
                         <select
                             id={`${idPrefix}version`}
-                            value={versionId ?? ''}
+                            value={versionId ?? ""}
                             onChange={(e) =>
                                 pickVersion(Number(e.target.value))
                             }
@@ -339,7 +369,7 @@ export function VersePicker({
                             </Label>
                             <select
                                 id={`${idPrefix}chapter`}
-                                value={chapter || ''}
+                                value={chapter || ""}
                                 onChange={(e) =>
                                     pickChapter(Number(e.target.value))
                                 }
@@ -357,14 +387,19 @@ export function VersePicker({
                         </div>
                     </div>
 
+                    <p className="text-muted-foreground -mb-1 text-xs">
+                        Pick a chapter alone to share the whole chapter, or
+                        choose verses below to share a passage.
+                    </p>
+
                     <div className="grid grid-cols-2 gap-3">
                         <div className="grid gap-2">
                             <Label htmlFor={`${idPrefix}verse-start`}>
-                                From verse
+                                From verse (optional)
                             </Label>
                             <select
                                 id={`${idPrefix}verse-start`}
-                                value={verseStart || ''}
+                                value={verseStart || ""}
                                 onChange={(e) =>
                                     pickVerseStart(Number(e.target.value))
                                 }
@@ -386,7 +421,7 @@ export function VersePicker({
                             </Label>
                             <select
                                 id={`${idPrefix}verse-end`}
-                                value={verseEnd || ''}
+                                value={verseEnd || ""}
                                 onChange={(e) =>
                                     pickVerseEnd(Number(e.target.value))
                                 }
@@ -409,7 +444,7 @@ export function VersePicker({
 
             <div className="grid gap-2">
                 <Label htmlFor={`${idPrefix}reference`}>
-                    {pickerAvailable ? 'Selected passage' : 'Reference'}
+                    {pickerAvailable ? "Selected passage" : "Reference"}
                 </Label>
                 <div className="flex gap-2">
                     <Input
@@ -422,8 +457,8 @@ export function VersePicker({
                         readOnly={pickerAvailable}
                         placeholder={
                             pickerAvailable
-                                ? 'Choose a book, chapter and verse'
-                                : 'John 3:16'
+                                ? "Choose a book and chapter"
+                                : "John 3:16"
                         }
                         required
                         className={fieldClassName}
@@ -434,7 +469,7 @@ export function VersePicker({
                             variant="outline"
                             disabled={looking || !value.reference.trim()}
                             onClick={() => lookUp({}, value.reference.trim())}
-                            className={cn('shrink-0', fieldClassName)}
+                            className={cn("shrink-0", fieldClassName)}
                         >
                             {looking && <Spinner />}
                             Look up
@@ -454,10 +489,10 @@ export function VersePicker({
                 {notice && (
                     <p
                         className={cn(
-                            'text-xs',
-                            notice.tone === 'warning'
-                                ? 'text-amber-600 dark:text-amber-400'
-                                : 'text-muted-foreground',
+                            "text-xs",
+                            notice.tone === "warning"
+                                ? "text-amber-600 dark:text-amber-400"
+                                : "text-muted-foreground",
                         )}
                     >
                         {notice.message}

@@ -1,5 +1,6 @@
-import { Link } from '@inertiajs/react';
+import { Link } from "@inertiajs/react";
 import {
+    Bell,
     BookMarked,
     ChartColumn,
     LayoutDashboard,
@@ -7,10 +8,10 @@ import {
     ShoppingBag,
     Users,
     UsersRound,
-} from 'lucide-react';
-import AppLogo from '@/components/app-logo';
-import { NavMain } from '@/components/nav-main';
-import { NavUser } from '@/components/nav-user';
+} from "lucide-react";
+import AppLogo from "@/components/app-logo";
+import { NavMain } from "@/components/nav-main";
+import { NavUser } from "@/components/nav-user";
 import {
     Sidebar,
     SidebarContent,
@@ -19,43 +20,48 @@ import {
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
-} from '@/components/ui/sidebar';
-import type { NavItem } from '@/types';
+} from "@/components/ui/sidebar";
+import type { NavItem } from "@/types";
 
 const mainNavItems: NavItem[] = [
     {
-        title: 'Dashboard',
-        href: '/admin/dashboard',
+        title: "Dashboard",
+        href: "/admin/dashboard",
         icon: LayoutDashboard,
     },
     {
-        title: 'Analytics',
-        href: '/admin/analytics',
+        title: "Analytics",
+        href: "/admin/analytics",
         icon: ChartColumn,
     },
     {
-        title: 'Groups',
-        href: '/admin/groups',
+        title: "Groups",
+        href: "/admin/groups",
         icon: Users,
     },
     {
         title: "Today's verse",
-        href: '/admin/daily-verse',
+        href: "/admin/daily-verse",
         icon: BookMarked,
     },
     {
-        title: 'Send announcement',
-        href: '/admin/announcements/create',
+        title: "Announcements",
+        href: "/admin/announcements",
         icon: Megaphone,
     },
     {
-        title: 'Marketplace',
-        href: '/admin/marketplace',
+        title: "Notifications",
+        href: "/notifications",
+        icon: Bell,
+    },
+    {
+        title: "Marketplace",
+        href: "/admin/marketplace",
         icon: ShoppingBag,
     },
     {
-        title: 'Users',
-        href: '/admin/users',
+        title: "Users",
+        href: "/admin/users",
         icon: UsersRound,
     },
 ];

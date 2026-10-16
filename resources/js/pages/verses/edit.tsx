@@ -1,16 +1,16 @@
-import { Form, Head } from '@inertiajs/react';
-import { useState } from 'react';
-import GroupVerseController from '@/actions/App/Http/Controllers/GroupVerseController';
-import { PageHeader } from '@/components/page-header';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import InputError from '@/components/input-error';
-import { Label } from '@/components/ui/label';
-import { Spinner } from '@/components/ui/spinner';
-import { Textarea } from '@/components/ui/textarea';
-import { VersePicker } from '@/components/verse-picker';
-import type { VerseFields } from '@/components/verse-picker';
-import type { Group, Verse } from '@/types/models';
+import { Form, Head } from "@inertiajs/react";
+import { useState } from "react";
+import GroupVerseController from "@/actions/App/Http/Controllers/GroupVerseController";
+import { PageHeader } from "@/components/page-header";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import InputError from "@/components/input-error";
+import { Label } from "@/components/ui/label";
+import { Spinner } from "@/components/ui/spinner";
+import { Textarea } from "@/components/ui/textarea";
+import { VersePicker } from "@/components/verse-picker";
+import type { VerseFields } from "@/components/verse-picker";
+import type { Group, Verse } from "@/types/models";
 
 export default function VerseEdit({
     group,
@@ -20,10 +20,10 @@ export default function VerseEdit({
     verse: Verse | null;
 }) {
     const [fields, setFields] = useState<VerseFields>({
-        reference: verse?.reference ?? '',
-        text: verse?.text ?? '',
-        translation: verse?.translation ?? '',
-        copyright: verse?.copyright ?? '',
+        reference: verse?.reference ?? "",
+        text: verse?.text ?? "",
+        translation: verse?.translation ?? "",
+        copyright: verse?.copyright ?? "",
     });
 
     function updateFields(patch: Partial<VerseFields>) {
@@ -56,7 +56,9 @@ export default function VerseEdit({
                             />
 
                             <div className="grid gap-2">
-                                <Label htmlFor="text">Verse text</Label>
+                                <Label htmlFor="text">
+                                    Verse text (optional)
+                                </Label>
                                 <Textarea
                                     id="text"
                                     name="text"
@@ -64,7 +66,6 @@ export default function VerseEdit({
                                     onChange={(e) =>
                                         updateFields({ text: e.target.value })
                                     }
-                                    required
                                     rows={6}
                                     className="bg-muted rounded-xl border-transparent px-4"
                                 />

@@ -15,7 +15,7 @@ class Announcement extends Notification implements ShouldQueue
     /**
      * Create a new notification instance.
      */
-    public function __construct(public string $title, public string $body)
+    public function __construct(public string $title, public string $body, public ?int $announcementId = null)
     {
         //
     }
@@ -50,6 +50,7 @@ class Announcement extends Notification implements ShouldQueue
         return [
             'title' => $this->title,
             'body' => $this->body,
+            'announcement_id' => $this->announcementId,
         ];
     }
 }

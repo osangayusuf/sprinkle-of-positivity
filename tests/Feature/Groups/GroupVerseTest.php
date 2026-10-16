@@ -186,3 +186,36 @@ test('past days of a private group stay hidden from non-members', function () {
     $this->get(route('groups.verse.show', ['group' => $group, 'date' => today()->subDay()->toDateString()]))
         ->assertRedirect(route('groups.show', $group));
 });
+
+test('a manager can set a whole chapter without any verse text', function () {
+    $group = Group::factory()->create();
+    $manager = createApprovedManager($group);
+    $this->actingAs($manager);
+
+    $this->put(route('groups.verse.update', $group), [
+        'reference' => 'Hosea 12',
+        'text' => '',
+    ])->assertRedirect(route('groups.verse.show', $group));
+
+    $verse = GroupVerse::query()->sole();
+    expect($verse->reference)->toBe('Hosea 12');
+    expect($verse->text)->toBeNull();
+});
+
+test('groups without insights send the verse page back to the group page', function () {
+    $group = Group::factory()->withoutInsights()->create();
+    GroupVerse::factory()->for($group)->create(['date' => today()]);
+    $this->actingAs(User::factory()->create());
+
+    $this->get(route('groups.verse.show', $group))
+        ->assertRedirect(route('groups.show', $group));
+});
+
+test('the group page tells the client whether to offer Bible Study Insights', function (bool $showsInsights) {
+    $group = Group::factory()->create(['shows_insights' => $showsInsights]);
+    $this->actingAs(User::factory()->create());
+
+    $this->get(route('groups.show', $group))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page->where('group.shows_insights', $showsInsights));
+})->with([true, false]);

@@ -173,3 +173,16 @@ test('non-admins cannot view the verse history', function () {
 
     $this->get(route('admin.daily-verse.history'))->assertForbidden();
 });
+
+test('admins can set a whole chapter as the daily reading without verse text', function () {
+    $this->actingAs(User::factory()->admin()->create());
+
+    $this->put(route('admin.daily-verse.update'), [
+        'reference' => 'Hosea 12',
+        'text' => '',
+    ])->assertRedirect();
+
+    $verse = DailyVerse::query()->sole();
+    expect($verse->reference)->toBe('Hosea 12');
+    expect($verse->text)->toBeNull();
+});

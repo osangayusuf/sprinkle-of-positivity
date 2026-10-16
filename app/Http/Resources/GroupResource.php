@@ -27,6 +27,7 @@ class GroupResource extends JsonResource
             'starts_on' => $this->starts_on?->toDateString(),
             'status' => $this->status->value,
             'is_private' => $this->is_private,
+            'shows_insights' => $this->shows_insights,
             'members_count' => $this->whenCounted('approvedMembers'),
             'current_day' => $this->currentDayNumber(),
         ];
