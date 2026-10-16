@@ -211,3 +211,28 @@ test('an admin who has not opted in as a partner is not offered as a partner', f
         'name' => 'X', 'purpose' => 'Test', 'manager_ids' => [$admin->id],
     ])->assertInvalid('manager_ids.0');
 });
+
+test('admins can turn Bible Study Insights off for a discussion group', function () {
+    $admin = User::factory()->admin()->create();
+    $manager = User::factory()->partner()->create();
+    $this->actingAs($admin);
+
+    $this->post(route('admin.groups.store'), [
+        'name' => 'Hangout and Banter',
+        'purpose' => 'Fellowship.',
+        'manager_ids' => [$manager->id],
+    ])->assertRedirect(route('admin.groups.index'));
+
+    $group = Group::query()->sole();
+    expect($group->shows_insights)->toBeFalse();
+
+    $this->put(route('admin.groups.update', $group), [
+        'name' => $group->name,
+        'purpose' => $group->purpose,
+        'status' => GroupStatus::Active->value,
+        'manager_ids' => [$manager->id],
+        'shows_insights' => true,
+    ])->assertRedirect(route('admin.groups.index'));
+
+    expect($group->fresh()->shows_insights)->toBeTrue();
+});

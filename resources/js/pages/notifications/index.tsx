@@ -1,8 +1,8 @@
-import { Head, Link } from '@inertiajs/react';
-import { Bell, BellOff, ChevronRight } from 'lucide-react';
-import { PageHeader } from '@/components/page-header';
-import { cn } from '@/lib/utils';
-import type { Notification } from '@/types/models';
+import { Head, Link } from "@inertiajs/react";
+import { Bell, BellOff, ChevronRight, Megaphone } from "lucide-react";
+import { PageHeader } from "@/components/page-header";
+import { cn } from "@/lib/utils";
+import type { Notification } from "@/types/models";
 
 function dateGroupLabel(isoDate: string): string {
     const date = new Date(isoDate);
@@ -11,17 +11,17 @@ function dateGroupLabel(isoDate: string): string {
     yesterday.setDate(today.getDate() - 1);
 
     if (date.toDateString() === today.toDateString()) {
-        return 'Today';
+        return "Today";
     }
 
     if (date.toDateString() === yesterday.toDateString()) {
-        return 'Yesterday';
+        return "Yesterday";
     }
 
     return date.toLocaleDateString(undefined, {
-        day: '2-digit',
-        month: 'long',
-        year: 'numeric',
+        day: "2-digit",
+        month: "long",
+        year: "numeric",
     });
 }
 
@@ -41,6 +41,17 @@ export default function NotificationsIndex({
         <>
             <Head title="Notifications" />
             <PageHeader title="Notifications" backHref="/home" />
+
+            <div className="px-4 pt-4">
+                <Link
+                    href="/announcements"
+                    className="bg-muted flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-semibold"
+                >
+                    <Megaphone className="text-primary size-5" />
+                    <span className="flex-1">All announcements</span>
+                    <ChevronRight className="text-muted-foreground size-5" />
+                </Link>
+            </div>
 
             <div className="px-4 py-4">
                 {notifications.length === 0 ? (
@@ -66,10 +77,10 @@ export default function NotificationsIndex({
                                     >
                                         <span
                                             className={cn(
-                                                'flex size-10 shrink-0 items-center justify-center rounded-full',
+                                                "flex size-10 shrink-0 items-center justify-center rounded-full",
                                                 notification.read
-                                                    ? 'bg-muted text-muted-foreground'
-                                                    : 'bg-primary-tint text-primary-tint-foreground',
+                                                    ? "bg-muted text-muted-foreground"
+                                                    : "bg-primary-tint text-primary-tint-foreground",
                                             )}
                                         >
                                             <Bell className="size-5" />
@@ -86,8 +97,8 @@ export default function NotificationsIndex({
                                                 {new Date(
                                                     notification.created_at,
                                                 ).toLocaleTimeString([], {
-                                                    hour: '2-digit',
-                                                    minute: '2-digit',
+                                                    hour: "2-digit",
+                                                    minute: "2-digit",
                                                 })}
                                             </p>
                                         </div>

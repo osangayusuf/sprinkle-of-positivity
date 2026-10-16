@@ -25,6 +25,7 @@ class GroupFactory extends Factory
             'name' => $name,
             'slug' => Str::slug($name).'-'.fake()->unique()->numberBetween(1, 100000),
             'purpose' => fake()->paragraph(),
+            'shows_insights' => true,
             'created_by' => User::factory(),
         ];
     }
@@ -37,6 +38,17 @@ class GroupFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'is_private' => true,
+        ]);
+    }
+
+    /**
+     * Indicate that the group is a discussion space with no Bible Study
+     * Insights.
+     */
+    public function withoutInsights(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'shows_insights' => false,
         ]);
     }
 

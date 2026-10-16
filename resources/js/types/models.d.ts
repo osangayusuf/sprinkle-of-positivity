@@ -1,10 +1,10 @@
-export type GroupMembershipRole = 'manager' | 'member';
+export type GroupMembershipRole = "manager" | "member";
 
 export type GroupMembershipStatus =
-    | 'pending'
-    | 'approved'
-    | 'rejected'
-    | 'removed';
+    | "pending"
+    | "approved"
+    | "rejected"
+    | "removed";
 
 export type Group = {
     id: number;
@@ -14,8 +14,9 @@ export type Group = {
     cover_image_url: string | null;
     duration_days: number | null;
     starts_on: string | null;
-    status: 'active' | 'archived';
+    status: "active" | "archived";
     is_private: boolean;
+    shows_insights: boolean;
     members_count?: number;
     current_day: number | null;
 };
@@ -39,7 +40,7 @@ export type Verse = {
     id: number;
     date: string;
     reference: string;
-    text: string;
+    text: string | null;
     translation: string | null;
     copyright: string | null;
     image_url: string | null;
@@ -98,7 +99,7 @@ export type Quiz = {
     created_by_name: string;
     created_by_avatar: string | null;
     created_at: string;
-    type: 'quiz' | 'poll';
+    type: "quiz" | "poll";
     closed: boolean;
     options: QuizOption[];
     responses_count: number;
@@ -173,4 +174,14 @@ export type Certificate = {
     group_name?: string;
     override_reason?: string | null;
     revoke_reason?: string | null;
+};
+
+export type Announcement = {
+    id: number;
+    title: string;
+    body: string;
+    last_sent_at: string | null;
+    created_at: string;
+    updated_at: string;
+    is_edited: boolean;
 };

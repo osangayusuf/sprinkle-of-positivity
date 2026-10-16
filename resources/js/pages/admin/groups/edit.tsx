@@ -1,21 +1,21 @@
-import { Form, Head } from '@inertiajs/react';
-import GroupController from '@/actions/App/Http/Controllers/Admin/GroupController';
-import Heading from '@/components/heading';
-import InputError from '@/components/input-error';
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Form, Head } from "@inertiajs/react";
+import GroupController from "@/actions/App/Http/Controllers/Admin/GroupController";
+import Heading from "@/components/heading";
+import InputError from "@/components/input-error";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
     Select,
     SelectContent,
     SelectItem,
     SelectTrigger,
     SelectValue,
-} from '@/components/ui/select';
-import { Spinner } from '@/components/ui/spinner';
-import { Textarea } from '@/components/ui/textarea';
-import type { Group } from '@/types/models';
+} from "@/components/ui/select";
+import { Spinner } from "@/components/ui/spinner";
+import { Textarea } from "@/components/ui/textarea";
+import type { Group } from "@/types/models";
 
 type Props = {
     group: Group;
@@ -180,10 +180,34 @@ export default function AdminGroupsEdit({ group, users, managerIds }: Props) {
                                 </div>
                             </div>
 
+                            <div className="flex items-start gap-3">
+                                <Checkbox
+                                    id="shows_insights"
+                                    name="shows_insights"
+                                    value="1"
+                                    defaultChecked={group.shows_insights}
+                                />
+                                <div className="grid gap-1">
+                                    <Label htmlFor="shows_insights">
+                                        Bible Study Insights
+                                    </Label>
+                                    <p className="text-muted-foreground text-sm">
+                                        Offer "Read Bible Study Insights" on
+                                        this group. Turn it off for
+                                        discussion-only groups such as Hangout
+                                        and Banter, Testimony or Training, which
+                                        keep just the group chat.
+                                    </p>
+                                    <InputError
+                                        message={errors.shows_insights}
+                                    />
+                                </div>
+                            </div>
+
                             <div className="grid gap-2">
                                 <Label htmlFor="cover_image">
                                     Cover image
-                                    {' (leave blank to keep the current one)'}
+                                    {" (leave blank to keep the current one)"}
                                 </Label>
                                 {group.cover_image_url && (
                                     <img
@@ -215,7 +239,7 @@ export default function AdminGroupsEdit({ group, users, managerIds }: Props) {
 
 AdminGroupsEdit.layout = {
     breadcrumbs: [
-        { title: 'Groups', href: '/admin/groups' },
-        { title: 'Edit group', href: '#' },
+        { title: "Groups", href: "/admin/groups" },
+        { title: "Edit group", href: "#" },
     ],
 };

@@ -47,7 +47,7 @@ class DailyVerseController extends Controller
         $verse = DailyVerse::query()->whereDate('date', $resolvedDate)->first() ?? new DailyVerse;
         $verse->date = $resolvedDate;
         $verse->reference = $request->string('reference')->value();
-        $verse->text = $request->string('text')->value();
+        $verse->text = $request->validated('text');
         $verse->translation = $request->validated('translation');
         $verse->copyright = $request->validated('copyright');
         $verse->created_by = $request->user()->id;

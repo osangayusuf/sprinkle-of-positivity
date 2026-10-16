@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Announcement as AnnouncementRecord;
 use App\Models\User;
 use App\Notifications\Announcement;
 
@@ -38,4 +39,17 @@ test('a user cannot view another users notification', function () {
     $this->actingAs($outsider);
 
     $this->get(route('notifications.show', $notification->id))->assertNotFound();
+});
+
+test('members can read current and past announcements', function () {
+    AnnouncementRecord::factory()->count(3)->create();
+    $this->actingAs(User::factory()->create());
+
+    $this->get(route('announcements.index'))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page->has('announcements', 3));
+});
+
+test('guests cannot open the announcements page', function () {
+    $this->get(route('announcements.index'))->assertRedirect();
 });

@@ -60,6 +60,7 @@ class GroupController extends Controller
         $group->slug = $this->uniqueSlug($request->string('name')->value());
         $group->created_by = $request->user()->id;
         $group->is_private = $request->boolean('is_private');
+        $group->shows_insights = $request->boolean('shows_insights');
 
         if ($request->hasFile('cover_image')) {
             $group->cover_image_path = $storePublicUpload->handle($request->file('cover_image'), 'groups');
@@ -96,6 +97,7 @@ class GroupController extends Controller
         $group->fill($request->safe()->only(['name', 'purpose', 'duration_days', 'starts_on']));
         $group->status = $request->enum('status', GroupStatus::class);
         $group->is_private = $request->boolean('is_private');
+        $group->shows_insights = $request->boolean('shows_insights');
 
         if ($request->hasFile('cover_image')) {
             $group->cover_image_path = $storePublicUpload->handle($request->file('cover_image'), 'groups');

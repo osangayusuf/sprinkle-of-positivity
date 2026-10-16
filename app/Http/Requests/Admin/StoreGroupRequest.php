@@ -31,6 +31,7 @@ class StoreGroupRequest extends FormRequest
             'duration_days' => ['nullable', 'integer', 'min:1', 'max:1000'],
             'starts_on' => ['nullable', 'date'],
             'is_private' => ['boolean'],
+            'shows_insights' => ['boolean'],
             'manager_ids' => ['required', 'array', 'min:1'],
             'manager_ids.*' => ['integer', 'distinct', Rule::exists('users', 'id')->where('partner_status', PartnerStatus::Approved->value)],
             'cover_image' => ['nullable', 'image', 'max:2048'],

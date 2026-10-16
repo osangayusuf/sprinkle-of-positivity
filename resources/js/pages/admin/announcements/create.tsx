@@ -1,12 +1,12 @@
-import { Form, Head } from '@inertiajs/react';
-import AnnouncementController from '@/actions/App/Http/Controllers/Admin/AnnouncementController';
-import Heading from '@/components/heading';
-import InputError from '@/components/input-error';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Spinner } from '@/components/ui/spinner';
-import { Textarea } from '@/components/ui/textarea';
+import { Form, Head } from "@inertiajs/react";
+import AnnouncementController from "@/actions/App/Http/Controllers/Admin/AnnouncementController";
+import Heading from "@/components/heading";
+import InputError from "@/components/input-error";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Spinner } from "@/components/ui/spinner";
+import { Textarea } from "@/components/ui/textarea";
 
 export default function AdminAnnouncementCreate() {
     return (
@@ -17,7 +17,7 @@ export default function AdminAnnouncementCreate() {
                 <Heading
                     variant="small"
                     title="Send an announcement"
-                    description="Delivered to every user's notifications"
+                    description="Delivered to every user's notifications and kept under Announcements"
                 />
 
                 <Form
@@ -63,6 +63,7 @@ export default function AdminAnnouncementCreate() {
 
 AdminAnnouncementCreate.layout = {
     breadcrumbs: [
-        { title: 'Send announcement', href: '/admin/announcements/create' },
+        { title: "Announcements", href: "/admin/announcements" },
+        { title: "New", href: "/admin/announcements/create" },
     ],
 };

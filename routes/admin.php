@@ -36,8 +36,11 @@ Route::middleware(['auth', 'verified', 'onboarded', 'can:access-admin'])
         Route::get('daily-verse/{date?}', [DailyVerseController::class, 'edit'])->name('daily-verse.edit');
         Route::put('daily-verse/{date?}', [DailyVerseController::class, 'update'])->name('daily-verse.update');
 
+        Route::get('announcements', [AnnouncementController::class, 'index'])->name('announcements.index');
         Route::get('announcements/create', [AnnouncementController::class, 'create'])->name('announcements.create');
         Route::post('announcements', [AnnouncementController::class, 'store'])->name('announcements.store');
+        Route::get('announcements/{announcement}/edit', [AnnouncementController::class, 'edit'])->name('announcements.edit');
+        Route::put('announcements/{announcement}', [AnnouncementController::class, 'update'])->name('announcements.update');
 
         Route::get('marketplace', [MarketplaceController::class, 'index'])->name('marketplace.index');
         Route::get('marketplace/create', [MarketplaceController::class, 'create'])->name('marketplace.create');

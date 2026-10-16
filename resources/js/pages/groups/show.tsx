@@ -1,9 +1,9 @@
-import { Head, Link, usePage } from '@inertiajs/react';
-import { ChevronLeft, Lock, MessageCircle, MoreVertical } from 'lucide-react';
-import { SignInPrompt } from '@/components/sign-in-prompt';
-import { Button } from '@/components/ui/button';
-import type { Auth } from '@/types/auth';
-import type { Group, GroupMembershipInfo } from '@/types/models';
+import { Head, Link, usePage } from "@inertiajs/react";
+import { ChevronLeft, Lock, MessageCircle, MoreVertical } from "lucide-react";
+import { SignInPrompt } from "@/components/sign-in-prompt";
+import { Button } from "@/components/ui/button";
+import type { Auth } from "@/types/auth";
+import type { Group, GroupMembershipInfo } from "@/types/models";
 
 type Props = {
     group: Group;
@@ -71,7 +71,7 @@ export default function GroupShow({
                     </p>
                 </div>
 
-                {typeof group.members_count === 'number' && (
+                {typeof group.members_count === "number" && (
                     <p className="text-muted-foreground text-sm">
                         {group.members_count} members
                     </p>
@@ -93,7 +93,7 @@ export default function GroupShow({
                         </Button>
                     )}
 
-                    {membership?.status === 'pending' && (
+                    {membership?.status === "pending" && (
                         <div className="bg-muted text-muted-foreground rounded-full px-5 py-4 text-center text-sm font-semibold">
                             Application pending approval
                         </div>
@@ -112,22 +112,24 @@ export default function GroupShow({
                         </Button>
                     )}
 
-                    {canViewContent ? (
-                        <Button
-                            asChild
-                            variant="outline"
-                            className="border-primary text-primary h-14 w-full rounded-full text-base"
-                        >
-                            <Link href={`/groups/${group.slug}/verse`}>
-                                Read Bible Study Insights
-                            </Link>
-                        </Button>
-                    ) : (
-                        <div className="bg-muted text-muted-foreground flex items-center justify-center gap-2 rounded-full px-5 py-4 text-center text-sm">
-                            <Lock className="size-4 shrink-0" />
-                            Bible Study Insights are visible to members only.
-                        </div>
-                    )}
+                    {group.shows_insights &&
+                        (canViewContent ? (
+                            <Button
+                                asChild
+                                variant="outline"
+                                className="border-primary text-primary h-14 w-full rounded-full text-base"
+                            >
+                                <Link href={`/groups/${group.slug}/verse`}>
+                                    Read Bible Study Insights
+                                </Link>
+                            </Button>
+                        ) : (
+                            <div className="bg-muted text-muted-foreground flex items-center justify-center gap-2 rounded-full px-5 py-4 text-center text-sm">
+                                <Lock className="size-4 shrink-0" />
+                                Bible Study Insights are visible to members
+                                only.
+                            </div>
+                        ))}
                 </div>
             </div>
         </>

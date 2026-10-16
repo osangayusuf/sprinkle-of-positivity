@@ -28,6 +28,10 @@ class GroupVerseController extends Controller
      */
     public function show(Request $request, Group $group, ChallengeProgress $challengeProgress): Response|RedirectResponse
     {
+        if (! $group->shows_insights) {
+            return to_route('groups.show', $group);
+        }
+
         if (Gate::denies('viewContent', $group)) {
             return $this->privateGroupRedirect($group);
         }
@@ -123,7 +127,7 @@ class GroupVerseController extends Controller
             $group,
             $request->user(),
             $request->string('reference')->value(),
-            $request->string('text')->value(),
+            $request->validated('text'),
             image: $request->file('image'),
             translation: $request->validated('translation'),
             copyright: $request->validated('copyright'),
