@@ -1,46 +1,47 @@
-import { createInertiaApp } from "@inertiajs/react";
-import { registerSW } from "virtual:pwa-register";
-import { CelebrationModal } from "@/components/celebration-modal";
-import { Toaster } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { initializeTheme } from "@/hooks/use-appearance";
-import AppLayout from "@/layouts/app-layout";
-import AuthLayout from "@/layouts/auth-layout";
-import MobileShellLayout from "@/layouts/mobile-shell-layout";
+import { createInertiaApp } from '@inertiajs/react';
+import { registerSW } from 'virtual:pwa-register';
+import { CelebrationModal } from '@/components/celebration-modal';
+import { Toaster } from '@/components/ui/sonner';
+import { TooltipProvider } from '@/components/ui/tooltip';
+import { initializeTheme } from '@/hooks/use-appearance';
+import AppLayout from '@/layouts/app-layout';
+import AuthLayout from '@/layouts/auth-layout';
+import MobileShellLayout from '@/layouts/mobile-shell-layout';
 
-const appName = import.meta.env.VITE_APP_NAME || "Laravel";
+const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
 const MOBILE_SHELL_PAGE_PREFIXES = [
-    "home",
-    "groups/",
-    "verses/",
-    "insights/",
-    "leaderboard/",
-    "partner/",
-    "announcements/",
-    "notifications/",
-    "profile",
-    "marketplace/",
-    "settings/",
-    "quizzes/",
-    "certificates/",
+    'home',
+    'groups/',
+    'verses/',
+    'insights/',
+    'leaderboard/',
+    'partner/',
+    'announcements/',
+    'notifications/',
+    'profile',
+    'marketplace/',
+    'settings/',
+    'quizzes/',
+    'certificates/',
 ];
 
 void createInertiaApp({
     title: (title) => (title ? `${title} - ${appName}` : appName),
     layout: (name) => {
         switch (true) {
-            case name === "landing":
-            case name === "testimonials":
-            case name === "support":
-            case name === "manual":
-            case name === "accountability-partners":
-            case name === "certificates/show":
-            case name.startsWith("onboarding/"):
+            case name === 'landing':
+            case name === 'testimonials':
+            case name === 'support':
+            case name === 'manual':
+            case name === 'accountability-partners':
+            case name === 'hangout':
+            case name === 'certificates/show':
+            case name.startsWith('onboarding/'):
                 return null;
-            case name.startsWith("auth/"):
+            case name.startsWith('auth/'):
                 return AuthLayout;
-            case name.startsWith("admin/"):
+            case name.startsWith('admin/'):
                 return AppLayout;
             case MOBILE_SHELL_PAGE_PREFIXES.some((prefix) =>
                 name.startsWith(prefix),
@@ -61,7 +62,7 @@ void createInertiaApp({
         );
     },
     progress: {
-        color: "#4B5563",
+        color: '#4B5563',
     },
 });
 

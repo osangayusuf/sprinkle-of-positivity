@@ -1,14 +1,14 @@
-import { Form, Head } from "@inertiajs/react";
-import AnnouncementController from "@/actions/App/Http/Controllers/Admin/AnnouncementController";
-import Heading from "@/components/heading";
-import InputError from "@/components/input-error";
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Spinner } from "@/components/ui/spinner";
-import { Textarea } from "@/components/ui/textarea";
-import type { Announcement } from "@/types/models";
+import { Form, Head } from '@inertiajs/react';
+import AnnouncementController from '@/actions/App/Http/Controllers/Admin/AnnouncementController';
+import Heading from '@/components/heading';
+import InputError from '@/components/input-error';
+import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Spinner } from '@/components/ui/spinner';
+import { Textarea } from '@/components/ui/textarea';
+import type { Announcement } from '@/types/models';
 
 export default function AdminAnnouncementEdit({
     announcement,
@@ -82,7 +82,7 @@ export default function AdminAnnouncementEdit({
 
 AdminAnnouncementEdit.layout = {
     breadcrumbs: [
-        { title: "Announcements", href: "/admin/announcements" },
-        { title: "Edit", href: "#" },
+        { title: 'Announcements', href: '/admin/announcements' },
+        { title: 'Edit', href: '#' },
     ],
 };

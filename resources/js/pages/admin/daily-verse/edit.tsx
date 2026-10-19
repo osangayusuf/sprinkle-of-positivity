@@ -1,19 +1,19 @@
-import { Form, Head, Link, router } from "@inertiajs/react";
-import { useState } from "react";
-import DailyVerseController from "@/actions/App/Http/Controllers/Admin/DailyVerseController";
-import Heading from "@/components/heading";
-import InputError from "@/components/input-error";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Spinner } from "@/components/ui/spinner";
-import { Textarea } from "@/components/ui/textarea";
-import { VersePicker } from "@/components/verse-picker";
-import type { VerseFields } from "@/components/verse-picker";
-import type { Verse } from "@/types/models";
+import { Form, Head, Link, router } from '@inertiajs/react';
+import { useState } from 'react';
+import DailyVerseController from '@/actions/App/Http/Controllers/Admin/DailyVerseController';
+import Heading from '@/components/heading';
+import InputError from '@/components/input-error';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Spinner } from '@/components/ui/spinner';
+import { Textarea } from '@/components/ui/textarea';
+import { VersePicker } from '@/components/verse-picker';
+import type { VerseFields } from '@/components/verse-picker';
+import type { Verse } from '@/types/models';
 
 function todayDateString(): string {
-    return new Date().toLocaleDateString("en-CA");
+    return new Date().toLocaleDateString('en-CA');
 }
 
 export default function AdminDailyVerseEdit({
@@ -24,10 +24,10 @@ export default function AdminDailyVerseEdit({
     date: string;
 }) {
     const [fields, setFields] = useState<VerseFields>({
-        reference: verse?.reference ?? "",
-        text: verse?.text ?? "",
-        translation: verse?.translation ?? "",
-        copyright: verse?.copyright ?? "",
+        reference: verse?.reference ?? '',
+        text: verse?.text ?? '',
+        translation: verse?.translation ?? '',
+        copyright: verse?.copyright ?? '',
     });
     const today = todayDateString();
     const isToday = date === today;
@@ -146,5 +146,5 @@ export default function AdminDailyVerseEdit({
 }
 
 AdminDailyVerseEdit.layout = {
-    breadcrumbs: [{ title: "Today's verse", href: "/admin/daily-verse" }],
+    breadcrumbs: [{ title: "Today's verse", href: '/admin/daily-verse' }],
 };

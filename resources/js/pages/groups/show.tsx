@@ -1,9 +1,9 @@
-import { Head, Link, usePage } from "@inertiajs/react";
-import { ChevronLeft, Lock, MessageCircle, MoreVertical } from "lucide-react";
-import { SignInPrompt } from "@/components/sign-in-prompt";
-import { Button } from "@/components/ui/button";
-import type { Auth } from "@/types/auth";
-import type { Group, GroupMembershipInfo } from "@/types/models";
+import { Head, Link, usePage } from '@inertiajs/react';
+import { ChevronLeft, Lock, MessageCircle, MoreVertical } from 'lucide-react';
+import { SignInPrompt } from '@/components/sign-in-prompt';
+import { Button } from '@/components/ui/button';
+import type { Auth } from '@/types/auth';
+import type { Group, GroupMembershipInfo } from '@/types/models';
 
 type Props = {
     group: Group;
@@ -71,7 +71,7 @@ export default function GroupShow({
                     </p>
                 </div>
 
-                {typeof group.members_count === "number" && (
+                {typeof group.members_count === 'number' && (
                     <p className="text-muted-foreground text-sm">
                         {group.members_count} members
                     </p>
@@ -93,7 +93,7 @@ export default function GroupShow({
                         </Button>
                     )}
 
-                    {membership?.status === "pending" && (
+                    {membership?.status === 'pending' && (
                         <div className="bg-muted text-muted-foreground rounded-full px-5 py-4 text-center text-sm font-semibold">
                             Application pending approval
                         </div>

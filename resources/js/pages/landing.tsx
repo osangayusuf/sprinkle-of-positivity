@@ -5,6 +5,7 @@ import {
     CalendarDays,
     Flame,
     HandHeart,
+    Images,
     Award,
     Coffee,
     GraduationCap,
@@ -27,6 +28,7 @@ import {
 } from '@/components/ui/sheet';
 import {
     accountabilityPartners,
+    hangout,
     home,
     login,
     manual,
@@ -115,7 +117,7 @@ const activities = [
     {
         icon: Coffee,
         title: 'Community hangouts',
-        body: 'Hangouts are held periodically.',
+        body: 'Hangouts are held periodically. The last hangout was on October 4th, 2026.',
         tag: 'Periodic',
     },
 ];
@@ -191,6 +193,12 @@ function Nav() {
                     Accountability Partners
                 </Link>
                 <Link
+                    href={hangout()}
+                    className="text-ink hover:text-primary focus-visible:ring-primary rounded-full px-3 py-3 outline-none focus-visible:ring-[3px]"
+                >
+                    Hangout Photos
+                </Link>
+                <Link
                     href={supportPage()}
                     className="text-ink hover:text-primary focus-visible:ring-primary rounded-full px-3 py-3 outline-none focus-visible:ring-[3px]"
                 >
@@ -247,6 +255,9 @@ function Nav() {
                             className={mobileLinkClass}
                         >
                             Accountability Partners
+                        </Link>
+                        <Link href={hangout()} className={mobileLinkClass}>
+                            Hangout Photos
                         </Link>
                         <Link href={supportPage()} className={mobileLinkClass}>
                             Give / Support
@@ -610,6 +621,12 @@ function Footer() {
                             >
                                 <Users className="size-4" aria-hidden="true" />
                                 Accountability Partners
+                            </Link>
+                        </li>
+                        <li>
+                            <Link href={hangout()} className={linkClass}>
+                                <Images className="size-4" aria-hidden="true" />
+                                Hangout Photos
                             </Link>
                         </li>
                         <li>

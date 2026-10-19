@@ -1,10 +1,10 @@
-export type GroupMembershipRole = "manager" | "member";
+export type GroupMembershipRole = 'manager' | 'member';
 
 export type GroupMembershipStatus =
-    | "pending"
-    | "approved"
-    | "rejected"
-    | "removed";
+    | 'pending'
+    | 'approved'
+    | 'rejected'
+    | 'removed';
 
 export type Group = {
     id: number;
@@ -14,7 +14,7 @@ export type Group = {
     cover_image_url: string | null;
     duration_days: number | null;
     starts_on: string | null;
-    status: "active" | "archived";
+    status: 'active' | 'archived';
     is_private: boolean;
     shows_insights: boolean;
     members_count?: number;
@@ -99,7 +99,7 @@ export type Quiz = {
     created_by_name: string;
     created_by_avatar: string | null;
     created_at: string;
-    type: "quiz" | "poll";
+    type: 'quiz' | 'poll';
     closed: boolean;
     options: QuizOption[];
     responses_count: number;

@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\User;
+use Illuminate\Support\Facades\File;
 
 test('guests see the public landing page', function () {
     $this->get(route('root'))
@@ -38,4 +39,27 @@ test('anyone can see the accountability partners gallery', function () {
                 ->has('photo')
             )
         );
+});
+
+test('anyone can see the hangout photo gallery', function () {
+    $thumbs = public_path('images/hangout/thumb');
+    $createdDirectory = ! is_dir($thumbs);
+    File::ensureDirectoryExists($thumbs);
+    $file = $thumbs.'/zz-test-photo.jpg';
+    File::put($file, 'x');
+
+    try {
+        $this->get(route('hangout'))
+            ->assertOk()
+            ->assertInertia(fn ($page) => $page
+                ->component('hangout')
+                ->where('photos', fn ($photos) => collect($photos)->contains(fn ($photo) => $photo['thumb'] === '/images/hangout/thumb/zz-test-photo.jpg'
+                    && $photo['full'] === '/images/hangout/full/zz-test-photo.jpg'))
+            );
+    } finally {
+        File::delete($file);
+        if ($createdDirectory && File::isEmptyDirectory($thumbs)) {
+            File::deleteDirectory(dirname($thumbs));
+        }
+    }
 });
