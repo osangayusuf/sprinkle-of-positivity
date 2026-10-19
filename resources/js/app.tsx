@@ -35,6 +35,7 @@ void createInertiaApp({
             case name === "support":
             case name === "manual":
             case name === "accountability-partners":
+            case name === "hangout":
             case name === "certificates/show":
             case name.startsWith("onboarding/"):
                 return null;

@@ -22,6 +22,20 @@ Route::get('accountability-partners', function () {
 
     return Inertia::render('accountability-partners', ['partners' => $partners]);
 })->name('accountability-partners');
+Route::get('hangout', function () {
+    $directory = public_path('images/hangout/thumb');
+
+    $photos = collect(File::isDirectory($directory) ? File::files($directory) : [])
+        ->map(fn ($file) => [
+            'name' => $file->getFilename(),
+            'thumb' => '/images/hangout/thumb/'.rawurlencode($file->getFilename()),
+            'full' => '/images/hangout/full/'.rawurlencode($file->getFilename()),
+        ])
+        ->sortBy('name', SORT_NATURAL | SORT_FLAG_CASE)
+        ->values();
+
+    return Inertia::render('hangout', ['photos' => $photos]);
+})->name('hangout');
 Route::get('manual', ManualController::class)->name('manual');
 Route::get('support', fn () => Inertia::render('support'))->name('support');
 
