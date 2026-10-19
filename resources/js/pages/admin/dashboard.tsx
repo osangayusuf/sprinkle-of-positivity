@@ -1,4 +1,4 @@
-import { Head, Link } from "@inertiajs/react";
+import { Head, Link } from '@inertiajs/react';
 import {
     Award,
     BookMarked,
@@ -6,8 +6,8 @@ import {
     Megaphone,
     ShoppingBag,
     Users as UsersIcon,
-} from "lucide-react";
-import Heading from "@/components/heading";
+} from 'lucide-react';
+import Heading from '@/components/heading';
 
 type DashboardCard = {
     title: string;
@@ -31,56 +31,56 @@ export default function AdminDashboard({
 }) {
     const cards: DashboardCard[] = [
         {
-            title: "Analytics",
-            description: "Visitors, logins and member activity",
-            href: "/admin/analytics",
+            title: 'Analytics',
+            description: 'Visitors, logins and member activity',
+            href: '/admin/analytics',
             icon: ChartColumn,
         },
         {
-            title: "Groups",
-            description: "Create and manage Bible study groups",
-            href: "/admin/groups",
+            title: 'Groups',
+            description: 'Create and manage Bible study groups',
+            href: '/admin/groups',
             icon: UsersIcon,
             count: counts.groups,
         },
         {
             title: "Today's verse",
-            description: "Set the global daily verse, or set many at once",
-            href: "/admin/daily-verse",
+            description: 'Set the global daily verse, or set many at once',
+            href: '/admin/daily-verse',
             icon: BookMarked,
         },
         {
-            title: "Announcements",
-            description: "Send, review and correct messages to every member",
-            href: "/admin/announcements",
+            title: 'Announcements',
+            description: 'Send, review and correct messages to every member',
+            href: '/admin/announcements',
             icon: Megaphone,
         },
         {
-            title: "Marketplace",
-            description: "Manage promotional listings shown to members",
-            href: "/admin/marketplace",
+            title: 'Marketplace',
+            description: 'Manage promotional listings shown to members',
+            href: '/admin/marketplace',
             icon: ShoppingBag,
             count: counts.activeListings,
         },
         {
-            title: "Certificates",
-            description: "Review, issue and revoke completion certificates",
-            href: "/admin/certificates",
+            title: 'Certificates',
+            description: 'Review, issue and revoke completion certificates',
+            href: '/admin/certificates',
             icon: Award,
         },
         {
-            title: "Participants",
+            title: 'Participants',
             description: `Every participant's progress. ${counts.resetsThisWeek} restart(s) in the last 7 days`,
-            href: "/partner/participants",
+            href: '/partner/participants',
             icon: UsersIcon,
         },
         {
-            title: "Users",
+            title: 'Users',
             description:
                 counts.pendingPartners > 0
                     ? `${counts.pendingPartners} accountability partner(s) awaiting approval`
                     : `${counts.partners} approved accountability partner(s)`,
-            href: "/admin/users",
+            href: '/admin/users',
             icon: UsersIcon,
             count: counts.users,
         },
@@ -129,5 +129,5 @@ export default function AdminDashboard({
 }
 
 AdminDashboard.layout = {
-    breadcrumbs: [{ title: "Dashboard", href: "/admin/dashboard" }],
+    breadcrumbs: [{ title: 'Dashboard', href: '/admin/dashboard' }],
 };

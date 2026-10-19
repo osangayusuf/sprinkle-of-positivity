@@ -1,13 +1,13 @@
-import { Form, Head } from "@inertiajs/react";
-import GroupController from "@/actions/App/Http/Controllers/Admin/GroupController";
-import Heading from "@/components/heading";
-import InputError from "@/components/input-error";
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Spinner } from "@/components/ui/spinner";
-import { Textarea } from "@/components/ui/textarea";
+import { Form, Head } from '@inertiajs/react';
+import GroupController from '@/actions/App/Http/Controllers/Admin/GroupController';
+import Heading from '@/components/heading';
+import InputError from '@/components/input-error';
+import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Spinner } from '@/components/ui/spinner';
+import { Textarea } from '@/components/ui/textarea';
 
 type Props = {
     users: { id: number; name: string; email: string }[];
@@ -182,7 +182,7 @@ export default function AdminGroupsCreate({ users }: Props) {
 
 AdminGroupsCreate.layout = {
     breadcrumbs: [
-        { title: "Groups", href: "/admin/groups" },
-        { title: "New group", href: "/admin/groups/create" },
+        { title: 'Groups', href: '/admin/groups' },
+        { title: 'New group', href: '/admin/groups/create' },
     ],
 };

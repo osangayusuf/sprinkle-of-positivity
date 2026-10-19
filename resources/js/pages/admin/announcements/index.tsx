@@ -1,15 +1,15 @@
-import { Head, Link } from "@inertiajs/react";
-import Heading from "@/components/heading";
-import { Button } from "@/components/ui/button";
-import type { Announcement } from "@/types/models";
+import { Head, Link } from '@inertiajs/react';
+import Heading from '@/components/heading';
+import { Button } from '@/components/ui/button';
+import type { Announcement } from '@/types/models';
 
 function formatDateTime(isoDate: string): string {
     return new Date(isoDate).toLocaleString(undefined, {
-        day: "2-digit",
-        month: "short",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
     });
 }
 
@@ -84,5 +84,5 @@ export default function AdminAnnouncementIndex({
 }
 
 AdminAnnouncementIndex.layout = {
-    breadcrumbs: [{ title: "Announcements", href: "/admin/announcements" }],
+    breadcrumbs: [{ title: 'Announcements', href: '/admin/announcements' }],
 };

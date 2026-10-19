@@ -1,13 +1,13 @@
-import { Head } from "@inertiajs/react";
-import { Megaphone } from "lucide-react";
-import { PageHeader } from "@/components/page-header";
-import type { Announcement } from "@/types/models";
+import { Head } from '@inertiajs/react';
+import { Megaphone } from 'lucide-react';
+import { PageHeader } from '@/components/page-header';
+import type { Announcement } from '@/types/models';
 
 function formatDate(isoDate: string): string {
     return new Date(isoDate).toLocaleDateString(undefined, {
-        day: "2-digit",
-        month: "long",
-        year: "numeric",
+        day: '2-digit',
+        month: 'long',
+        year: 'numeric',
     });
 }
 
@@ -41,7 +41,7 @@ export default function AnnouncementsIndex({
                                     announcement.last_sent_at ??
                                         announcement.created_at,
                                 )}
-                                {announcement.is_edited && " • Updated"}
+                                {announcement.is_edited && ' • Updated'}
                             </p>
                             <p className="text-foreground mt-3 text-sm leading-relaxed whitespace-pre-line">
                                 {announcement.body}
