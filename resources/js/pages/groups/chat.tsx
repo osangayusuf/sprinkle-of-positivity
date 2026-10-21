@@ -218,7 +218,7 @@ function MessageBubble({
                     </span>
                     {message.author.is_manager && (
                         <span className="bg-primary-tint text-primary-tint-foreground rounded-full px-2 py-0.5 text-[10px] font-semibold">
-                            Manager
+                            Accountability partner
                         </span>
                     )}
                     <span>{formatRelativeTime(message.created_at)}</span>

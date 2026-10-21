@@ -124,7 +124,7 @@ export default function GroupManage({
                                     </p>
                                     {member.role === 'manager' && (
                                         <p className="text-muted-foreground text-xs">
-                                            Manager
+                                            Accountability partner
                                         </p>
                                     )}
                                 </div>
