@@ -2,8 +2,8 @@ import { Form, Head } from '@inertiajs/react';
 import { useState } from 'react';
 import GroupVerseController from '@/actions/App/Http/Controllers/GroupVerseController';
 import { PageHeader } from '@/components/page-header';
+import { ImageInput } from '@/components/image-input';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import InputError from '@/components/input-error';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
@@ -81,11 +81,9 @@ export default function VerseEdit({
                                         className="h-32 w-full rounded-xl object-cover"
                                     />
                                 )}
-                                <Input
+                                <ImageInput
                                     id="image"
                                     name="image"
-                                    type="file"
-                                    accept="image/*"
                                     className="bg-muted h-12 rounded-xl border-transparent px-4"
                                 />
                                 <InputError message={errors.image} />

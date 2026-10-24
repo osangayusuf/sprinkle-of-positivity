@@ -4,6 +4,7 @@ import { useState } from 'react';
 import DailyVerseBulkController from '@/actions/App/Http/Controllers/Admin/DailyVerseBulkController';
 import Heading from '@/components/heading';
 import InputError from '@/components/input-error';
+import { ImageInput } from '@/components/image-input';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -137,11 +138,9 @@ export default function AdminDailyVerseBulk() {
                                                 <Label htmlFor={`image-${id}`}>
                                                     Image (optional)
                                                 </Label>
-                                                <Input
+                                                <ImageInput
                                                     id={`image-${id}`}
                                                     name={`rows[${id}][image]`}
-                                                    type="file"
-                                                    accept="image/*"
                                                 />
                                             </div>
                                         </div>

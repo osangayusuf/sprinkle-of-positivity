@@ -12,6 +12,7 @@ const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
 const MOBILE_SHELL_PAGE_PREFIXES = [
     'home',
+    'give/',
     'groups/',
     'verses/',
     'insights/',

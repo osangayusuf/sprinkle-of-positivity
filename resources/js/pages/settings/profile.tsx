@@ -13,6 +13,7 @@ import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
 import { UserAvatar } from '@/components/user-avatar';
 import { GOAL_OPTIONS, MONTHS } from '@/lib/profile-options';
+import { imageFileError, MAX_IMAGE_MB } from '@/lib/upload';
 import { cn } from '@/lib/utils';
 import { send } from '@/routes/verification';
 import type { AuthenticatedAuth } from '@/types';
@@ -232,6 +233,7 @@ export default function Profile({
 function ProfilePicture() {
     const { auth } = usePage<{ auth: AuthenticatedAuth }>().props;
     const formRef = useRef<FormComponentRef>(null);
+    const [avatarError, setAvatarError] = useState<string | null>(null);
 
     return (
         <div className="flex items-center gap-4">
@@ -266,12 +268,36 @@ function ProfilePicture() {
                                 accept="image/*"
                                 className="sr-only"
                                 disabled={processing}
-                                onChange={(event) =>
-                                    event.currentTarget.files?.length &&
-                                    formRef.current?.submit()
-                                }
+                                onChange={(event) => {
+                                    const file = event.currentTarget.files?.[0];
+
+                                    if (!file) {
+                                        return;
+                                    }
+
+                                    const message = imageFileError(
+                                        file,
+                                        MAX_IMAGE_MB,
+                                    );
+
+                                    setAvatarError(message);
+
+                                    if (message) {
+                                        event.currentTarget.value = '';
+
+                                        return;
+                                    }
+
+                                    formRef.current?.submit();
+                                }}
                             />
-                            <InputError message={errors.avatar} />
+                            <p className="text-muted-foreground text-xs">
+                                Maximum file size: {MAX_IMAGE_MB} MB
+                            </p>
+                            <InputError
+                                message={avatarError ?? errors.avatar}
+                                role="alert"
+                            />
                         </>
                     )}
                 </Form>

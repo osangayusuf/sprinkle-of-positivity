@@ -33,6 +33,7 @@ class HomeController extends Controller
             'yourGroups' => GroupResource::collection(
                 $request->user() ? $this->recentlyActiveGroups($request->user()) : collect()
             ),
+            'showGiveBanner' => (bool) $request->session()->pull('show_give_banner', false),
             'featuredListings' => MarketplaceListingResource::collection(
                 MarketplaceListing::active()->limit(7)->get()
             ),

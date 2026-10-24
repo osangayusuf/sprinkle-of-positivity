@@ -3,6 +3,7 @@ import { useState } from 'react';
 import DailyVerseController from '@/actions/App/Http/Controllers/Admin/DailyVerseController';
 import Heading from '@/components/heading';
 import InputError from '@/components/input-error';
+import { ImageInput } from '@/components/image-input';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -124,12 +125,7 @@ export default function AdminDailyVerseEdit({
                                         className="h-32 w-full rounded-lg object-cover"
                                     />
                                 )}
-                                <Input
-                                    id="image"
-                                    name="image"
-                                    type="file"
-                                    accept="image/*"
-                                />
+                                <ImageInput id="image" name="image" />
                                 <InputError message={errors.image} />
                             </div>
 

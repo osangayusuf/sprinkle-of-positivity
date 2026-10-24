@@ -28,3 +28,39 @@ test('onboarded users can visit home', function () {
 
     $response->assertOk();
 });
+
+test('the giving banner is shown once after signing in', function () {
+    $user = User::factory()->create();
+
+    $this->post(route('login.store'), [
+        'email' => $user->email,
+        'password' => 'password',
+    ]);
+
+    $this->get(route('home'))
+        ->assertInertia(fn ($page) => $page->where('showGiveBanner', true));
+
+    $this->get(route('home'))
+        ->assertInertia(fn ($page) => $page->where('showGiveBanner', false));
+});
+
+test('the giving banner is not shown without signing in', function () {
+    $this->actingAs(User::factory()->create())
+        ->get(route('home'))
+        ->assertInertia(fn ($page) => $page->where('showGiveBanner', false));
+});
+
+test('the give page is shown to signed in users and not to guests', function () {
+    $this->get(route('give'))->assertRedirect(route('login'));
+
+    $this->actingAs(User::factory()->create())
+        ->get(route('give'))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page->component('give/index'));
+});
+
+test('admins can open the give page too', function () {
+    $this->actingAs(User::factory()->admin()->create())
+        ->get(route('give'))
+        ->assertOk();
+});

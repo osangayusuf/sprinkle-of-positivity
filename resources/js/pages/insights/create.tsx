@@ -7,8 +7,11 @@ import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
 import { Textarea } from '@/components/ui/textarea';
 import { UserAvatar } from '@/components/user-avatar';
+import { imageFileError, MAX_INSIGHT_IMAGE_MB } from '@/lib/upload';
 import type { AuthenticatedAuth } from '@/types/auth';
 import type { Group } from '@/types/models';
+
+const MAX_BODY_LENGTH = 5000;
 
 export default function InsightCreate({
     group,
@@ -20,10 +23,24 @@ export default function InsightCreate({
     const { auth } = usePage<{ auth: AuthenticatedAuth }>().props;
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [imagePreview, setImagePreview] = useState<string | null>(null);
+    const [imageError, setImageError] = useState<string | null>(null);
+    const [body, setBody] = useState('');
 
     function onImageChange(event: React.ChangeEvent<HTMLInputElement>) {
         const file = event.target.files?.[0];
-        setImagePreview(file ? URL.createObjectURL(file) : null);
+        const message = file
+            ? imageFileError(file, MAX_INSIGHT_IMAGE_MB)
+            : null;
+
+        setImageError(message);
+
+        if (!file || message) {
+            clearImage();
+
+            return;
+        }
+
+        setImagePreview(URL.createObjectURL(file));
     }
 
     function clearImage() {
@@ -66,9 +83,21 @@ export default function InsightCreate({
                                 name="body"
                                 required
                                 rows={8}
+                                value={body}
+                                onChange={(event) =>
+                                    setBody(event.target.value)
+                                }
+                                maxLength={MAX_BODY_LENGTH}
                                 placeholder="Write your insight here..."
                                 className="resize-none border-none px-0 shadow-none focus-visible:ring-0"
                             />
+                            <p
+                                className={`text-xs ${body.length >= MAX_BODY_LENGTH ? 'text-red-600 dark:text-red-400' : 'text-muted-foreground'}`}
+                                aria-live="polite"
+                            >
+                                {body.length.toLocaleString()} /{' '}
+                                {MAX_BODY_LENGTH.toLocaleString()} characters
+                            </p>
                             <InputError message={errors.body} />
 
                             {imagePreview && (
@@ -88,7 +117,10 @@ export default function InsightCreate({
                                     </button>
                                 </div>
                             )}
-                            <InputError message={errors.image} />
+                            <InputError
+                                message={imageError ?? errors.image}
+                                role="alert"
+                            />
 
                             <input
                                 ref={fileInputRef}
@@ -101,12 +133,21 @@ export default function InsightCreate({
                             />
 
                             <div className="flex items-center justify-between">
-                                <label
-                                    htmlFor="insight-image"
-                                    className="bg-muted flex size-11 cursor-pointer items-center justify-center rounded-xl"
-                                >
-                                    <ImageIcon className="text-muted-foreground size-5" />
-                                </label>
+                                <div className="flex items-center gap-3">
+                                    <label
+                                        htmlFor="insight-image"
+                                        className="bg-muted flex size-11 cursor-pointer items-center justify-center rounded-xl"
+                                    >
+                                        <ImageIcon className="text-muted-foreground size-5" />
+                                        <span className="sr-only">
+                                            Add an image
+                                        </span>
+                                    </label>
+                                    <span className="text-muted-foreground text-xs">
+                                        Max image size: {MAX_INSIGHT_IMAGE_MB}{' '}
+                                        MB
+                                    </span>
+                                </div>
 
                                 <Button
                                     type="submit"
