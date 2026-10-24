@@ -60,7 +60,7 @@ test('a profile picture must be an image', function () {
         ->post(route('profile.avatar.update'), [
             'avatar' => UploadedFile::fake()->create('notes.pdf', 10, 'application/pdf'),
         ])
-        ->assertSessionHasErrors(['avatar' => 'The avatar field must be an image.']);
+        ->assertSessionHasErrors(['avatar' => 'Please choose an image file (JPG, PNG, GIF, WebP).']);
 
     expect($user->refresh()->avatar_path)->toBeNull();
 });
@@ -73,7 +73,7 @@ test('a profile picture cannot be larger than 2MB', function () {
         ->post(route('profile.avatar.update'), [
             'avatar' => UploadedFile::fake()->image('huge.jpg')->size(2049),
         ])
-        ->assertSessionHasErrors(['avatar' => 'The avatar field must not be greater than 2048 kilobytes.']);
+        ->assertSessionHasErrors(['avatar' => 'That file is too large. Please choose one smaller than 2048 KB.']);
 });
 
 test('guests cannot upload a profile picture', function () {

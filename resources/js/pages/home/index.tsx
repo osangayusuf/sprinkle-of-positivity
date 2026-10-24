@@ -1,5 +1,6 @@
 import { Head, Link, usePage } from '@inertiajs/react';
 import { Bell, BookOpenText, ShieldCheck, Users } from 'lucide-react';
+import { GiveBanner } from '@/components/give-banner';
 import { GroupCard } from '@/components/group-card';
 import { MarketplaceBannerCard } from '@/components/marketplace-banner-card';
 import { Button } from '@/components/ui/button';
@@ -26,10 +27,12 @@ export default function HomeIndex({
     verse,
     yourGroups,
     featuredListings,
+    showGiveBanner,
 }: {
     verse: Verse | null;
     yourGroups: Group[];
     featuredListings: MarketplaceListing[];
+    showGiveBanner: boolean;
 }) {
     const { auth, unreadNotificationsCount } = usePage<{
         auth: Auth;
@@ -97,6 +100,8 @@ export default function HomeIndex({
                     </div>
                 )}
             </header>
+
+            {auth.user && showGiveBanner && <GiveBanner />}
 
             <div className="px-4">
                 {verse ? (

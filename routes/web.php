@@ -43,6 +43,10 @@ Route::middleware('onboarded')->group(function () {
     Route::get('home', [HomeController::class, 'show'])->name('home');
 });
 
+Route::middleware(['auth', 'verified', 'onboarded'])->group(function () {
+    Route::inertia('give', 'give/index')->name('give');
+});
+
 require __DIR__.'/onboarding.php';
 require __DIR__.'/partners.php';
 require __DIR__.'/groups.php';

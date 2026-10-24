@@ -2,6 +2,7 @@ import { Form, Head } from '@inertiajs/react';
 import GroupController from '@/actions/App/Http/Controllers/Admin/GroupController';
 import Heading from '@/components/heading';
 import InputError from '@/components/input-error';
+import { ImageInput } from '@/components/image-input';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
@@ -216,11 +217,9 @@ export default function AdminGroupsEdit({ group, users, managerIds }: Props) {
                                         className="h-32 w-full rounded-lg object-cover"
                                     />
                                 )}
-                                <Input
+                                <ImageInput
                                     id="cover_image"
                                     name="cover_image"
-                                    type="file"
-                                    accept="image/*"
                                 />
                                 <InputError message={errors.cover_image} />
                             </div>
