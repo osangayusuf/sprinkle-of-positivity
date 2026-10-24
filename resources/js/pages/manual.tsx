@@ -1,6 +1,7 @@
-import { Head, Link } from '@inertiajs/react';
+import { Link } from '@inertiajs/react';
 import { ArrowLeft } from 'lucide-react';
 import Reveal from '@/components/landing/reveal';
+import Seo from '@/components/seo';
 
 type Contents = {
     title: string;
@@ -45,7 +46,10 @@ export default function Manual({
 }) {
     return (
         <>
-            <Head title="User manual" />
+            <Seo
+                title="User manual"
+                description="The complete guide to using Light Shining in the Dark: member guide, groups, quizzes and more."
+            />
             <div className="landing bg-paper text-ink min-h-screen">
                 <div className="mx-auto max-w-7xl px-5 py-10 md:px-8 lg:py-16">
                     <Link

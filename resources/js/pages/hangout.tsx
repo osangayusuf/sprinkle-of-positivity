@@ -1,4 +1,4 @@
-import { Head, Link } from '@inertiajs/react';
+import { Link } from '@inertiajs/react';
 import { ArrowLeft, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import {
@@ -7,6 +7,7 @@ import {
     DialogDescription,
     DialogTitle,
 } from '@/components/ui/dialog';
+import Seo from '@/components/seo';
 
 type Photo = {
     name: string;
@@ -61,7 +62,10 @@ export default function Hangout({ photos }: { photos: Photo[] }) {
 
     return (
         <>
-            <Head title="Hangout Photos" />
+            <Seo
+                title="Hangout photos"
+                description="Photos from the Light Shining in the Dark community hangout."
+            />
             <div className="landing bg-paper text-ink min-h-screen">
                 <div className="mx-auto max-w-7xl px-5 py-10 md:px-8 lg:py-16">
                     <Link

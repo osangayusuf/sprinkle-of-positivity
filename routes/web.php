@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ManualController;
+use App\Http\Controllers\SeoController;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -9,6 +10,9 @@ use Inertia\Inertia;
 Route::get('/', function () {
     return request()->user() ? to_route('home') : Inertia::render('landing');
 })->name('root');
+
+Route::get('robots.txt', [SeoController::class, 'robots'])->name('robots');
+Route::get('sitemap.xml', [SeoController::class, 'sitemap'])->name('sitemap');
 
 Route::get('testimonials', fn () => Inertia::render('testimonials'))->name('testimonials');
 Route::get('accountability-partners', function () {
