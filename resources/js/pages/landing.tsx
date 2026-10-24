@@ -1,4 +1,4 @@
-import { Head, Link } from '@inertiajs/react';
+import { Link } from '@inertiajs/react';
 import {
     ArrowUpRight,
     BookOpenText,
@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import AppLogoIcon from '@/components/app-logo-icon';
 import Reveal from '@/components/landing/reveal';
+import Seo from '@/components/seo';
 import { Sprinkle } from '@/components/landing/sprinkle';
 import {
     Sheet,
@@ -662,13 +663,10 @@ function Footer() {
 export default function Landing() {
     return (
         <>
-            <Head title="Bible study accountability community">
-                <meta
-                    head-key="description"
-                    name="description"
-                    content={program.intro}
-                />
-            </Head>
+            <Seo
+                title="Light Shining in the Dark | Bible study accountability community"
+                description={program.intro}
+            />
 
             <a
                 href="#anchor"

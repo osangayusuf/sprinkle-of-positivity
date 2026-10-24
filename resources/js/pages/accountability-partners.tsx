@@ -1,6 +1,7 @@
-import { Head, Link } from '@inertiajs/react';
+import { Link } from '@inertiajs/react';
 import { ArrowLeft } from 'lucide-react';
 import Reveal from '@/components/landing/reveal';
+import Seo from '@/components/seo';
 
 type Partner = {
     name: string;
@@ -14,7 +15,10 @@ export default function AccountabilityPartners({
 }) {
     return (
         <>
-            <Head title="Accountability Partners" />
+            <Seo
+                title="Accountability partners"
+                description="Meet the accountability partners who walk alongside members of Light Shining in the Dark."
+            />
             <div className="landing bg-paper text-ink min-h-screen">
                 <div className="mx-auto max-w-7xl px-5 py-10 md:px-8 lg:py-16">
                     <Link

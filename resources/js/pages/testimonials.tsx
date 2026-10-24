@@ -1,6 +1,7 @@
-import { Head, Link } from '@inertiajs/react';
+import { Link } from '@inertiajs/react';
 import { ArrowLeft } from 'lucide-react';
 import Reveal from '@/components/landing/reveal';
+import Seo from '@/components/seo';
 
 type Testimonial = {
     quote: string;
@@ -79,7 +80,10 @@ const testimonials: Testimonial[] = [
 export default function Testimonials() {
     return (
         <>
-            <Head title="Testimonials" />
+            <Seo
+                title="Testimonials"
+                description="Read how Light Shining in the Dark has helped members grow in their faith and stay consistent in Bible study."
+            />
             <div className="landing bg-paper text-ink min-h-screen">
                 <div className="mx-auto max-w-7xl px-5 py-10 md:px-8 lg:py-16">
                     <Link
