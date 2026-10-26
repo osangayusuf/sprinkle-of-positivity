@@ -27,6 +27,7 @@ class UserResource extends JsonResource
                 default => Role::MEMBER,
             },
             'is_partner' => $this->hasRole(Role::PARTNER),
+            'is_disabled' => $this->isDisabled(),
             'partner_status' => $this->partner_status?->value,
         ];
     }

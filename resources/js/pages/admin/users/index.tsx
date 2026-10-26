@@ -9,6 +9,7 @@ type AdminUser = {
     points: number;
     role: 'admin' | 'member' | 'partner';
     is_partner: boolean;
+    is_disabled: boolean;
     partner_status: 'pending' | 'approved' | 'rejected' | null;
 };
 
@@ -29,6 +30,14 @@ export default function AdminUsersIndex({ users }: { users: AdminUser[] }) {
         router.put(
             `/admin/users/${user.id}/partner`,
             { decision },
+            { preserveScroll: true },
+        );
+    }
+
+    function toggleDisabled(user: AdminUser) {
+        router.put(
+            UserController.updateDisabled.url({ user: user.id }),
+            { disabled: !user.is_disabled },
             { preserveScroll: true },
         );
     }
@@ -54,6 +63,9 @@ export default function AdminUsersIndex({ users }: { users: AdminUser[] }) {
                                     Points
                                 </th>
                                 <th className="px-4 py-2 font-medium">Role</th>
+                                <th className="px-4 py-2 font-medium">
+                                    Account
+                                </th>
                             </tr>
                         </thead>
                         <tbody>
@@ -131,12 +143,28 @@ export default function AdminUsersIndex({ users }: { users: AdminUser[] }) {
                                             </span>
                                         )}
                                     </td>
+                                    <td className="px-4 py-2">
+                                        {user.is_disabled && (
+                                            <span className="text-destructive mr-3 text-xs">
+                                                Disabled
+                                            </span>
+                                        )}
+                                        <button
+                                            type="button"
+                                            className={`text-xs font-semibold ${user.is_disabled ? 'text-primary' : 'text-destructive'}`}
+                                            onClick={() => toggleDisabled(user)}
+                                        >
+                                            {user.is_disabled
+                                                ? 'Enable'
+                                                : 'Disable'}
+                                        </button>
+                                    </td>
                                 </tr>
                             ))}
                             {users.length === 0 && (
                                 <tr>
                                     <td
-                                        colSpan={4}
+                                        colSpan={5}
                                         className="text-muted-foreground px-4 py-6 text-center"
                                     >
                                         No users yet.

@@ -58,5 +58,6 @@ Route::middleware(['auth', 'verified', 'onboarded', 'can:access-admin'])
 
         Route::get('users', [UserController::class, 'index'])->name('users.index');
         Route::put('users/{user}/partner', [PartnerController::class, 'update'])->name('users.update-partner');
+        Route::put('users/{user}/disabled', [UserController::class, 'updateDisabled'])->name('users.update-disabled');
         Route::put('users/{user}/role', [UserController::class, 'updateRole'])->name('users.update-role');
     });
