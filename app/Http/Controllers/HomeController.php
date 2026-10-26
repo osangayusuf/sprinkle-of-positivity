@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\BirthdayResource;
 use App\Http\Resources\GroupResource;
 use App\Http\Resources\MarketplaceListingResource;
 use App\Http\Resources\VerseResource;
@@ -21,7 +22,8 @@ class HomeController extends Controller
 {
     /**
      * The home feed: today's global verse of the day, the member's most
-     * recently active groups (none for guests), and featured marketplace
+     * recently active groups (none for guests), today's birthdays (none for
+     * guests), and featured marketplace
      * listings.
      */
     public function show(Request $request): Response
@@ -33,11 +35,32 @@ class HomeController extends Controller
             'yourGroups' => GroupResource::collection(
                 $request->user() ? $this->recentlyActiveGroups($request->user()) : collect()
             ),
+            'birthdays' => BirthdayResource::collection(
+                $request->user() ? $this->birthdaysToday($request->user()) : collect()
+            ),
             'showGiveBanner' => (bool) $request->session()->pull('show_give_banner', false),
             'featuredListings' => MarketplaceListingResource::collection(
                 MarketplaceListing::active()->limit(7)->get()
             ),
         ]);
+    }
+
+    /**
+     * Today's birthday people, capped at 5, each flagged with whether the
+     * given member has already wished them this year.
+     *
+     * @return Collection<int, User>
+     */
+    private function birthdaysToday(User $viewer): Collection
+    {
+        return User::query()
+            ->hasBirthdayToday()
+            ->withExists(['birthdayWishesReceived as wished' => fn ($query) => $query
+                ->where('sender_id', $viewer->id)
+                ->where('year', today()->year)])
+            ->orderBy('name')
+            ->limit(5)
+            ->get();
     }
 
     /**
