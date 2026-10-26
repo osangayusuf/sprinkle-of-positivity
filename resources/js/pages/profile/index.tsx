@@ -3,7 +3,6 @@ import {
     Award,
     Bell,
     ChevronRight,
-    HandHeart,
     HeartHandshake,
     LogOut,
     User as UserIcon,
@@ -15,7 +14,6 @@ import { usePushSubscription } from '@/hooks/use-push-subscription';
 import { logout } from '@/routes';
 import { apply } from '@/routes/partner';
 import { edit } from '@/routes/profile';
-import { give } from '@/routes';
 import type { AuthenticatedAuth } from '@/types/auth';
 
 export default function ProfileIndex({
@@ -84,15 +82,6 @@ export default function ProfileIndex({
                         <span className="flex-1 text-sm font-medium">
                             Certificates
                         </span>
-                        <ChevronRight className="text-muted-foreground size-4" />
-                    </Link>
-
-                    <Link
-                        href={give()}
-                        className="flex items-center gap-3 px-4 py-3"
-                    >
-                        <HandHeart className="text-muted-foreground size-4" />
-                        <span className="flex-1 text-sm font-medium">Give</span>
                         <ChevronRight className="text-muted-foreground size-4" />
                     </Link>
 
