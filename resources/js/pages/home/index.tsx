@@ -1,36 +1,44 @@
-import { Head, Link, usePage } from '@inertiajs/react';
-import { Bell, BookOpenText, ShieldCheck, Users } from 'lucide-react';
-import { GiveBanner } from '@/components/give-banner';
-import { GroupCard } from '@/components/group-card';
-import { MarketplaceBannerCard } from '@/components/marketplace-banner-card';
-import { Button } from '@/components/ui/button';
-import { VerseCard } from '@/components/verse-card';
-import { login, register } from '@/routes';
-import type { Auth } from '@/types/auth';
-import type { Group, MarketplaceListing, Verse } from '@/types/models';
+import { Head, Link, usePage } from "@inertiajs/react";
+import { Bell, BookOpenText, ShieldCheck, Users } from "lucide-react";
+import { BirthdayBanner } from "@/components/birthday-banner";
+import { GiveBanner } from "@/components/give-banner";
+import { GroupCard } from "@/components/group-card";
+import { MarketplaceBannerCard } from "@/components/marketplace-banner-card";
+import { Button } from "@/components/ui/button";
+import { VerseCard } from "@/components/verse-card";
+import { login, register } from "@/routes";
+import type { Auth } from "@/types/auth";
+import type {
+    Birthday,
+    Group,
+    MarketplaceListing,
+    Verse,
+} from "@/types/models";
 
 function timeOfDayGreeting(): string {
     const hour = new Date().getHours();
 
     if (hour < 12) {
-        return 'Good morning';
+        return "Good morning";
     }
 
     if (hour < 17) {
-        return 'Good afternoon';
+        return "Good afternoon";
     }
 
-    return 'Good evening';
+    return "Good evening";
 }
 
 export default function HomeIndex({
     verse,
     yourGroups,
+    birthdays,
     featuredListings,
     showGiveBanner,
 }: {
     verse: Verse | null;
     yourGroups: Group[];
+    birthdays: Birthday[];
     featuredListings: MarketplaceListing[];
     showGiveBanner: boolean;
 }) {
@@ -38,7 +46,7 @@ export default function HomeIndex({
         auth: Auth;
         unreadNotificationsCount: number;
     }>().props;
-    const firstName = auth.user?.name.split(' ')[0];
+    const firstName = auth.user?.name.split(" ")[0];
 
     return (
         <>
@@ -49,7 +57,7 @@ export default function HomeIndex({
                     <p className="text-lg font-semibold">
                         {firstName
                             ? `${timeOfDayGreeting()}, ${firstName}`
-                            : 'Welcome'}
+                            : "Welcome"}
                     </p>
                     <p className="text-muted-foreground text-sm">
                         Keep meditating on the word of God.
@@ -102,6 +110,14 @@ export default function HomeIndex({
             </header>
 
             {auth.user && showGiveBanner && <GiveBanner />}
+
+            {birthdays.length > 0 && (
+                <div className="px-4 pt-2">
+                    {birthdays.map((birthday) => (
+                        <BirthdayBanner key={birthday.id} birthday={birthday} />
+                    ))}
+                </div>
+            )}
 
             <div className="px-4">
                 {verse ? (

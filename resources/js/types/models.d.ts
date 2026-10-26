@@ -185,3 +185,12 @@ export type Announcement = {
     updated_at: string;
     is_edited: boolean;
 };
+
+export type Birthday = {
+    id: number;
+    name: string;
+    avatar: string | null;
+    date: string;
+    is_you: boolean;
+    wished: boolean;
+};

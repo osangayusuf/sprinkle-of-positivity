@@ -10,6 +10,8 @@ use Carbon\CarbonInterface;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -92,6 +94,27 @@ class User extends Authenticatable implements PasskeyUser
         return Attribute::make(
             get: fn (): ?string => $this->avatar_path ? Storage::disk('public')->url($this->avatar_path) : null,
         );
+    }
+
+    /**
+     * Active users whose birthday falls on today's day and month.
+     *
+     * @param  Builder<User>  $query
+     */
+    #[Scope]
+    protected function hasBirthdayToday(Builder $query): void
+    {
+        $query->whereNull('disabled_at')
+            ->where('birthday_day', today()->day)
+            ->where('birthday_month', today()->month);
+    }
+
+    /**
+     * @return HasMany<BirthdayWish, $this>
+     */
+    public function birthdayWishesReceived(): HasMany
+    {
+        return $this->hasMany(BirthdayWish::class, 'recipient_id');
     }
 
     /**
