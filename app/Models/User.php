@@ -36,6 +36,7 @@ use NotificationChannels\WebPush\HasPushSubscriptions;
  * @property array<int, string>|null $goals
  * @property int $points
  * @property CarbonInterface|null $onboarding_completed_at
+ * @property CarbonInterface|null $disabled_at
  * @property PartnerStatus|null $partner_status
  * @property CarbonInterface|null $partner_decided_at
  * @property string|null $two_factor_secret
@@ -74,6 +75,7 @@ class User extends Authenticatable implements PasskeyUser
             'birthday_month' => 'integer',
             'goals' => 'array',
             'onboarding_completed_at' => 'datetime',
+            'disabled_at' => 'datetime',
             'partner_status' => PartnerStatus::class,
             'partner_decided_at' => 'datetime',
         ];
@@ -108,6 +110,14 @@ class User extends Authenticatable implements PasskeyUser
     public function hasRole(string $role): bool
     {
         return $this->roles->contains('name', $role);
+    }
+
+    /**
+     * Whether an admin has disabled the account, blocking sign-in.
+     */
+    public function isDisabled(): bool
+    {
+        return $this->disabled_at !== null;
     }
 
     /**
