@@ -15,7 +15,7 @@ import {
     Phone,
     Users,
 } from 'lucide-react';
-import AppLogoIcon from '@/components/app-logo-icon';
+import AppLogoFull from '@/components/app-logo-full';
 import Reveal from '@/components/landing/reveal';
 import Seo from '@/components/seo';
 import { Sprinkle } from '@/components/landing/sprinkle';
@@ -170,12 +170,7 @@ function Nav() {
                 href="/"
                 className="focus-visible:ring-primary flex items-center gap-2.5 rounded-sm outline-none focus-visible:ring-[3px] focus-visible:ring-offset-2"
             >
-                <AppLogoIcon className="size-9" />
-                <span className="font-display text-ink text-lg leading-none font-semibold tracking-tight">
-                    Light Shining
-                    <br />
-                    in the Dark
-                </span>
+                <AppLogoFull tone="on-light" className="w-24" />
             </Link>
             <nav
                 aria-label="Main"
@@ -559,10 +554,7 @@ function Footer() {
             <div className="mx-auto grid max-w-7xl gap-10 px-5 py-14 md:grid-cols-12 md:px-8">
                 <div className="md:col-span-6">
                     <div className="flex items-center gap-2.5">
-                        <AppLogoIcon className="size-9" />
-                        <span className="font-display text-xl font-semibold">
-                            {program.name}
-                        </span>
+                        <AppLogoFull tone="on-dark" className="w-32" />
                     </div>
                     <p className="text-paper/70 mt-4 max-w-xs">
                         {program.kind}.
