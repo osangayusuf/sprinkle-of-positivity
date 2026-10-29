@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Actions\PostGroupMessage;
+use App\Actions\UpdateGroupMessage;
 use App\Enums\GroupMembershipRole;
 use App\Enums\GroupMembershipStatus;
 use App\Http\Requests\Groups\PostGroupMessageRequest;
+use App\Http\Requests\Groups\UpdateGroupMessageRequest;
 use App\Http\Resources\GroupResource;
 use App\Models\Group;
 use App\Models\GroupMessage;
@@ -36,7 +38,7 @@ class GroupChatController extends Controller
 
         $latest = GroupMessage::query()
             ->where('group_id', $group->id)
-            ->with('user.roles')
+            ->with(['user.roles', 'mentions:users.id,users.name', 'replyTo.user:id,name', 'replyTo.mentions:users.id,users.name'])
             ->orderByDesc('id')
             ->limit($limit + 1)
             ->get();
@@ -51,6 +53,8 @@ class GroupChatController extends Controller
             'messages' => $latest->take($limit)->reverse()->values()->map(fn (GroupMessage $message) => [
                 'id' => $message->id,
                 'body' => $message->body,
+                'preview' => $message->preview(),
+                'edited' => $message->edited_at !== null,
                 'created_at' => $message->created_at->toIso8601String(),
                 'author' => [
                     'id' => $message->user->id,
@@ -58,9 +62,28 @@ class GroupChatController extends Controller
                     'avatar' => $message->user->avatar,
                     'is_manager' => $managerIds->contains($message->user_id) || $message->user->hasRole(Role::ADMIN),
                 ],
+                'mentions' => $message->mentions->map(fn ($mentioned) => [
+                    'id' => $mentioned->id,
+                    'name' => $mentioned->name,
+                ])->values(),
+                'reply_to' => $message->replyTo ? [
+                    'id' => $message->replyTo->id,
+                    'author_name' => $message->replyTo->user->name,
+                    'preview' => $message->replyTo->preview(),
+                ] : null,
                 'mine' => $message->user_id === $user->id,
+                'can_edit' => $message->user_id === $user->id,
                 'can_delete' => $canManage || $message->user_id === $user->id,
             ]),
+            'members' => $group->approvedMembers()
+                ->whereKeyNot($user->id)
+                ->orderBy('users.name')
+                ->get(['users.id', 'users.name', 'users.avatar_path'])
+                ->map(fn ($member) => [
+                    'id' => $member->id,
+                    'name' => $member->name,
+                    'avatar' => $member->avatar,
+                ]),
             'hasMore' => $latest->count() > $limit,
             'limit' => $limit,
         ]);
@@ -71,7 +94,19 @@ class GroupChatController extends Controller
      */
     public function store(PostGroupMessageRequest $request, Group $group, PostGroupMessage $action): RedirectResponse
     {
-        $action->handle($group, $request->user(), $request->string('body')->value());
+        $action->handle($group, $request->user(), $request->string('body')->value(), $request->integer('reply_to_id') ?: null);
+
+        return back();
+    }
+
+    /**
+     * Edit a message: only its author can.
+     */
+    public function update(UpdateGroupMessageRequest $request, Group $group, GroupMessage $message, UpdateGroupMessage $action): RedirectResponse
+    {
+        abort_unless($message->group_id === $group->id, 404);
+
+        $action->handle($message, $request->string('body')->value());
 
         return back();
     }

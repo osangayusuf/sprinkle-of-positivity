@@ -4,6 +4,7 @@ namespace App\Http\Requests\Groups;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class PostGroupMessageRequest extends FormRequest
 {
@@ -24,6 +25,7 @@ class PostGroupMessageRequest extends FormRequest
     {
         return [
             'body' => ['required', 'string', 'max:1000'],
+            'reply_to_id' => ['nullable', 'integer', Rule::exists('group_messages', 'id')->where('group_id', $this->route('group')->id)],
         ];
     }
 }

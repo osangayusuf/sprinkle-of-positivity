@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
@@ -19,6 +20,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  * @property int $commentable_id
  * @property int|null $parent_id
  * @property string $body
+ * @property CarbonInterface|null $edited_at
  * @property CarbonInterface $created_at
  */
 #[Fillable(['body'])]
@@ -26,6 +28,14 @@ class Comment extends Model
 {
     /** @use HasFactory<CommentFactory> */
     use HasFactory, Reactable;
+
+    /**
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return ['edited_at' => 'datetime'];
+    }
 
     /**
      * @return BelongsTo<User, $this>
@@ -57,5 +67,15 @@ class Comment extends Model
     public function replies(): HasMany
     {
         return $this->hasMany(Comment::class, 'parent_id');
+    }
+
+    /**
+     * The members tagged in this comment with an `@[id]` token in its body.
+     *
+     * @return BelongsToMany<User, $this>
+     */
+    public function mentions(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'comment_mentions')->withTimestamps();
     }
 }

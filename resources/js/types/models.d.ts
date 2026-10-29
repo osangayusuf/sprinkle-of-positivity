@@ -72,6 +72,9 @@ export type Comment = {
     id: number;
     user: InsightAuthor;
     body: string;
+    mentions: ChatMention[];
+    edited: boolean;
+    can_edit: boolean;
     created_at: string;
     reaction_summary: ReactionSummary;
     my_reaction: string | null;
@@ -107,6 +110,15 @@ export type Quiz = {
     correct_quiz_option_id: number | null;
 };
 
+export type ChatMention = {
+    id: number;
+    name: string;
+};
+
+export type ChatMember = ChatMention & {
+    avatar: string | null;
+};
+
 export type ChatMessage = {
     id: number;
     body: string;
@@ -117,7 +129,16 @@ export type ChatMessage = {
         avatar: string | null;
         is_manager: boolean;
     };
+    preview: string;
+    edited: boolean;
+    mentions: ChatMention[];
+    reply_to: {
+        id: number;
+        author_name: string;
+        preview: string;
+    } | null;
     mine: boolean;
+    can_edit: boolean;
     can_delete: boolean;
 };
 

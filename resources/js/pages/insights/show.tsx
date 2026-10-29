@@ -1,28 +1,47 @@
 import { Form, Head, usePage } from '@inertiajs/react';
 import { ArrowRight } from 'lucide-react';
+import { useState } from 'react';
 import CommentController from '@/actions/App/Http/Controllers/CommentController';
 import { CommentItem } from '@/components/comment-item';
+import { MentionTextarea } from '@/components/mention-textarea';
 import { PageHeader } from '@/components/page-header';
 import { ReactionBar } from '@/components/reaction-bar';
 import { SignInPrompt } from '@/components/sign-in-prompt';
 import { UserAvatar } from '@/components/user-avatar';
+import { serializeMentions } from '@/lib/chat-message';
 import { formatRelativeTime } from '@/lib/format';
 import type { Auth } from '@/types/auth';
-import type { Comment, Group, Insight } from '@/types/models';
+import type {
+    ChatMember,
+    ChatMention,
+    Comment,
+    Group,
+    Insight,
+} from '@/types/models';
 
 export default function InsightShow({
     group,
     insight,
     comments,
     canParticipate,
+    members,
 }: {
     group: Group;
     insight: Insight;
     comments: Comment[];
     canParticipate: boolean;
+    members: ChatMember[];
 }) {
     const { auth } = usePage<{ auth: Auth }>().props;
     const totalComments = countComments(comments);
+
+    function buildEditUrl(commentId: number): string {
+        return CommentController.update.url({
+            group: group.slug,
+            insight: insight.id,
+            comment: commentId,
+        });
+    }
 
     function buildReactUrl(commentId: number): string {
         return `/groups/${group.slug}/insights/${insight.id}/comments/${commentId}/reactions`;
@@ -83,6 +102,8 @@ export default function InsightShow({
                             key={comment.id}
                             comment={comment}
                             buildReactUrl={buildReactUrl}
+                            buildEditUrl={buildEditUrl}
+                            members={members}
                         />
                     ))}
 
@@ -105,17 +126,11 @@ export default function InsightShow({
                             insight: insight.id,
                         })}
                         resetOnSuccess
-                        className="bg-background sticky bottom-20 flex items-center gap-2 pt-3"
+                        className="bg-background sticky bottom-20 flex items-end gap-2 pt-3"
                     >
                         {({ processing }) => (
                             <>
-                                <input
-                                    type="text"
-                                    name="body"
-                                    required
-                                    placeholder="Add comment"
-                                    className="bg-muted h-11 flex-1 rounded-full px-4 text-sm outline-none"
-                                />
+                                <CommentField members={members} />
                                 <button
                                     type="submit"
                                     disabled={processing}
@@ -137,5 +152,45 @@ function countComments(comments: Comment[]): number {
     return comments.reduce(
         (total, comment) => total + 1 + countComments(comment.replies),
         0,
+    );
+}
+
+function CommentField({ members }: { members: ChatMember[] }) {
+    const [draft, setDraft] = useState('');
+    const [tagged, setTagged] = useState<ChatMention[]>([]);
+
+    return (
+        <div className="flex-1">
+            <input
+                type="hidden"
+                name="body"
+                value={serializeMentions(draft, tagged)}
+            />
+            <MentionTextarea
+                value={draft}
+                onValueChange={setDraft}
+                members={members}
+                onTag={(member) =>
+                    setTagged((current) => [
+                        ...current.filter(
+                            (mention) => mention.id !== member.id,
+                        ),
+                        { id: member.id, name: member.name },
+                    ])
+                }
+                rows={1}
+                required
+                maxLength={2000}
+                aria-label="Comment"
+                placeholder="Add comment"
+                onKeyDown={(event) => {
+                    if (event.key === 'Enter' && !event.shiftKey) {
+                        event.preventDefault();
+                        event.currentTarget.form?.requestSubmit();
+                    }
+                }}
+                className="bg-muted max-h-32 min-h-11 rounded-2xl border-transparent px-4 py-3"
+            />
+        </div>
     );
 }

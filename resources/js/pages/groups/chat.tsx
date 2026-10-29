@@ -1,8 +1,10 @@
 import { Form, Head, router, usePoll } from '@inertiajs/react';
-import { Send, Trash2 } from 'lucide-react';
-import { useEffect, useRef } from 'react';
+import { Pencil, Reply, Send, Trash2, X } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 import GroupChatController from '@/actions/App/Http/Controllers/GroupChatController';
 import InputError from '@/components/input-error';
+import { MentionTextarea } from '@/components/mention-textarea';
+import { MessageBody } from '@/components/message-body';
 import { PageHeader } from '@/components/page-header';
 import { Button } from '@/components/ui/button';
 import {
@@ -15,11 +17,16 @@ import {
     DialogTrigger,
 } from '@/components/ui/dialog';
 import { Spinner } from '@/components/ui/spinner';
-import { Textarea } from '@/components/ui/textarea';
 import { UserAvatar } from '@/components/user-avatar';
+import { displayMentions, serializeMentions } from '@/lib/chat-message';
 import { formatRelativeTime } from '@/lib/format';
 import { cn } from '@/lib/utils';
-import type { ChatMessage, Group } from '@/types/models';
+import type {
+    ChatMember,
+    ChatMention,
+    ChatMessage,
+    Group,
+} from '@/types/models';
 
 const POLL_INTERVAL_MS = 5000;
 const PAGE_SIZE = 50;
@@ -35,17 +42,24 @@ function isNearBottom(): boolean {
 export default function GroupChat({
     group,
     messages,
+    members,
     hasMore,
     limit,
 }: {
     group: Group;
     messages: ChatMessage[];
+    members: ChatMember[];
     hasMore: boolean;
     limit: number;
 }) {
     const bottomRef = useRef<HTMLDivElement>(null);
     const followNewMessages = useRef(true);
     const lastMessageId = messages.at(-1)?.id;
+    const [draft, setDraft] = useState('');
+    const [tagged, setTagged] = useState<ChatMention[]>([]);
+    const [replyingTo, setReplyingTo] = useState<ChatMessage | null>(null);
+    const [editing, setEditing] = useState<ChatMessage | null>(null);
+    const composerRef = useRef<HTMLDivElement>(null);
 
     // Only the messages change between polls; the poll reuses the current
     // URL, so a raised `limit` (earlier history) is kept.
@@ -82,6 +96,34 @@ export default function GroupChat({
             bottomRef.current?.scrollIntoView({ block: 'end' });
         }
     }, [lastMessageId]);
+
+    function resetComposer() {
+        setDraft('');
+        setTagged([]);
+        setReplyingTo(null);
+        setEditing(null);
+    }
+
+    function startEdit(message: ChatMessage) {
+        setReplyingTo(null);
+        setEditing(message);
+        setDraft(displayMentions(message.body, message.mentions));
+        setTagged(message.mentions);
+        requestAnimationFrame(() =>
+            composerRef.current?.querySelector('textarea')?.focus(),
+        );
+    }
+
+    function startReply(message: ChatMessage) {
+        if (editing) {
+            resetComposer();
+        }
+
+        setReplyingTo(message);
+        requestAnimationFrame(() =>
+            composerRef.current?.querySelector('textarea')?.focus(),
+        );
+    }
 
     function loadEarlier() {
         router.get(
@@ -126,6 +168,8 @@ export default function GroupChat({
                     <MessageBubble
                         key={message.id}
                         message={message}
+                        onReply={() => startReply(message)}
+                        onEdit={() => startEdit(message)}
                         deleteUrl={GroupChatController.destroy.url({
                             group: group.slug,
                             message: message.id,
@@ -136,21 +180,99 @@ export default function GroupChat({
                 <div ref={bottomRef} className="scroll-mb-40" />
             </div>
 
-            <div className="bg-background border-border sticky bottom-[3.75rem] z-10 mt-4 border-t px-4 py-3">
+            <div
+                ref={composerRef}
+                className="bg-background border-border sticky bottom-[3.75rem] z-10 mt-4 border-t px-4 py-3"
+            >
+                {editing && (
+                    <div className="bg-muted border-l-primary mb-2 flex items-start gap-2 rounded-xl border-l-4 px-3 py-2 text-xs">
+                        <div className="min-w-0 flex-1">
+                            <p className="font-semibold">Editing message</p>
+                            <p className="text-muted-foreground line-clamp-2 break-words">
+                                {editing.preview}
+                            </p>
+                        </div>
+                        <button
+                            type="button"
+                            aria-label="Cancel edit"
+                            onClick={resetComposer}
+                            className="text-muted-foreground"
+                        >
+                            <X className="size-4" />
+                        </button>
+                    </div>
+                )}
+                {replyingTo && (
+                    <div className="bg-muted mb-2 flex items-start gap-2 rounded-xl border-l-4 border-l-primary px-3 py-2 text-xs">
+                        <div className="min-w-0 flex-1">
+                            <p className="font-semibold">
+                                Replying to{' '}
+                                {replyingTo.mine
+                                    ? 'yourself'
+                                    : replyingTo.author.name}
+                            </p>
+                            <p className="text-muted-foreground line-clamp-2 break-words">
+                                {replyingTo.preview}
+                            </p>
+                        </div>
+                        <button
+                            type="button"
+                            aria-label="Cancel reply"
+                            onClick={() => setReplyingTo(null)}
+                            className="text-muted-foreground"
+                        >
+                            <X className="size-4" />
+                        </button>
+                    </div>
+                )}
                 <Form
-                    {...GroupChatController.store.form({ group: group.slug })}
+                    {...(editing
+                        ? GroupChatController.update.form({
+                              group: group.slug,
+                              message: editing.id,
+                          })
+                        : GroupChatController.store.form({
+                              group: group.slug,
+                          }))}
                     resetOnSuccess
                     options={{ preserveScroll: true }}
                     onSuccess={() => {
                         followNewMessages.current = true;
+                        resetComposer();
                     }}
                     className="flex items-end gap-2"
                 >
                     {({ processing, errors }) => (
                         <>
                             <div className="grid flex-1 gap-1">
-                                <Textarea
+                                <input
+                                    type="hidden"
                                     name="body"
+                                    value={serializeMentions(draft, tagged)}
+                                />
+                                {!editing && (
+                                    <input
+                                        type="hidden"
+                                        name="reply_to_id"
+                                        value={replyingTo?.id ?? ''}
+                                    />
+                                )}
+                                <MentionTextarea
+                                    value={draft}
+                                    onValueChange={setDraft}
+                                    members={members}
+                                    onTag={(member) =>
+                                        setTagged((current) => [
+                                            ...current.filter(
+                                                (mention) =>
+                                                    mention.id !== member.id,
+                                            ),
+                                            {
+                                                id: member.id,
+                                                name: member.name,
+                                            },
+                                        ])
+                                    }
                                     rows={1}
                                     required
                                     maxLength={1000}
@@ -188,14 +310,20 @@ export default function GroupChat({
 
 function MessageBubble({
     message,
+    onReply,
+    onEdit,
     deleteUrl,
 }: {
     message: ChatMessage;
+    onReply: () => void;
+    onEdit: () => void;
     deleteUrl: string;
 }) {
     return (
         <div
+            id={`message-${message.id}`}
             className={cn(
+                'scroll-mt-20',
                 'flex items-end gap-2',
                 message.mine && 'flex-row-reverse',
             )}
@@ -221,7 +349,28 @@ function MessageBubble({
                             Accountability partner
                         </span>
                     )}
-                    <span>{formatRelativeTime(message.created_at)}</span>
+                    <span>
+                        {formatRelativeTime(message.created_at)}
+                        {message.edited && ' · edited'}
+                    </span>
+                    <button
+                        type="button"
+                        aria-label="Reply to message"
+                        onClick={onReply}
+                        className="text-muted-foreground"
+                    >
+                        <Reply className="size-3.5" />
+                    </button>
+                    {message.can_edit && (
+                        <button
+                            type="button"
+                            aria-label="Edit message"
+                            onClick={onEdit}
+                            className="text-muted-foreground"
+                        >
+                            <Pencil className="size-3.5" />
+                        </button>
+                    )}
                     {message.can_delete && (
                         <DeleteMessage deleteUrl={deleteUrl} />
                     )}
@@ -235,7 +384,33 @@ function MessageBubble({
                             : 'bg-muted text-foreground',
                     )}
                 >
-                    {message.body}
+                    {message.reply_to && (
+                        <button
+                            type="button"
+                            onClick={() =>
+                                document
+                                    .getElementById(
+                                        `message-${message.reply_to?.id}`,
+                                    )
+                                    ?.scrollIntoView({
+                                        block: 'center',
+                                        behavior: 'smooth',
+                                    })
+                            }
+                            className="bg-background/20 mb-1 block w-full rounded-lg border-l-4 border-l-current px-2 py-1 text-left text-xs"
+                        >
+                            <span className="block font-semibold">
+                                {message.reply_to.author_name}
+                            </span>
+                            <span className="line-clamp-2 break-words opacity-80">
+                                {message.reply_to.preview}
+                            </span>
+                        </button>
+                    )}
+                    <MessageBody
+                        body={message.body}
+                        mentions={message.mentions}
+                    />
                 </div>
             </div>
         </div>
