@@ -1,9 +1,12 @@
-import { Form, Head, Link } from '@inertiajs/react';
-import GroupApplicationController from '@/actions/App/Http/Controllers/GroupApplicationController';
-import { PageHeader } from '@/components/page-header';
-import { Button } from '@/components/ui/button';
-import { UserAvatar } from '@/components/user-avatar';
-import type { Group, GroupMember } from '@/types/models';
+import { Form, Head, Link } from "@inertiajs/react";
+import { useState } from "react";
+import GroupApplicationController from "@/actions/App/Http/Controllers/GroupApplicationController";
+import { PageHeader } from "@/components/page-header";
+import { SearchInput } from "@/components/search-input";
+import { Button } from "@/components/ui/button";
+import { UserAvatar } from "@/components/user-avatar";
+import { matchesSearch } from "@/lib/search";
+import type { Group, GroupMember } from "@/types/models";
 
 type Props = {
     group: Group;
@@ -16,6 +19,15 @@ export default function GroupManage({
     pendingApplications,
     members,
 }: Props) {
+    const [search, setSearch] = useState("");
+    const isSearching = search.trim() !== "";
+    const filteredPendingApplications = pendingApplications.filter(
+        (application) => matchesSearch(search, application.name),
+    );
+    const filteredMembers = members.filter((member) =>
+        matchesSearch(search, member.name),
+    );
+
     return (
         <>
             <Head title={`Manage ${group.name}`} />
@@ -25,17 +37,25 @@ export default function GroupManage({
             />
 
             <div className="flex flex-col gap-6 px-4 py-6">
+                <SearchInput
+                    value={search}
+                    onChange={setSearch}
+                    placeholder="Search members and applications"
+                />
+
                 <section className="flex flex-col gap-3">
                     <h2 className="text-muted-foreground text-sm font-semibold">
                         Pending applications
                     </h2>
 
-                    {pendingApplications.length === 0 ? (
+                    {filteredPendingApplications.length === 0 ? (
                         <p className="text-muted-foreground text-sm">
-                            No pending applications.
+                            {isSearching && pendingApplications.length > 0
+                                ? "No applications match your search."
+                                : "No pending applications."}
                         </p>
                     ) : (
-                        pendingApplications.map((application) => (
+                        filteredPendingApplications.map((application) => (
                             <div
                                 key={application.membership_id}
                                 className="bg-muted flex items-center justify-between rounded-2xl p-3"
@@ -107,7 +127,13 @@ export default function GroupManage({
                         Members
                     </h2>
 
-                    {members.map((member) => (
+                    {isSearching && filteredMembers.length === 0 && (
+                        <p className="text-muted-foreground text-sm">
+                            No members match your search.
+                        </p>
+                    )}
+
+                    {filteredMembers.map((member) => (
                         <div
                             key={member.membership_id}
                             className="bg-muted flex items-center justify-between rounded-2xl p-3"
@@ -122,14 +148,14 @@ export default function GroupManage({
                                     <p className="truncate font-semibold">
                                         {member.name}
                                     </p>
-                                    {member.role === 'manager' && (
+                                    {member.role === "manager" && (
                                         <p className="text-muted-foreground text-xs">
                                             Accountability partner
                                         </p>
                                     )}
                                 </div>
                             </div>
-                            {member.role !== 'manager' && (
+                            {member.role !== "manager" && (
                                 <div className="flex shrink-0 items-center gap-2">
                                     <Button
                                         asChild

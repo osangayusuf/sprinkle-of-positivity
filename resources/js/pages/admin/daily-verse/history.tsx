@@ -1,9 +1,12 @@
-import { Head, Link } from '@inertiajs/react';
-import Heading from '@/components/heading';
-import type { Verse } from '@/types/models';
+import { Head, Link } from "@inertiajs/react";
+import { useState } from "react";
+import Heading from "@/components/heading";
+import { SearchInput } from "@/components/search-input";
+import { matchesSearch } from "@/lib/search";
+import type { Verse } from "@/types/models";
 
 function todayDateString(): string {
-    return new Date().toLocaleDateString('en-CA');
+    return new Date().toLocaleDateString("en-CA");
 }
 
 export default function AdminDailyVerseHistory({
@@ -12,6 +15,10 @@ export default function AdminDailyVerseHistory({
     verses: Verse[];
 }) {
     const today = todayDateString();
+    const [search, setSearch] = useState("");
+    const filteredVerses = verses.filter((verse) =>
+        matchesSearch(search, verse.reference, verse.date),
+    );
 
     return (
         <>
@@ -22,6 +29,13 @@ export default function AdminDailyVerseHistory({
                     variant="small"
                     title="Verse history"
                     description="Every global daily verse that's been set, most recent first"
+                />
+
+                <SearchInput
+                    value={search}
+                    onChange={setSearch}
+                    placeholder="Search by reference or date"
+                    className="max-w-sm"
                 />
 
                 <div className="overflow-x-auto rounded-lg border">
@@ -37,7 +51,7 @@ export default function AdminDailyVerseHistory({
                             </tr>
                         </thead>
                         <tbody>
-                            {verses.map((verse) => (
+                            {filteredVerses.map((verse) => (
                                 <tr key={verse.id} className="border-t">
                                     <td className="px-4 py-2 whitespace-nowrap">
                                         {verse.date}
@@ -70,13 +84,15 @@ export default function AdminDailyVerseHistory({
                                     </td>
                                 </tr>
                             ))}
-                            {verses.length === 0 && (
+                            {filteredVerses.length === 0 && (
                                 <tr>
                                     <td
                                         colSpan={4}
                                         className="text-muted-foreground px-4 py-6 text-center"
                                     >
-                                        No verses have been set yet.
+                                        {verses.length === 0
+                                            ? "No verses have been set yet."
+                                            : "No verses match your search."}
                                     </td>
                                 </tr>
                             )}
@@ -90,7 +106,7 @@ export default function AdminDailyVerseHistory({
 
 AdminDailyVerseHistory.layout = {
     breadcrumbs: [
-        { title: "Today's verse", href: '/admin/daily-verse' },
-        { title: 'History', href: '/admin/daily-verse/history' },
+        { title: "Today's verse", href: "/admin/daily-verse" },
+        { title: "History", href: "/admin/daily-verse/history" },
     ],
 };

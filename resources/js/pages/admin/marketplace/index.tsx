@@ -1,14 +1,22 @@
-import { Form, Head, Link } from '@inertiajs/react';
-import MarketplaceController from '@/actions/App/Http/Controllers/Admin/MarketplaceController';
-import Heading from '@/components/heading';
-import { Button } from '@/components/ui/button';
-import type { MarketplaceListing } from '@/types/models';
+import { Form, Head, Link } from "@inertiajs/react";
+import { useState } from "react";
+import MarketplaceController from "@/actions/App/Http/Controllers/Admin/MarketplaceController";
+import Heading from "@/components/heading";
+import { SearchInput } from "@/components/search-input";
+import { Button } from "@/components/ui/button";
+import { matchesSearch } from "@/lib/search";
+import type { MarketplaceListing } from "@/types/models";
 
 export default function AdminMarketplaceIndex({
     listings,
 }: {
     listings: MarketplaceListing[];
 }) {
+    const [search, setSearch] = useState("");
+    const filteredListings = listings.filter((listing) =>
+        matchesSearch(search, listing.title, listing.description),
+    );
+
     return (
         <>
             <Head title="Marketplace" />
@@ -27,6 +35,13 @@ export default function AdminMarketplaceIndex({
                     </Button>
                 </div>
 
+                <SearchInput
+                    value={search}
+                    onChange={setSearch}
+                    placeholder="Search listings"
+                    className="max-w-sm"
+                />
+
                 <div className="overflow-x-auto rounded-lg border">
                     <table className="w-full min-w-[640px] text-sm">
                         <thead className="bg-muted text-muted-foreground text-left">
@@ -39,15 +54,15 @@ export default function AdminMarketplaceIndex({
                             </tr>
                         </thead>
                         <tbody>
-                            {listings.map((listing) => (
+                            {filteredListings.map((listing) => (
                                 <tr key={listing.id} className="border-t">
                                     <td className="px-4 py-2">
                                         {listing.title}
                                     </td>
                                     <td className="px-4 py-2">
                                         {listing.is_active
-                                            ? 'Active'
-                                            : 'Inactive'}
+                                            ? "Active"
+                                            : "Inactive"}
                                     </td>
                                     <td className="px-4 py-2 text-right">
                                         <div className="flex justify-end gap-2">
@@ -79,13 +94,15 @@ export default function AdminMarketplaceIndex({
                                     </td>
                                 </tr>
                             ))}
-                            {listings.length === 0 && (
+                            {filteredListings.length === 0 && (
                                 <tr>
                                     <td
                                         colSpan={3}
                                         className="text-muted-foreground px-4 py-6 text-center"
                                     >
-                                        No listings yet.
+                                        {listings.length === 0
+                                            ? "No listings yet."
+                                            : "No listings match your search."}
                                     </td>
                                 </tr>
                             )}
@@ -98,5 +115,5 @@ export default function AdminMarketplaceIndex({
 }
 
 AdminMarketplaceIndex.layout = {
-    breadcrumbs: [{ title: 'Marketplace', href: '/admin/marketplace' }],
+    breadcrumbs: [{ title: "Marketplace", href: "/admin/marketplace" }],
 };

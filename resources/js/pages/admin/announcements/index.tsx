@@ -1,15 +1,18 @@
-import { Head, Link } from '@inertiajs/react';
-import Heading from '@/components/heading';
-import { Button } from '@/components/ui/button';
-import type { Announcement } from '@/types/models';
+import { Head, Link } from "@inertiajs/react";
+import { useState } from "react";
+import Heading from "@/components/heading";
+import { SearchInput } from "@/components/search-input";
+import { Button } from "@/components/ui/button";
+import { matchesSearch } from "@/lib/search";
+import type { Announcement } from "@/types/models";
 
 function formatDateTime(isoDate: string): string {
     return new Date(isoDate).toLocaleString(undefined, {
-        day: '2-digit',
-        month: 'short',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
     });
 }
 
@@ -18,6 +21,11 @@ export default function AdminAnnouncementIndex({
 }: {
     announcements: Announcement[];
 }) {
+    const [search, setSearch] = useState("");
+    const filteredAnnouncements = announcements.filter((announcement) =>
+        matchesSearch(search, announcement.title, announcement.body),
+    );
+
     return (
         <>
             <Head title="Announcements" />
@@ -36,13 +44,22 @@ export default function AdminAnnouncementIndex({
                     </Button>
                 </div>
 
-                {announcements.length === 0 ? (
+                <SearchInput
+                    value={search}
+                    onChange={setSearch}
+                    placeholder="Search announcements"
+                    className="max-w-sm"
+                />
+
+                {filteredAnnouncements.length === 0 ? (
                     <p className="text-muted-foreground rounded-lg border px-4 py-6 text-center text-sm">
-                        No announcements have been sent yet.
+                        {announcements.length === 0
+                            ? "No announcements have been sent yet."
+                            : "No announcements match your search."}
                     </p>
                 ) : (
                     <ul className="divide-y rounded-lg border">
-                        {announcements.map((announcement) => (
+                        {filteredAnnouncements.map((announcement) => (
                             <li
                                 key={announcement.id}
                                 className="flex items-start justify-between gap-4 px-4 py-4"
@@ -84,5 +101,5 @@ export default function AdminAnnouncementIndex({
 }
 
 AdminAnnouncementIndex.layout = {
-    breadcrumbs: [{ title: 'Announcements', href: '/admin/announcements' }],
+    breadcrumbs: [{ title: "Announcements", href: "/admin/announcements" }],
 };

@@ -1,7 +1,10 @@
-import { Link } from '@inertiajs/react';
-import { ArrowLeft } from 'lucide-react';
-import Reveal from '@/components/landing/reveal';
-import Seo from '@/components/seo';
+import { Link } from "@inertiajs/react";
+import { ArrowLeft } from "lucide-react";
+import { useState } from "react";
+import Reveal from "@/components/landing/reveal";
+import { SearchInput } from "@/components/search-input";
+import Seo from "@/components/seo";
+import { matchesSearch } from "@/lib/search";
 
 type Partner = {
     name: string;
@@ -13,6 +16,11 @@ export default function AccountabilityPartners({
 }: {
     partners: Partner[];
 }) {
+    const [search, setSearch] = useState("");
+    const filteredPartners = partners.filter((partner) =>
+        matchesSearch(search, partner.name),
+    );
+
     return (
         <>
             <Seo
@@ -31,8 +39,19 @@ export default function AccountabilityPartners({
                     <h1 className="font-display text-ink mt-8 max-w-3xl text-5xl leading-[0.98] font-semibold tracking-[-0.03em] md:text-6xl">
                         Meet our accountability partners
                     </h1>
-                    <ul className="mt-14 grid grid-cols-2 gap-x-6 gap-y-10 md:grid-cols-3 lg:grid-cols-4">
-                        {partners.map((partner, index) => (
+                    <SearchInput
+                        value={search}
+                        onChange={setSearch}
+                        placeholder="Search partners"
+                        className="mt-10 max-w-md"
+                    />
+                    {filteredPartners.length === 0 && (
+                        <p className="text-ink/70 mt-10">
+                            No partners match your search.
+                        </p>
+                    )}
+                    <ul className="mt-10 grid grid-cols-2 gap-x-6 gap-y-10 md:grid-cols-3 lg:grid-cols-4">
+                        {filteredPartners.map((partner, index) => (
                             <li key={partner.name}>
                                 <Reveal
                                     delay={

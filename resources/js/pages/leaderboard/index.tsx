@@ -1,12 +1,15 @@
-import { Head, Link } from '@inertiajs/react';
-import { PageHeader } from '@/components/page-header';
-import { PointsBadge } from '@/components/points-badge';
-import { UserAvatar } from '@/components/user-avatar';
-import { progressWidthClass } from '@/lib/progress-width';
-import { cn } from '@/lib/utils';
-import type { LeaderboardEntry } from '@/types/models';
+import { Head, Link } from "@inertiajs/react";
+import { useState } from "react";
+import { PageHeader } from "@/components/page-header";
+import { PointsBadge } from "@/components/points-badge";
+import { SearchInput } from "@/components/search-input";
+import { UserAvatar } from "@/components/user-avatar";
+import { progressWidthClass } from "@/lib/progress-width";
+import { matchesSearch } from "@/lib/search";
+import { cn } from "@/lib/utils";
+import type { LeaderboardEntry } from "@/types/models";
 
-const MEDALS: Record<number, string> = { 1: '🥇', 2: '🥈', 3: '🥉' };
+const MEDALS: Record<number, string> = { 1: "🥇", 2: "🥈", 3: "🥉" };
 
 export default function LeaderboardIndex({
     entries,
@@ -17,6 +20,11 @@ export default function LeaderboardIndex({
     myPoints: number;
     myLevel: string | null;
 }) {
+    const [search, setSearch] = useState("");
+    const filteredEntries = entries.filter((entry) =>
+        matchesSearch(search, entry.name),
+    );
+
     return (
         <>
             <Head title="Leaderboard" />
@@ -40,14 +48,20 @@ export default function LeaderboardIndex({
                     </Link>
                 </div>
 
+                <SearchInput
+                    value={search}
+                    onChange={setSearch}
+                    placeholder="Search members"
+                />
+
                 <div className="flex flex-col">
-                    {entries.map((entry) => (
+                    {filteredEntries.map((entry) => (
                         <div
                             key={entry.id}
                             className={cn(
-                                'flex items-center gap-3 rounded-xl px-2 py-3',
+                                "flex items-center gap-3 rounded-xl px-2 py-3",
                                 entry.is_me &&
-                                    'bg-primary text-primary-foreground',
+                                    "bg-primary text-primary-foreground",
                             )}
                         >
                             <span className="w-6 shrink-0 text-center text-sm font-semibold">
@@ -69,11 +83,11 @@ export default function LeaderboardIndex({
                                 <div className="bg-muted/30 mt-1.5 h-1.5 w-full max-w-32 overflow-hidden rounded-full">
                                     <div
                                         className={cn(
-                                            'h-full rounded-full',
+                                            "h-full rounded-full",
                                             progressWidthClass(entry.progress),
                                             entry.is_me
-                                                ? 'bg-primary-foreground'
-                                                : 'bg-primary',
+                                                ? "bg-primary-foreground"
+                                                : "bg-primary",
                                         )}
                                     />
                                 </div>
@@ -85,9 +99,11 @@ export default function LeaderboardIndex({
                         </div>
                     ))}
 
-                    {entries.length === 0 && (
+                    {filteredEntries.length === 0 && (
                         <p className="text-muted-foreground py-10 text-center text-sm">
-                            No one has earned points yet.
+                            {entries.length === 0
+                                ? "No one has earned points yet."
+                                : "No one matches your search."}
                         </p>
                     )}
                 </div>

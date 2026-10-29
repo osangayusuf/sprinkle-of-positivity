@@ -1,7 +1,10 @@
-import { Head, Link } from '@inertiajs/react';
-import { PageHeader } from '@/components/page-header';
-import { UserAvatar } from '@/components/user-avatar';
-import { cn } from '@/lib/utils';
+import { Head, Link } from "@inertiajs/react";
+import { useState } from "react";
+import { PageHeader } from "@/components/page-header";
+import { SearchInput } from "@/components/search-input";
+import { UserAvatar } from "@/components/user-avatar";
+import { matchesSearch } from "@/lib/search";
+import { cn } from "@/lib/utils";
 
 type Entry = {
     rank: number;
@@ -37,6 +40,18 @@ export default function LeaderboardConsistency({
     partners: PartnerEntry[];
     lagging: LaggingEntry[] | null;
 }) {
+    const [search, setSearch] = useState("");
+    const isSearching = search.trim() !== "";
+    const filteredEntries = entries.filter((entry) =>
+        matchesSearch(search, entry.name, entry.group),
+    );
+    const filteredPartners = partners.filter((partner) =>
+        matchesSearch(search, partner.name),
+    );
+    const filteredLagging = lagging?.filter((entry) =>
+        matchesSearch(search, entry.name, entry.group, entry.partner),
+    );
+
     return (
         <>
             <Head title="Consistency" />
@@ -50,22 +65,30 @@ export default function LeaderboardConsistency({
                     Points leaderboard
                 </Link>
 
+                <SearchInput
+                    value={search}
+                    onChange={setSearch}
+                    placeholder="Search by name or group"
+                />
+
                 <section>
                     <h2 className="mb-2 text-base font-semibold">
                         Longest current streaks
                     </h2>
-                    {entries.length === 0 && (
+                    {filteredEntries.length === 0 && (
                         <p className="text-muted-foreground py-6 text-center text-sm">
-                            No one has started a streak yet.
+                            {isSearching
+                                ? "No matches."
+                                : "No one has started a streak yet."}
                         </p>
                     )}
-                    {entries.map((entry) => (
+                    {filteredEntries.map((entry) => (
                         <div
                             key={`${entry.rank}-${entry.name}`}
                             className={cn(
-                                'flex items-center gap-3 rounded-xl px-2 py-3',
+                                "flex items-center gap-3 rounded-xl px-2 py-3",
                                 entry.is_me &&
-                                    'bg-primary text-primary-foreground',
+                                    "bg-primary text-primary-foreground",
                             )}
                         >
                             <span className="w-6 shrink-0 text-center text-sm font-semibold">
@@ -78,7 +101,7 @@ export default function LeaderboardConsistency({
                             />
                             <div className="min-w-0 flex-1">
                                 <p className="truncate text-sm font-semibold">
-                                    {entry.is_me ? 'You' : entry.name}
+                                    {entry.is_me ? "You" : entry.name}
                                 </p>
                                 <p className="truncate text-xs opacity-70">
                                     {entry.group}
@@ -95,12 +118,14 @@ export default function LeaderboardConsistency({
                     <h2 className="mb-2 text-base font-semibold">
                         Most consistent partners
                     </h2>
-                    {partners.length === 0 && (
+                    {filteredPartners.length === 0 && (
                         <p className="text-muted-foreground py-6 text-center text-sm">
-                            No partners have participants yet.
+                            {isSearching
+                                ? "No matches."
+                                : "No partners have participants yet."}
                         </p>
                     )}
-                    {partners.map((partner, index) => (
+                    {filteredPartners.map((partner, index) => (
                         <div
                             key={partner.name}
                             className="flex items-center gap-3 px-2 py-3"
@@ -118,7 +143,7 @@ export default function LeaderboardConsistency({
                                     {partner.name}
                                 </p>
                                 <p className="text-muted-foreground text-xs">
-                                    {partner.on_track} of {partner.participants}{' '}
+                                    {partner.on_track} of {partner.participants}{" "}
                                     participants keeping up
                                 </p>
                             </div>
@@ -129,17 +154,19 @@ export default function LeaderboardConsistency({
                     ))}
                 </section>
 
-                {lagging && (
+                {filteredLagging && (
                     <section>
                         <h2 className="mb-2 text-base font-semibold">
                             Needs a check-in
                         </h2>
-                        {lagging.length === 0 && (
+                        {filteredLagging.length === 0 && (
                             <p className="text-muted-foreground py-6 text-center text-sm">
-                                Everyone is keeping up.
+                                {isSearching
+                                    ? "No matches."
+                                    : "Everyone is keeping up."}
                             </p>
                         )}
-                        {lagging.map((entry) => (
+                        {filteredLagging.map((entry) => (
                             <div
                                 key={`${entry.group}-${entry.name}`}
                                 className="flex items-center justify-between gap-3 px-2 py-3"
@@ -152,12 +179,12 @@ export default function LeaderboardConsistency({
                                         {entry.group}
                                         {entry.partner
                                             ? ` · ${entry.partner}`
-                                            : ''}
+                                            : ""}
                                     </p>
                                 </div>
                                 <span className="text-muted-foreground shrink-0 text-xs">
                                     {entry.reset_count} restart
-                                    {entry.reset_count === 1 ? '' : 's'}
+                                    {entry.reset_count === 1 ? "" : "s"}
                                 </span>
                             </div>
                         ))}

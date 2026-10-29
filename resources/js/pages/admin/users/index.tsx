@@ -1,19 +1,27 @@
-import { Head, router } from '@inertiajs/react';
-import UserController from '@/actions/App/Http/Controllers/Admin/UserController';
-import Heading from '@/components/heading';
+import { Head, router } from "@inertiajs/react";
+import { useState } from "react";
+import UserController from "@/actions/App/Http/Controllers/Admin/UserController";
+import Heading from "@/components/heading";
+import { SearchInput } from "@/components/search-input";
+import { matchesSearch } from "@/lib/search";
 
 type AdminUser = {
     id: number;
     name: string;
     email: string;
     points: number;
-    role: 'admin' | 'member' | 'partner';
+    role: "admin" | "member" | "partner";
     is_partner: boolean;
     is_disabled: boolean;
-    partner_status: 'pending' | 'approved' | 'rejected' | null;
+    partner_status: "pending" | "approved" | "rejected" | null;
 };
 
 export default function AdminUsersIndex({ users }: { users: AdminUser[] }) {
+    const [search, setSearch] = useState("");
+    const filteredUsers = users.filter((user) =>
+        matchesSearch(search, user.name, user.email),
+    );
+
     function changeRole(
         user: AdminUser,
         role: string,
@@ -21,7 +29,7 @@ export default function AdminUsersIndex({ users }: { users: AdminUser[] }) {
     ) {
         router.put(
             UserController.updateRole.url({ user: user.id }),
-            { role, also_partner: role === 'admin' && alsoPartner },
+            { role, also_partner: role === "admin" && alsoPartner },
             { preserveScroll: true },
         );
     }
@@ -53,6 +61,13 @@ export default function AdminUsersIndex({ users }: { users: AdminUser[] }) {
                     description="View members, manage roles and approve accountability partners"
                 />
 
+                <SearchInput
+                    value={search}
+                    onChange={setSearch}
+                    placeholder="Search by name or email"
+                    className="max-w-sm"
+                />
+
                 <div className="overflow-x-auto rounded-lg border">
                     <table className="w-full min-w-[640px] text-sm">
                         <thead className="bg-muted text-muted-foreground text-left">
@@ -69,7 +84,7 @@ export default function AdminUsersIndex({ users }: { users: AdminUser[] }) {
                             </tr>
                         </thead>
                         <tbody>
-                            {users.map((user) => (
+                            {filteredUsers.map((user) => (
                                 <tr key={user.id} className="border-t">
                                     <td className="px-4 py-2">{user.name}</td>
                                     <td className="px-4 py-2">{user.email}</td>
@@ -90,7 +105,7 @@ export default function AdminUsersIndex({ users }: { users: AdminUser[] }) {
                                             </option>
                                             <option value="admin">Admin</option>
                                         </select>
-                                        {user.role === 'admin' && (
+                                        {user.role === "admin" && (
                                             <label className="ml-3 inline-flex items-center gap-2 text-xs">
                                                 <input
                                                     type="checkbox"
@@ -98,7 +113,7 @@ export default function AdminUsersIndex({ users }: { users: AdminUser[] }) {
                                                     onChange={(e) =>
                                                         changeRole(
                                                             user,
-                                                            'admin',
+                                                            "admin",
                                                             e.target.checked,
                                                         )
                                                     }
@@ -106,7 +121,7 @@ export default function AdminUsersIndex({ users }: { users: AdminUser[] }) {
                                                 Also an accountability partner
                                             </label>
                                         )}
-                                        {user.partner_status === 'pending' && (
+                                        {user.partner_status === "pending" && (
                                             <span className="ml-3 inline-flex items-center gap-2">
                                                 <span className="text-xs text-amber-600">
                                                     Awaiting approval
@@ -117,7 +132,7 @@ export default function AdminUsersIndex({ users }: { users: AdminUser[] }) {
                                                     onClick={() =>
                                                         decidePartner(
                                                             user,
-                                                            'approved',
+                                                            "approved",
                                                         )
                                                     }
                                                 >
@@ -129,7 +144,7 @@ export default function AdminUsersIndex({ users }: { users: AdminUser[] }) {
                                                     onClick={() =>
                                                         decidePartner(
                                                             user,
-                                                            'rejected',
+                                                            "rejected",
                                                         )
                                                     }
                                                 >
@@ -137,7 +152,7 @@ export default function AdminUsersIndex({ users }: { users: AdminUser[] }) {
                                                 </button>
                                             </span>
                                         )}
-                                        {user.partner_status === 'rejected' && (
+                                        {user.partner_status === "rejected" && (
                                             <span className="text-destructive ml-3 text-xs">
                                                 Rejected
                                             </span>
@@ -151,23 +166,25 @@ export default function AdminUsersIndex({ users }: { users: AdminUser[] }) {
                                         )}
                                         <button
                                             type="button"
-                                            className={`text-xs font-semibold ${user.is_disabled ? 'text-primary' : 'text-destructive'}`}
+                                            className={`text-xs font-semibold ${user.is_disabled ? "text-primary" : "text-destructive"}`}
                                             onClick={() => toggleDisabled(user)}
                                         >
                                             {user.is_disabled
-                                                ? 'Enable'
-                                                : 'Disable'}
+                                                ? "Enable"
+                                                : "Disable"}
                                         </button>
                                     </td>
                                 </tr>
                             ))}
-                            {users.length === 0 && (
+                            {filteredUsers.length === 0 && (
                                 <tr>
                                     <td
                                         colSpan={5}
                                         className="text-muted-foreground px-4 py-6 text-center"
                                     >
-                                        No users yet.
+                                        {users.length === 0
+                                            ? "No users yet."
+                                            : "No users match your search."}
                                     </td>
                                 </tr>
                             )}
@@ -180,5 +197,5 @@ export default function AdminUsersIndex({ users }: { users: AdminUser[] }) {
 }
 
 AdminUsersIndex.layout = {
-    breadcrumbs: [{ title: 'Users', href: '/admin/users' }],
+    breadcrumbs: [{ title: "Users", href: "/admin/users" }],
 };
