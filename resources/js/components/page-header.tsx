@@ -13,7 +13,8 @@ type PageHeaderProps = {
 
 /**
  * The back-chevron + centered-title header used by every screen except
- * Home, which has its own bespoke greeting header.
+ * Home, which has its own bespoke greeting header. It sticks to the top of
+ * the viewport so the back button stays reachable on long pages.
  */
 export function PageHeader({
     title,
@@ -24,7 +25,7 @@ export function PageHeader({
     return (
         <header
             className={cn(
-                'border-border flex h-14 items-center justify-between border-b px-4',
+                'border-border bg-background sticky top-0 z-20 flex h-14 items-center justify-between border-b px-4',
                 className,
             )}
         >
