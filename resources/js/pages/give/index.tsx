@@ -17,7 +17,7 @@ export default function GiveIndex() {
                         <HandHeart className="size-6" aria-hidden="true" />
                     </span>
                     <h2 className="text-heading text-lg font-bold">
-                        Help keep the study going
+                        Support the work
                     </h2>
                     <p className="text-muted-foreground text-sm">
                         {support.intro}

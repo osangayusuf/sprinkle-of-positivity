@@ -7,7 +7,7 @@ export type DonationAccount = {
 };
 
 export const support = {
-    intro: 'Gifts help keep the study going and the community growing. Give what you can, in the currency that suits you.',
+    intro: 'The study runs freely and no gift is required to take part. If you would like to support the work and the community, you are welcome to give what you can, in the currency that suits you.',
     accounts: [
         {
             label: 'Naira account',

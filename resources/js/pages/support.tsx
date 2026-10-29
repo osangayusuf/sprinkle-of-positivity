@@ -11,7 +11,7 @@ export default function Support() {
         <>
             <Seo
                 title="Give and support the program"
-                description="Support Light Shining in the Dark, a Bible study accountability community, with a gift to keep the study going."
+                description="Support Light Shining in the Dark, a Bible study accountability community, with a gift. Giving is entirely optional."
             />
             <div className="landing bg-paper text-ink min-h-screen">
                 <div className="mx-auto max-w-7xl px-5 py-10 md:px-8 lg:py-16">
@@ -28,7 +28,7 @@ export default function Support() {
                                 Support the program
                             </p>
                             <h1 className="font-display text-ink mt-4 text-5xl leading-[0.98] font-semibold tracking-[-0.03em] md:text-6xl">
-                                Help keep the study going.
+                                Support the work.
                             </h1>
                         </div>
                         <p className="text-ink-soft max-w-md text-lg leading-relaxed lg:col-span-5 lg:col-start-8 lg:self-end">
