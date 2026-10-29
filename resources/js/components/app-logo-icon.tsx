@@ -1,17 +1,46 @@
-import type { SVGAttributes } from 'react';
+import type { ImgHTMLAttributes } from 'react';
+
+import { cn } from '@/lib/utils';
+
+type Props = Omit<ImgHTMLAttributes<HTMLImageElement>, 'src' | 'alt'> & {
+    /** Force the variant for surfaces that stay dark/light in every theme. */
+    tone?: 'auto' | 'on-dark' | 'on-light';
+};
 
 /**
- * The brand mark — three pink petals around a navy center, matching
- * design-reference/splash-screen/home.png. Always rendered in the brand's
- * own colors (not `currentColor`), since it's inherently two-tone.
+ * The brand mark — an open book with rays of light. The black variant is used
+ * on light surfaces and the pink/cream one on dark surfaces; `auto` follows
+ * the app's light/dark theme.
  */
-export default function AppLogoIcon(props: SVGAttributes<SVGElement>) {
+export default function AppLogoIcon({
+    tone = 'auto',
+    className,
+    ...props
+}: Props) {
     return (
-        <svg {...props} viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="8.2" cy="14.2" r="3.6" fill="var(--primary)" />
-            <circle cx="15.8" cy="14.2" r="3.6" fill="var(--primary)" />
-            <circle cx="12" cy="17.6" r="3.6" fill="var(--primary)" />
-            <circle cx="12" cy="6.6" r="2.8" fill="var(--heading)" />
-        </svg>
+        <>
+            <img
+                {...props}
+                src="/images/logo/mark-light.png"
+                alt=""
+                className={cn(
+                    'h-auto',
+                    tone === 'on-dark' && 'hidden',
+                    tone === 'auto' && 'dark:hidden',
+                    className,
+                )}
+            />
+            <img
+                {...props}
+                src="/images/logo/mark-dark.png"
+                alt=""
+                className={cn(
+                    'h-auto',
+                    tone === 'on-light' && 'hidden',
+                    tone === 'auto' && 'hidden dark:block',
+                    className,
+                )}
+            />
+        </>
     );
 }
