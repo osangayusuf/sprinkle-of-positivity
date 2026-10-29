@@ -1,8 +1,11 @@
 <?php
 
+use App\Enums\GroupMembershipStatus;
 use App\Models\Group;
 use App\Models\GroupMessage;
 use App\Models\User;
+use App\Notifications\MentionedInGroupChat;
+use Illuminate\Support\Facades\Notification;
 
 test('a member sees the group chat oldest message first', function () {
     $group = Group::factory()->create();
@@ -170,4 +173,209 @@ test('the group page offers the chat only to people who can use it', function ()
         ->assertInertia(fn ($page) => $page->where('canChat', true));
     $this->actingAs(User::factory()->create())->get(route('groups.show', $group))
         ->assertInertia(fn ($page) => $page->where('canChat', false));
+});
+
+test('tagged members are recorded and notified', function () {
+    Notification::fake();
+    $group = Group::factory()->create();
+    $author = createApprovedMember($group);
+    $tagged = createApprovedMember($group);
+    $bystander = createApprovedMember($group);
+
+    $this->actingAs($author)
+        ->post(route('groups.chat.store', $group), ['body' => "Hi @[{$tagged->id}], welcome!"])
+        ->assertRedirect();
+
+    expect(GroupMessage::query()->sole()->mentions->modelKeys())->toBe([$tagged->id]);
+    Notification::assertSentTo($tagged, MentionedInGroupChat::class);
+    Notification::assertNotSentTo($bystander, MentionedInGroupChat::class);
+});
+
+test('mention tokens for outsiders, pending members and yourself are ignored', function () {
+    Notification::fake();
+    $group = Group::factory()->create();
+    $author = createApprovedMember($group);
+    $outsider = User::factory()->create();
+    $pending = User::factory()->create();
+    $membership = joinAsApprovedMember($group, $pending);
+    $membership->status = GroupMembershipStatus::Pending;
+    $membership->save();
+
+    $this->actingAs($author)
+        ->post(route('groups.chat.store', $group), [
+            'body' => "@[{$outsider->id}] @[{$pending->id}] @[{$author->id}]",
+        ]);
+
+    expect(GroupMessage::query()->sole()->mentions)->toHaveCount(0);
+    Notification::assertNothingSent();
+});
+
+test('the chat lists each message mentions and the members who can be tagged', function () {
+    $group = Group::factory()->create();
+    $viewer = createApprovedMember($group);
+    $other = createApprovedMember($group);
+    $outsider = User::factory()->create();
+    $message = GroupMessage::factory()->for($group)->create(['body' => "Hello @[{$other->id}]"]);
+    $message->mentions()->attach($other->id);
+
+    $this->actingAs($viewer)->get(route('groups.chat.show', $group))
+        ->assertInertia(fn ($page) => $page
+            ->where('messages.0.mentions.0.id', $other->id)
+            ->where('messages.0.mentions.0.name', $other->name)
+            ->has('members', 1)
+            ->where('members.0.id', $other->id));
+});
+
+test('a member can reply to an earlier message', function () {
+    $group = Group::factory()->create();
+    $member = createApprovedMember($group);
+    $original = GroupMessage::factory()->for($group)->create(['body' => 'Original']);
+
+    $this->actingAs($member)
+        ->post(route('groups.chat.store', $group), ['body' => 'Agreed', 'reply_to_id' => $original->id])
+        ->assertRedirect();
+
+    expect(GroupMessage::query()->latest('id')->first()->reply_to_id)->toBe($original->id);
+
+    $this->actingAs($member)->get(route('groups.chat.show', $group))
+        ->assertInertia(fn ($page) => $page
+            ->where('messages.1.reply_to.id', $original->id)
+            ->where('messages.1.reply_to.author_name', $original->user->name)
+            ->where('messages.1.reply_to.preview', 'Original')
+            ->where('messages.0.reply_to', null));
+});
+
+test('a reply cannot point at a message from another group or one that does not exist', function () {
+    $group = Group::factory()->create();
+    $member = createApprovedMember($group);
+    $elsewhere = GroupMessage::factory()->create();
+
+    $this->actingAs($member)
+        ->post(route('groups.chat.store', $group), ['body' => 'Hi', 'reply_to_id' => $elsewhere->id])
+        ->assertInvalid('reply_to_id');
+    $this->actingAs($member)
+        ->post(route('groups.chat.store', $group), ['body' => 'Hi', 'reply_to_id' => 99999])
+        ->assertInvalid('reply_to_id');
+
+    expect(GroupMessage::query()->where('group_id', $group->id)->count())->toBe(0);
+});
+
+test('deleting a message keeps the replies to it', function () {
+    $group = Group::factory()->create();
+    $member = createApprovedMember($group);
+    $original = GroupMessage::factory()->for($group)->for($member)->create();
+    $reply = GroupMessage::factory()->for($group)->create(['reply_to_id' => $original->id]);
+
+    $this->actingAs($member)->delete(route('groups.chat.destroy', [$group, $original]))->assertRedirect();
+
+    expect($reply->fresh()->reply_to_id)->toBeNull();
+});
+
+test('a reply quote shows tagged names instead of mention tokens', function () {
+    $group = Group::factory()->create();
+    $member = createApprovedMember($group);
+    $tagged = createApprovedMember($group);
+    $original = GroupMessage::factory()->for($group)->create(['body' => "Hey @[{$tagged->id}]"]);
+    $original->mentions()->attach($tagged->id);
+    GroupMessage::factory()->for($group)->create(['reply_to_id' => $original->id]);
+
+    $this->actingAs($member)->get(route('groups.chat.show', $group))
+        ->assertInertia(fn ($page) => $page->where('messages.1.reply_to.preview', "Hey @{$tagged->name}"));
+});
+
+test('@everyone notifies every other approved member but is not recorded as individual mentions', function () {
+    Notification::fake();
+    $group = Group::factory()->create();
+    $author = createApprovedMember($group);
+    $first = createApprovedMember($group);
+    $second = createApprovedMember($group);
+    $outsider = User::factory()->create();
+
+    $this->actingAs($author)->post(route('groups.chat.store', $group), ['body' => 'Hello @everyone!']);
+
+    Notification::assertSentTo([$first, $second], MentionedInGroupChat::class);
+    Notification::assertNotSentTo([$author, $outsider], MentionedInGroupChat::class);
+    expect(GroupMessage::query()->sole()->mentions)->toHaveCount(0);
+});
+
+test('@everyone and a direct tag notify a member only once', function () {
+    Notification::fake();
+    $group = Group::factory()->create();
+    $author = createApprovedMember($group);
+    $tagged = createApprovedMember($group);
+
+    $this->actingAs($author)->post(route('groups.chat.store', $group), ['body' => "@everyone and @[{$tagged->id}]"]);
+
+    Notification::assertSentToTimes($tagged, MentionedInGroupChat::class, 1);
+});
+
+test('text that merely contains everyone does not notify the group', function () {
+    Notification::fake();
+    $group = Group::factory()->create();
+    $author = createApprovedMember($group);
+    createApprovedMember($group);
+
+    $this->actingAs($author)->post(route('groups.chat.store', $group), ['body' => 'hi everyone, mail me at a@everyone.com']);
+
+    Notification::assertNothingSent();
+});
+
+test('an author can edit their message and it is marked as edited', function () {
+    $group = Group::factory()->create();
+    $member = createApprovedMember($group);
+    $message = GroupMessage::factory()->for($group)->for($member)->create(['body' => 'Old']);
+
+    $this->actingAs($member)
+        ->patch(route('groups.chat.update', [$group, $message]), ['body' => 'New'])
+        ->assertRedirect();
+
+    expect($message->fresh())->body->toBe('New')->edited_at->not->toBeNull();
+
+    $this->actingAs($member)->get(route('groups.chat.show', $group))
+        ->assertInertia(fn ($page) => $page
+            ->where('messages.0.body', 'New')
+            ->where('messages.0.edited', true)
+            ->where('messages.0.can_edit', true));
+});
+
+test('only the author can edit a message, not even a manager', function () {
+    $group = Group::factory()->create();
+    $message = GroupMessage::factory()->for($group)->create(['body' => 'Mine']);
+
+    $this->actingAs(createApprovedMember($group))
+        ->patch(route('groups.chat.update', [$group, $message]), ['body' => 'Hijack'])
+        ->assertForbidden();
+    $this->actingAs(createApprovedManager($group))
+        ->patch(route('groups.chat.update', [$group, $message]), ['body' => 'Hijack'])
+        ->assertForbidden();
+
+    expect($message->fresh()->body)->toBe('Mine');
+});
+
+test('an edited message must still have a valid body and belong to the group', function () {
+    $group = Group::factory()->create();
+    $member = createApprovedMember($group);
+    $message = GroupMessage::factory()->for($group)->for($member)->create();
+    $foreign = GroupMessage::factory()->for($member)->create();
+
+    $this->actingAs($member)->patch(route('groups.chat.update', [$group, $message]), ['body' => ''])->assertInvalid('body');
+    $this->actingAs($member)->patch(route('groups.chat.update', [$group, $foreign]), ['body' => 'Moved'])->assertNotFound();
+});
+
+test('editing a message re-syncs its mentions and only notifies newly tagged members', function () {
+    Notification::fake();
+    $group = Group::factory()->create();
+    $author = createApprovedMember($group);
+    $kept = createApprovedMember($group);
+    $dropped = createApprovedMember($group);
+    $added = createApprovedMember($group);
+
+    $this->actingAs($author)->post(route('groups.chat.store', $group), ['body' => "@[{$kept->id}] @[{$dropped->id}]"]);
+    $message = GroupMessage::query()->sole();
+
+    $this->actingAs($author)->patch(route('groups.chat.update', [$group, $message]), ['body' => "@[{$kept->id}] @[{$added->id}]"]);
+
+    expect($message->fresh()->mentions->modelKeys())->toEqualCanonicalizing([$kept->id, $added->id]);
+    Notification::assertSentToTimes($kept, MentionedInGroupChat::class, 1);
+    Notification::assertSentToTimes($added, MentionedInGroupChat::class, 1);
 });

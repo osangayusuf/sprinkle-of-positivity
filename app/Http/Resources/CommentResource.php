@@ -22,6 +22,12 @@ class CommentResource extends JsonResource
                 'avatar' => $this->user->avatar,
             ],
             'body' => $this->body,
+            'mentions' => $this->mentions->map(fn ($mentioned) => [
+                'id' => $mentioned->id,
+                'name' => $mentioned->name,
+            ])->values(),
+            'edited' => $this->edited_at !== null,
+            'can_edit' => $this->user_id === $request->user()?->id,
             'created_at' => $this->created_at->toIso8601String(),
             'reaction_summary' => $this->reactionSummary(),
             'my_reaction' => $this->reactions

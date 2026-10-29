@@ -25,6 +25,7 @@ Route::middleware(['auth', 'verified', 'onboarded'])->group(function () {
 
     Route::get('groups/{group:slug}/chat', [GroupChatController::class, 'show'])->name('groups.chat.show');
     Route::post('groups/{group:slug}/chat', [GroupChatController::class, 'store'])->middleware('throttle:30,1')->name('groups.chat.store');
+    Route::patch('groups/{group:slug}/chat/{message}', [GroupChatController::class, 'update'])->middleware('throttle:30,1')->name('groups.chat.update');
     Route::delete('groups/{group:slug}/chat/{message}', [GroupChatController::class, 'destroy'])->name('groups.chat.destroy');
 
     Route::get('groups/{group:slug}/verse/edit', [GroupVerseController::class, 'edit'])->name('groups.verse.edit');
@@ -34,6 +35,7 @@ Route::middleware(['auth', 'verified', 'onboarded'])->group(function () {
     Route::get('groups/{group:slug}/insights/create', [InsightController::class, 'create'])->name('groups.insights.create');
     Route::post('groups/{group:slug}/insights', [InsightController::class, 'store'])->name('groups.insights.store');
     Route::post('groups/{group:slug}/insights/{insight}/comments', [CommentController::class, 'store'])->name('groups.insights.comments.store');
+    Route::patch('groups/{group:slug}/insights/{insight}/comments/{comment}', [CommentController::class, 'update'])->name('groups.insights.comments.update');
     Route::post('groups/{group:slug}/insights/{insight}/reactions', [ReactionController::class, 'forInsight'])->name('groups.insights.reactions.store');
     Route::post('groups/{group:slug}/insights/{insight}/comments/{comment}/reactions', [ReactionController::class, 'forComment'])->name('groups.insights.comments.reactions.store');
 

@@ -72,7 +72,7 @@ class InsightController extends Controller
         $insight->loadCount('comments');
 
         $comments = $insight->rootComments()
-            ->with(['user', 'reactions', 'replies.user', 'replies.reactions'])
+            ->with(['user', 'reactions', 'mentions:users.id,users.name', 'replies.user', 'replies.reactions', 'replies.mentions:users.id,users.name'])
             ->oldest()
             ->get();
 
@@ -81,6 +81,17 @@ class InsightController extends Controller
             'insight' => new InsightResource($insight),
             'comments' => CommentResource::collection($comments),
             'canParticipate' => $request->user()?->can('participate', $group) ?? false,
+            'members' => $request->user()
+                ? $group->approvedMembers()
+                    ->whereKeyNot($request->user()->id)
+                    ->orderBy('users.name')
+                    ->get(['users.id', 'users.name', 'users.avatar_path'])
+                    ->map(fn ($member) => [
+                        'id' => $member->id,
+                        'name' => $member->name,
+                        'avatar' => $member->avatar,
+                    ])
+                : [],
         ]);
     }
 
