@@ -1,5 +1,8 @@
-import { Head, router } from '@inertiajs/react';
-import Heading from '@/components/heading';
+import { Head, router } from "@inertiajs/react";
+import { useState } from "react";
+import Heading from "@/components/heading";
+import { SearchInput } from "@/components/search-input";
+import { matchesSearch } from "@/lib/search";
 
 type Props = {
     group: { id: number; name: string };
@@ -12,6 +15,11 @@ export default function AdminGroupAssignments({
     participants,
     partners,
 }: Props) {
+    const [search, setSearch] = useState("");
+    const filteredParticipants = participants.filter((participant) =>
+        matchesSearch(search, participant.name),
+    );
+
     function assign(membershipId: number, partnerId: string) {
         router.put(
             `/admin/groups/${group.id}/assignments/${membershipId}`,
@@ -31,6 +39,13 @@ export default function AdminGroupAssignments({
                     description="Choose which accountability partner looks after each participant"
                 />
 
+                <SearchInput
+                    value={search}
+                    onChange={setSearch}
+                    placeholder="Search participants"
+                    className="max-w-sm"
+                />
+
                 <div className="overflow-x-auto rounded-lg border">
                     <table className="w-full min-w-[480px] text-sm">
                         <thead className="bg-muted text-muted-foreground text-left">
@@ -44,14 +59,14 @@ export default function AdminGroupAssignments({
                             </tr>
                         </thead>
                         <tbody>
-                            {participants.map((participant) => (
+                            {filteredParticipants.map((participant) => (
                                 <tr key={participant.id} className="border-t">
                                     <td className="px-4 py-2">
                                         {participant.name}
                                     </td>
                                     <td className="px-4 py-2">
                                         <select
-                                            value={participant.partner_id ?? ''}
+                                            value={participant.partner_id ?? ""}
                                             onChange={(e) =>
                                                 assign(
                                                     participant.id,
@@ -75,13 +90,15 @@ export default function AdminGroupAssignments({
                                     </td>
                                 </tr>
                             ))}
-                            {participants.length === 0 && (
+                            {filteredParticipants.length === 0 && (
                                 <tr>
                                     <td
                                         colSpan={2}
                                         className="text-muted-foreground px-4 py-6 text-center"
                                     >
-                                        No approved participants yet.
+                                        {participants.length === 0
+                                            ? "No approved participants yet."
+                                            : "No participants match your search."}
                                     </td>
                                 </tr>
                             )}
@@ -95,7 +112,7 @@ export default function AdminGroupAssignments({
 
 AdminGroupAssignments.layout = {
     breadcrumbs: [
-        { title: 'Groups', href: '/admin/groups' },
-        { title: 'Assignments', href: '#' },
+        { title: "Groups", href: "/admin/groups" },
+        { title: "Assignments", href: "#" },
     ],
 };

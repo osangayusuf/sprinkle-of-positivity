@@ -1,6 +1,9 @@
-import { Head, Link } from '@inertiajs/react';
-import Heading from '@/components/heading';
-import { Button } from '@/components/ui/button';
+import { Head, Link } from "@inertiajs/react";
+import { useState } from "react";
+import Heading from "@/components/heading";
+import { SearchInput } from "@/components/search-input";
+import { Button } from "@/components/ui/button";
+import { matchesSearch } from "@/lib/search";
 
 type ChallengeGroup = {
     id: number;
@@ -18,6 +21,11 @@ export default function AdminCertificatesIndex({
 }: {
     groups: ChallengeGroup[];
 }) {
+    const [search, setSearch] = useState("");
+    const filteredGroups = groups.filter((group) =>
+        matchesSearch(search, group.name),
+    );
+
     return (
         <>
             <Head title="Certificates" />
@@ -27,6 +35,13 @@ export default function AdminCertificatesIndex({
                     variant="small"
                     title="Certificates"
                     description="Certificates are issued automatically after a challenge ends. Open a group to review, issue or revoke them."
+                />
+
+                <SearchInput
+                    value={search}
+                    onChange={setSearch}
+                    placeholder="Search groups"
+                    className="max-w-sm"
                 />
 
                 <div className="overflow-x-auto rounded-lg border">
@@ -47,11 +62,11 @@ export default function AdminCertificatesIndex({
                             </tr>
                         </thead>
                         <tbody>
-                            {groups.map((group) => (
+                            {filteredGroups.map((group) => (
                                 <tr key={group.id} className="border-t">
                                     <td className="px-4 py-2">{group.name}</td>
                                     <td className="px-4 py-2">
-                                        {group.duration_days} days,{' '}
+                                        {group.duration_days} days,{" "}
                                         {group.has_ended
                                             ? `ended ${group.ends_on}`
                                             : `ends ${group.ends_on}`}
@@ -77,13 +92,15 @@ export default function AdminCertificatesIndex({
                                     </td>
                                 </tr>
                             ))}
-                            {groups.length === 0 && (
+                            {filteredGroups.length === 0 && (
                                 <tr>
                                     <td
                                         colSpan={5}
                                         className="text-muted-foreground px-4 py-6 text-center"
                                     >
-                                        No groups run a challenge yet.
+                                        {groups.length === 0
+                                            ? "No groups run a challenge yet."
+                                            : "No groups match your search."}
                                     </td>
                                 </tr>
                             )}
@@ -96,5 +113,5 @@ export default function AdminCertificatesIndex({
 }
 
 AdminCertificatesIndex.layout = {
-    breadcrumbs: [{ title: 'Certificates', href: '/admin/certificates' }],
+    breadcrumbs: [{ title: "Certificates", href: "/admin/certificates" }],
 };

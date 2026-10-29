@@ -1,13 +1,15 @@
-import { Head, Link, router } from '@inertiajs/react';
-import { BellRing, BookOpenText, UserMinus } from 'lucide-react';
-import { useState } from 'react';
-import { PageHeader } from '@/components/page-header';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import { UserAvatar } from '@/components/user-avatar';
-import { cn } from '@/lib/utils';
+import { Head, Link, router } from "@inertiajs/react";
+import { BellRing, BookOpenText, UserMinus } from "lucide-react";
+import { useState } from "react";
+import { PageHeader } from "@/components/page-header";
+import { SearchInput } from "@/components/search-input";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { UserAvatar } from "@/components/user-avatar";
+import { matchesSearch } from "@/lib/search";
+import { cn } from "@/lib/utils";
 
-type Status = 'on_track' | 'at_risk' | 'lagging';
+type Status = "on_track" | "at_risk" | "lagging";
 
 type Participant = {
     id: number;
@@ -24,15 +26,15 @@ type Participant = {
 };
 
 const STATUS_LABEL: Record<Status, string> = {
-    on_track: 'Done today',
-    at_risk: 'Yet to post',
-    lagging: 'Behind',
+    on_track: "Done today",
+    at_risk: "Yet to post",
+    lagging: "Behind",
 };
 
 const STATUS_CLASS: Record<Status, string> = {
-    on_track: 'bg-success/15 text-success',
-    at_risk: 'bg-amber-500/15 text-amber-600',
-    lagging: 'bg-destructive/15 text-destructive',
+    on_track: "bg-success/15 text-success",
+    at_risk: "bg-amber-500/15 text-amber-600",
+    lagging: "bg-destructive/15 text-destructive",
 };
 
 export default function PartnerParticipants({
@@ -43,12 +45,22 @@ export default function PartnerParticipants({
     isAdmin: boolean;
 }) {
     const [rejecting, setRejecting] = useState<number | null>(null);
-    const [reason, setReason] = useState('');
+    const [reason, setReason] = useState("");
+    const [search, setSearch] = useState("");
+
+    const filteredParticipants = participants.filter((participant) =>
+        matchesSearch(
+            search,
+            participant.user.name,
+            participant.group.name,
+            participant.partner?.name,
+        ),
+    );
 
     const counts = {
-        on_track: participants.filter((p) => p.status === 'on_track').length,
-        at_risk: participants.filter((p) => p.status === 'at_risk').length,
-        lagging: participants.filter((p) => p.status === 'lagging').length,
+        on_track: participants.filter((p) => p.status === "on_track").length,
+        at_risk: participants.filter((p) => p.status === "at_risk").length,
+        lagging: participants.filter((p) => p.status === "lagging").length,
     };
 
     function nudge(id: number) {
@@ -67,7 +79,7 @@ export default function PartnerParticipants({
                 preserveScroll: true,
                 onSuccess: () => {
                     setRejecting(null);
-                    setReason('');
+                    setReason("");
                 },
             },
         );
@@ -77,7 +89,7 @@ export default function PartnerParticipants({
         <>
             <Head title="My participants" />
             <PageHeader
-                title={isAdmin ? 'All participants' : 'My participants'}
+                title={isAdmin ? "All participants" : "My participants"}
                 backHref="/home"
             />
 
@@ -87,7 +99,7 @@ export default function PartnerParticipants({
                         <div
                             key={status}
                             className={cn(
-                                'rounded-xl px-2 py-3',
+                                "rounded-xl px-2 py-3",
                                 STATUS_CLASS[status],
                             )}
                         >
@@ -99,13 +111,28 @@ export default function PartnerParticipants({
                     ))}
                 </div>
 
+                {participants.length > 0 && (
+                    <SearchInput
+                        value={search}
+                        onChange={setSearch}
+                        placeholder="Search participants"
+                    />
+                )}
+
                 {participants.length === 0 && (
                     <p className="text-muted-foreground py-10 text-center text-sm">
                         No participants are assigned yet.
                     </p>
                 )}
 
-                {participants.map((participant) => (
+                {participants.length > 0 &&
+                    filteredParticipants.length === 0 && (
+                        <p className="text-muted-foreground py-10 text-center text-sm">
+                            No participants match your search.
+                        </p>
+                    )}
+
+                {filteredParticipants.map((participant) => (
                     <div
                         key={participant.id}
                         className="border-border flex flex-col gap-3 rounded-2xl border p-4"
@@ -124,12 +151,12 @@ export default function PartnerParticipants({
                                     {participant.group.name}
                                     {isAdmin && participant.partner
                                         ? ` · ${participant.partner.name}`
-                                        : ''}
+                                        : ""}
                                 </p>
                             </div>
                             <span
                                 className={cn(
-                                    'rounded-full px-2.5 py-1 text-xs font-semibold',
+                                    "rounded-full px-2.5 py-1 text-xs font-semibold",
                                     STATUS_CLASS[participant.status],
                                 )}
                             >
@@ -164,17 +191,17 @@ export default function PartnerParticipants({
                         </dl>
 
                         <p className="text-muted-foreground text-xs">
-                            Last post:{' '}
+                            Last post:{" "}
                             {participant.last_posted_at
                                 ? new Date(
                                       participant.last_posted_at,
                                   ).toLocaleString(undefined, {
-                                      day: '2-digit',
-                                      month: 'short',
-                                      hour: '2-digit',
-                                      minute: '2-digit',
+                                      day: "2-digit",
+                                      month: "short",
+                                      hour: "2-digit",
+                                      minute: "2-digit",
                                   })
-                                : 'never'}
+                                : "never"}
                         </p>
 
                         {rejecting === participant.id ? (
@@ -189,7 +216,7 @@ export default function PartnerParticipants({
                                     <Button
                                         type="button"
                                         size="sm"
-                                        disabled={reason.trim() === ''}
+                                        disabled={reason.trim() === ""}
                                         onClick={() => reject(participant.id)}
                                     >
                                         Move to another partner

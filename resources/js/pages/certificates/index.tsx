@@ -1,20 +1,41 @@
-import { Head, Link } from '@inertiajs/react';
-import { Award, ChevronRight } from 'lucide-react';
-import { PageHeader } from '@/components/page-header';
-import type { Certificate } from '@/types/models';
+import { Head, Link } from "@inertiajs/react";
+import { Award, ChevronRight } from "lucide-react";
+import { useState } from "react";
+import { PageHeader } from "@/components/page-header";
+import { SearchInput } from "@/components/search-input";
+import { matchesSearch } from "@/lib/search";
+import type { Certificate } from "@/types/models";
 
 export default function CertificatesIndex({
     certificates,
 }: {
     certificates: Certificate[];
 }) {
+    const [search, setSearch] = useState("");
+    const filteredCertificates = certificates.filter((certificate) =>
+        matchesSearch(
+            search,
+            certificate.group_name,
+            certificate.year,
+            certificate.duration_days,
+        ),
+    );
+
     return (
         <>
             <Head title="Certificates" />
             <PageHeader title="Certificates" backHref="/profile" />
 
             <div className="flex flex-col gap-3 px-4 py-4">
-                {certificates.map((certificate) => (
+                {certificates.length > 0 && (
+                    <SearchInput
+                        value={search}
+                        onChange={setSearch}
+                        placeholder="Search certificates"
+                    />
+                )}
+
+                {filteredCertificates.map((certificate) => (
                     <Link
                         key={certificate.id}
                         href={`/certificates/${certificate.code}`}
@@ -26,7 +47,7 @@ export default function CertificatesIndex({
                                 {certificate.group_name}
                             </p>
                             <p className="text-muted-foreground text-xs">
-                                {certificate.duration_days}-day challenge,{' '}
+                                {certificate.duration_days}-day challenge,{" "}
                                 {certificate.year}
                             </p>
                         </div>
@@ -40,6 +61,13 @@ export default function CertificatesIndex({
                         will appear here.
                     </div>
                 )}
+
+                {certificates.length > 0 &&
+                    filteredCertificates.length === 0 && (
+                        <p className="text-muted-foreground py-10 text-center text-sm">
+                            No certificates match your search.
+                        </p>
+                    )}
             </div>
         </>
     );

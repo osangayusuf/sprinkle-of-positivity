@@ -1,6 +1,9 @@
-import { Head, Link } from '@inertiajs/react';
-import { PageHeader } from '@/components/page-header';
-import { UserAvatar } from '@/components/user-avatar';
+import { Head, Link } from "@inertiajs/react";
+import { useState } from "react";
+import { PageHeader } from "@/components/page-header";
+import { SearchInput } from "@/components/search-input";
+import { UserAvatar } from "@/components/user-avatar";
+import { matchesSearch } from "@/lib/search";
 
 type MemberInsight = {
     id: number;
@@ -20,6 +23,11 @@ export default function MemberInsights({
     member: { id: number; name: string; avatar: string | null };
     insights: MemberInsight[];
 }) {
+    const [search, setSearch] = useState("");
+    const filteredInsights = insights.filter((insight) =>
+        matchesSearch(search, insight.body, insight.verse.reference),
+    );
+
     return (
         <>
             <Head title={`${member.name} — insights`} />
@@ -41,10 +49,18 @@ export default function MemberInsights({
                         </p>
                         <p className="text-muted-foreground text-xs">
                             {group.name} · {insights.length} insight
-                            {insights.length === 1 ? '' : 's'}
+                            {insights.length === 1 ? "" : "s"}
                         </p>
                     </div>
                 </div>
+
+                {insights.length > 0 && (
+                    <SearchInput
+                        value={search}
+                        onChange={setSearch}
+                        placeholder="Search insights"
+                    />
+                )}
 
                 {insights.length === 0 && (
                     <p className="text-muted-foreground py-10 text-center text-sm">
@@ -52,8 +68,14 @@ export default function MemberInsights({
                     </p>
                 )}
 
+                {insights.length > 0 && filteredInsights.length === 0 && (
+                    <p className="text-muted-foreground py-10 text-center text-sm">
+                        No insights match your search.
+                    </p>
+                )}
+
                 <div className="divide-border divide-y">
-                    {insights.map((insight) => (
+                    {filteredInsights.map((insight) => (
                         <Link
                             key={insight.id}
                             href={`/groups/${group.slug}/insights/${insight.id}`}
@@ -63,10 +85,10 @@ export default function MemberInsights({
                                 {new Date(
                                     `${insight.verse.date}T00:00:00`,
                                 ).toLocaleDateString(undefined, {
-                                    weekday: 'short',
-                                    day: 'numeric',
-                                    month: 'short',
-                                })}{' '}
+                                    weekday: "short",
+                                    day: "numeric",
+                                    month: "short",
+                                })}{" "}
                                 · {insight.verse.reference}
                             </p>
                             <p className="line-clamp-3 text-sm">
@@ -74,7 +96,7 @@ export default function MemberInsights({
                             </p>
                             <p className="text-muted-foreground text-xs">
                                 {insight.comments_count} comment
-                                {insight.comments_count === 1 ? '' : 's'}
+                                {insight.comments_count === 1 ? "" : "s"}
                             </p>
                         </Link>
                     ))}

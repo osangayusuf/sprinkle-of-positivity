@@ -1,23 +1,25 @@
-import { Head, Link, usePage } from '@inertiajs/react';
-import { ChevronDown, Plus } from 'lucide-react';
-import { useState } from 'react';
-import { InsightCard } from '@/components/insight-card';
-import { PageHeader } from '@/components/page-header';
-import { QuizComposer } from '@/components/quiz-composer';
-import { QuizCard } from '@/components/quiz-card';
-import { SignInPrompt } from '@/components/sign-in-prompt';
-import { StreakTracker } from '@/components/streak-tracker';
-import { VerseCard } from '@/components/verse-card';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
-import type { Auth } from '@/types/auth';
+import { Head, Link, usePage } from "@inertiajs/react";
+import { ChevronDown, Plus } from "lucide-react";
+import { useState } from "react";
+import { InsightCard } from "@/components/insight-card";
+import { PageHeader } from "@/components/page-header";
+import { QuizComposer } from "@/components/quiz-composer";
+import { QuizCard } from "@/components/quiz-card";
+import { SearchInput } from "@/components/search-input";
+import { SignInPrompt } from "@/components/sign-in-prompt";
+import { StreakTracker } from "@/components/streak-tracker";
+import { VerseCard } from "@/components/verse-card";
+import { Button } from "@/components/ui/button";
+import { matchesSearch } from "@/lib/search";
+import { cn } from "@/lib/utils";
+import type { Auth } from "@/types/auth";
 import type {
     ChallengeProgress,
     Group,
     Insight,
     Quiz,
     Verse,
-} from '@/types/models';
+} from "@/types/models";
 
 type Props = {
     group: Group;
@@ -32,7 +34,7 @@ type Props = {
     pastDays: { date: string; reference: string; insights_count: number }[];
 };
 
-type Tab = 'insights' | 'qa';
+type Tab = "insights" | "qa";
 
 export default function VerseShow({
     group,
@@ -47,11 +49,23 @@ export default function VerseShow({
     pastDays,
 }: Props) {
     const { auth } = usePage<{ auth: Auth }>().props;
-    const [tab, setTab] = useState<Tab>('insights');
+    const [tab, setTab] = useState<Tab>("insights");
+    const [search, setSearch] = useState("");
+    const filteredInsights = insights.filter((insight) =>
+        matchesSearch(search, insight.body, insight.user.name),
+    );
+    const filteredQuizzes = quizzes.filter((quiz) =>
+        matchesSearch(
+            search,
+            quiz.question,
+            quiz.created_by_name,
+            ...quiz.options.map((option) => option.label),
+        ),
+    );
 
     const dateLabel = new Date(`${viewingDate}T00:00:00`).toLocaleDateString(
         undefined,
-        { weekday: 'long', day: 'numeric', month: 'long' },
+        { weekday: "long", day: "numeric", month: "long" },
     );
 
     const hasChallenge =
@@ -93,13 +107,13 @@ export default function VerseShow({
                 {verse ? (
                     <VerseCard
                         verse={verse}
-                        label={isToday ? "Today's verse" : 'Verse of the day'}
+                        label={isToday ? "Today's verse" : "Verse of the day"}
                     />
                 ) : (
                     <div className="bg-muted text-muted-foreground rounded-2xl p-6 text-center text-sm">
                         {isToday
-                            ? 'No verse has been set for today yet.'
-                            : 'No verse was set for this day.'}
+                            ? "No verse has been set for today yet."
+                            : "No verse was set for this day."}
                     </div>
                 )}
 
@@ -121,8 +135,8 @@ export default function VerseShow({
                     <div className="border-border flex border-b">
                         {(
                             [
-                                ['insights', 'Bible Study Insights'],
-                                ['qa', 'Q&A & Polls'],
+                                ["insights", "Bible Study Insights"],
+                                ["qa", "Q&A & Polls"],
                             ] as [Tab, string][]
                         ).map(([value, label]) => (
                             <button
@@ -130,10 +144,10 @@ export default function VerseShow({
                                 type="button"
                                 onClick={() => setTab(value)}
                                 className={cn(
-                                    'flex-1 border-b-2 pb-3 text-sm font-semibold',
+                                    "flex-1 border-b-2 pb-3 text-sm font-semibold",
                                     tab === value
-                                        ? 'border-primary text-primary'
-                                        : 'text-muted-foreground border-transparent',
+                                        ? "border-primary text-primary"
+                                        : "text-muted-foreground border-transparent",
                                 )}
                             >
                                 {label}
@@ -141,7 +155,7 @@ export default function VerseShow({
                         ))}
                     </div>
 
-                    {tab === 'insights' && (
+                    {tab === "insights" && (
                         <div className="flex flex-col">
                             {canParticipate && (
                                 <Link
@@ -160,14 +174,24 @@ export default function VerseShow({
                                 />
                             )}
 
-                            {insights.length === 0 ? (
+                            {insights.length > 0 && (
+                                <SearchInput
+                                    value={search}
+                                    onChange={setSearch}
+                                    placeholder="Search insights"
+                                    className="mt-4"
+                                />
+                            )}
+
+                            {filteredInsights.length === 0 ? (
                                 <p className="text-muted-foreground py-10 text-center text-sm">
-                                    No Bible Study Insights have been shared
-                                    yet.
+                                    {insights.length === 0
+                                        ? "No Bible Study Insights have been shared yet."
+                                        : "No insights match your search."}
                                 </p>
                             ) : (
                                 <div className="divide-border divide-y">
-                                    {insights.map((insight) => (
+                                    {filteredInsights.map((insight) => (
                                         <InsightCard
                                             key={insight.id}
                                             insight={insight}
@@ -179,19 +203,30 @@ export default function VerseShow({
                         </div>
                     )}
 
-                    {tab === 'qa' && (
+                    {tab === "qa" && (
                         <div className="flex flex-col">
                             {canManage && isToday && (
                                 <QuizComposer groupSlug={group.slug} />
                             )}
 
-                            {quizzes.length === 0 ? (
+                            {quizzes.length > 0 && (
+                                <SearchInput
+                                    value={search}
+                                    onChange={setSearch}
+                                    placeholder="Search questions and polls"
+                                    className="mt-4"
+                                />
+                            )}
+
+                            {filteredQuizzes.length === 0 ? (
                                 <p className="text-muted-foreground py-10 text-center text-sm">
-                                    No questions or polls have been posted yet.
+                                    {quizzes.length === 0
+                                        ? "No questions or polls have been posted yet."
+                                        : "No questions or polls match your search."}
                                 </p>
                             ) : (
                                 <div className="divide-border divide-y">
-                                    {quizzes.map((quiz) => (
+                                    {filteredQuizzes.map((quiz) => (
                                         <QuizCard
                                             key={quiz.id}
                                             quiz={quiz}
@@ -221,7 +256,7 @@ export default function VerseShow({
     );
 }
 
-type PastDay = Props['pastDays'][number];
+type PastDay = Props["pastDays"][number];
 
 function monthKey(date: string): string {
     return date.slice(0, 7);
@@ -270,13 +305,13 @@ function PastDays({
                                 {new Date(
                                     `${month}-01T00:00:00`,
                                 ).toLocaleDateString(undefined, {
-                                    month: 'long',
-                                    year: 'numeric',
+                                    month: "long",
+                                    year: "numeric",
                                 })}
                             </span>
                             <span className="text-muted-foreground flex items-center gap-2 text-xs font-normal">
                                 {monthDays.length} day
-                                {monthDays.length === 1 ? '' : 's'}
+                                {monthDays.length === 1 ? "" : "s"}
                                 <ChevronDown className="size-4 transition-transform group-open:rotate-180" />
                             </span>
                         </summary>
@@ -286,9 +321,9 @@ function PastDays({
                                     key={day.date}
                                     href={`/groups/${groupSlug}/verse?date=${day.date}`}
                                     className={cn(
-                                        'flex items-center justify-between gap-3 px-4 py-3 text-sm',
+                                        "flex items-center justify-between gap-3 px-4 py-3 text-sm",
                                         day.date === viewingDate &&
-                                            'bg-primary/10 text-primary',
+                                            "bg-primary/10 text-primary",
                                     )}
                                 >
                                     <span className="min-w-0">
@@ -296,9 +331,9 @@ function PastDays({
                                             {new Date(
                                                 `${day.date}T00:00:00`,
                                             ).toLocaleDateString(undefined, {
-                                                weekday: 'short',
-                                                day: 'numeric',
-                                                month: 'short',
+                                                weekday: "short",
+                                                day: "numeric",
+                                                month: "short",
                                             })}
                                         </span>
                                         <span className="text-muted-foreground block truncate text-xs">
@@ -307,7 +342,7 @@ function PastDays({
                                     </span>
                                     <span className="text-muted-foreground shrink-0 text-xs">
                                         {day.insights_count} insight
-                                        {day.insights_count === 1 ? '' : 's'}
+                                        {day.insights_count === 1 ? "" : "s"}
                                     </span>
                                 </Link>
                             ))}

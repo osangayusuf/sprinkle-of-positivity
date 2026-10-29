@@ -1,9 +1,10 @@
-import { Form, Head, Link } from '@inertiajs/react';
-import { useState } from 'react';
-import CertificateController from '@/actions/App/Http/Controllers/Admin/CertificateController';
-import Heading from '@/components/heading';
-import InputError from '@/components/input-error';
-import { Button } from '@/components/ui/button';
+import { Form, Head, Link } from "@inertiajs/react";
+import { useState } from "react";
+import CertificateController from "@/actions/App/Http/Controllers/Admin/CertificateController";
+import Heading from "@/components/heading";
+import InputError from "@/components/input-error";
+import { SearchInput } from "@/components/search-input";
+import { Button } from "@/components/ui/button";
 import {
     Dialog,
     DialogClose,
@@ -12,11 +13,12 @@ import {
     DialogFooter,
     DialogTitle,
     DialogTrigger,
-} from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import type { Certificate } from '@/types/models';
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { matchesSearch } from "@/lib/search";
+import type { Certificate } from "@/types/models";
 
 type MemberRow = {
     user: { id: number; name: string };
@@ -52,7 +54,7 @@ function FormDialog({
     description: string;
     submitLabel: string;
     destructive?: boolean;
-    form: { action: string; method: 'post' | 'get' };
+    form: { action: string; method: "post" | "get" };
     children: (errors: Record<string, string>) => React.ReactNode;
 }) {
     const [open, setOpen] = useState(false);
@@ -81,7 +83,7 @@ function FormDialog({
                                 <Button
                                     type="submit"
                                     variant={
-                                        destructive ? 'destructive' : 'default'
+                                        destructive ? "destructive" : "default"
                                     }
                                     disabled={processing}
                                 >
@@ -114,17 +116,22 @@ function ReasonField({
 
 function status(row: MemberRow): string {
     if (row.certificate?.revoked) {
-        return 'Revoked';
+        return "Revoked";
     }
 
     if (row.certificate) {
-        return row.certificate.override_reason ? 'Issued (override)' : 'Issued';
+        return row.certificate.override_reason ? "Issued (override)" : "Issued";
     }
 
-    return row.eligible ? 'Eligible' : 'Not eligible';
+    return row.eligible ? "Eligible" : "Not eligible";
 }
 
 export default function AdminCertificatesShow({ group, members }: Props) {
+    const [search, setSearch] = useState("");
+    const filteredMembers = members.filter((row) =>
+        matchesSearch(search, row.user.name, row.certificate?.recipient_name),
+    );
+
     return (
         <>
             <Head title={`Certificates: ${group.name}`} />
@@ -135,9 +142,16 @@ export default function AdminCertificatesShow({ group, members }: Props) {
                     title={group.name}
                     description={
                         group.has_ended
-                            ? 'The challenge has ended. Certificates are issued automatically to members who completed every day.'
-                            : 'The challenge is still running. Certificates are issued after it ends.'
+                            ? "The challenge has ended. Certificates are issued automatically to members who completed every day."
+                            : "The challenge is still running. Certificates are issued after it ends."
                     }
+                />
+
+                <SearchInput
+                    value={search}
+                    onChange={setSearch}
+                    placeholder="Search members"
+                    className="max-w-sm"
                 />
 
                 <div className="overflow-x-auto rounded-lg border">
@@ -158,7 +172,7 @@ export default function AdminCertificatesShow({ group, members }: Props) {
                             </tr>
                         </thead>
                         <tbody>
-                            {members.map((row) => {
+                            {filteredMembers.map((row) => {
                                 const certificate = row.certificate;
 
                                 return (
@@ -313,13 +327,15 @@ export default function AdminCertificatesShow({ group, members }: Props) {
                                     </tr>
                                 );
                             })}
-                            {members.length === 0 && (
+                            {filteredMembers.length === 0 && (
                                 <tr>
                                     <td
                                         colSpan={5}
                                         className="text-muted-foreground px-4 py-6 text-center"
                                     >
-                                        This group has no approved members.
+                                        {members.length === 0
+                                            ? "This group has no approved members."
+                                            : "No members match your search."}
                                     </td>
                                 </tr>
                             )}
@@ -333,7 +349,7 @@ export default function AdminCertificatesShow({ group, members }: Props) {
 
 AdminCertificatesShow.layout = {
     breadcrumbs: [
-        { title: 'Certificates', href: '/admin/certificates' },
-        { title: 'Group certificates', href: '#' },
+        { title: "Certificates", href: "/admin/certificates" },
+        { title: "Group certificates", href: "#" },
     ],
 };
