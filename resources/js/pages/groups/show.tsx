@@ -26,6 +26,25 @@ export default function GroupShow({
         <>
             <Head title={group.name} />
 
+            <div className="sticky top-0 z-20 -mb-14 flex h-14 items-center justify-between px-4 text-white">
+                <Link
+                    href="/groups"
+                    aria-label="Go back"
+                    className="flex size-9 items-center justify-center rounded-full bg-black/40"
+                >
+                    <ChevronLeft className="size-6" />
+                </Link>
+                {canManage && (
+                    <Link
+                        href={`/groups/${group.slug}/manage`}
+                        aria-label="Manage group"
+                        className="flex size-9 items-center justify-center rounded-full bg-black/40"
+                    >
+                        <MoreVertical className="size-6" />
+                    </Link>
+                )}
+            </div>
+
             <div className="relative flex h-56 flex-col justify-end p-4 text-white">
                 {group.cover_image_url ? (
                     <img
@@ -37,19 +56,6 @@ export default function GroupShow({
                     <div className="bg-heading absolute inset-0" />
                 )}
                 <div className="absolute inset-0 bg-black/50" />
-                <div className="relative z-10 flex items-start justify-between">
-                    <Link href="/groups" aria-label="Go back">
-                        <ChevronLeft className="size-6" />
-                    </Link>
-                    {canManage && (
-                        <Link
-                            href={`/groups/${group.slug}/manage`}
-                            aria-label="Manage group"
-                        >
-                            <MoreVertical className="size-6" />
-                        </Link>
-                    )}
-                </div>
                 <h1 className="relative z-10 text-2xl font-bold">
                     {group.name}
                 </h1>

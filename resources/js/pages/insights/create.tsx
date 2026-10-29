@@ -54,7 +54,7 @@ export default function InsightCreate({
         <>
             <Head title={`Share your reflection on ${verse.reference}`} />
 
-            <div className="flex h-14 items-center px-4">
+            <div className="bg-background sticky top-0 z-20 flex h-14 items-center px-4">
                 <Link href={`/groups/${group.slug}/verse`} aria-label="Go back">
                     <ChevronLeft className="size-6" />
                 </Link>
