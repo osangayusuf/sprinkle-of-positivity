@@ -20,6 +20,10 @@ class ProfileController extends Controller
         return Inertia::render('profile/index', [
             'points' => $user->points,
             'level' => $level['label'] ?? null,
+            'pushPreferences' => [
+                'chat' => $user->push_chat_enabled,
+                'insights' => $user->push_insights_enabled,
+            ],
         ]);
     }
 }

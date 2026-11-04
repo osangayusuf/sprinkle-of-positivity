@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\GroupMembershipStatus;
 use App\Enums\GroupStatus;
 use App\Http\Resources\GroupResource;
 use App\Models\Group;
@@ -56,6 +57,9 @@ class GroupController extends Controller
             ] : null,
             'canManage' => $user?->can('manage', $group) ?? false,
             'canChat' => $user?->can('participate', $group) ?? false,
+            'notificationsMuted' => $membership?->status === GroupMembershipStatus::Approved
+                ? $membership->notifications_muted
+                : null,
             'canViewContent' => Gate::forUser($user)->allows('viewContent', $group),
         ]);
     }

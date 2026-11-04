@@ -7,6 +7,7 @@ use App\Http\Controllers\GroupApplicationController;
 use App\Http\Controllers\GroupChatController;
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\GroupManagementController;
+use App\Http\Controllers\GroupNotificationController;
 use App\Http\Controllers\GroupVerseController;
 use App\Http\Controllers\InsightController;
 use App\Http\Controllers\MemberInsightController;
@@ -22,6 +23,8 @@ Route::middleware(['auth', 'verified', 'onboarded'])->group(function () {
     Route::get('groups/{group:slug}/manage', [GroupManagementController::class, 'edit'])->name('groups.manage');
     Route::patch('groups/{group:slug}/applications/{membership}', [GroupApplicationController::class, 'update'])->name('groups.applications.update');
     Route::delete('groups/{group:slug}/members/{membership}', [GroupApplicationController::class, 'destroy'])->name('groups.members.destroy');
+
+    Route::patch('groups/{group:slug}/notifications', [GroupNotificationController::class, 'update'])->name('groups.notifications.update');
 
     Route::get('groups/{group:slug}/chat', [GroupChatController::class, 'show'])->name('groups.chat.show');
     Route::post('groups/{group:slug}/chat', [GroupChatController::class, 'store'])->middleware('throttle:30,1')->name('groups.chat.store');

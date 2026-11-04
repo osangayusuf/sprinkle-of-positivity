@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Settings\AvatarController;
 use App\Http\Controllers\Settings\ProfileController;
+use App\Http\Controllers\Settings\PushPreferenceController;
 use App\Http\Controllers\Settings\SecurityController;
 use Illuminate\Auth\Middleware\RequirePassword;
 use Illuminate\Support\Facades\Route;
@@ -11,6 +12,8 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('settings/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('settings/profile', [ProfileController::class, 'update'])->name('profile.update');
+
+    Route::patch('settings/push-preferences', [PushPreferenceController::class, 'update'])->name('push-preferences.update');
 
     Route::post('settings/profile/avatar', [AvatarController::class, 'update'])->name('profile.avatar.update');
     Route::delete('settings/profile/avatar', [AvatarController::class, 'destroy'])->name('profile.avatar.destroy');

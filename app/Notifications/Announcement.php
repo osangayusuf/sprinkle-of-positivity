@@ -37,7 +37,8 @@ class Announcement extends Notification implements ShouldQueue
     {
         return (new WebPushMessage)
             ->title($this->title)
-            ->body($this->body);
+            ->body($this->body)
+            ->data(['url' => route('announcements.index', absolute: false)]);
     }
 
     /**

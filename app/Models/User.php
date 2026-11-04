@@ -37,6 +37,8 @@ use NotificationChannels\WebPush\HasPushSubscriptions;
  * @property int|null $birthday_month
  * @property array<int, string>|null $goals
  * @property int $points
+ * @property bool $push_chat_enabled
+ * @property bool $push_insights_enabled
  * @property CarbonInterface|null $onboarding_completed_at
  * @property CarbonInterface|null $disabled_at
  * @property PartnerStatus|null $partner_status
@@ -78,6 +80,8 @@ class User extends Authenticatable implements PasskeyUser
             'goals' => 'array',
             'onboarding_completed_at' => 'datetime',
             'disabled_at' => 'datetime',
+            'push_chat_enabled' => 'boolean',
+            'push_insights_enabled' => 'boolean',
             'partner_status' => PartnerStatus::class,
             'partner_decided_at' => 'datetime',
         ];

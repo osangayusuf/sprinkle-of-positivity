@@ -4,6 +4,8 @@ import { csrfHeader } from '@/lib/csrf';
 
 type PushSubscriptionState = {
     supported: boolean;
+    /** iOS only delivers web push to an installed (home-screen) PWA. */
+    installRequired: boolean;
     permission: NotificationPermission | null;
     subscribed: boolean;
     subscribing: boolean;
@@ -25,6 +27,18 @@ function urlBase64ToUint8Array(base64: string): Uint8Array {
     return bytes;
 }
 
+function needsInstallForPush(): boolean {
+    if (typeof window === 'undefined' || 'PushManager' in window) {
+        return false;
+    }
+
+    const isIos =
+        /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+        (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+    return isIos;
+}
+
 /**
  * Notification-permission prompt + PushManager subscribe/unsubscribe,
  * syncing the browser's subscription with the server via
@@ -39,6 +53,8 @@ export function usePushSubscription(): PushSubscriptionState {
         'serviceWorker' in navigator &&
         'PushManager' in window &&
         Boolean(vapidPublicKey);
+
+    const installRequired = needsInstallForPush();
 
     const [permission, setPermission] = useState<NotificationPermission | null>(
         supported ? Notification.permission : null,
@@ -127,6 +143,7 @@ export function usePushSubscription(): PushSubscriptionState {
 
     return {
         supported,
+        installRequired,
         permission,
         subscribed,
         subscribing,

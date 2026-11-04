@@ -93,7 +93,7 @@ class Group extends Model
     {
         return $this->belongsToMany(User::class)
             ->using(GroupMembership::class)
-            ->withPivot(['id', 'role', 'status', 'code_of_conduct_accepted_at', 'applied_at', 'decided_at', 'decided_by'])
+            ->withPivot(['id', 'role', 'status', 'code_of_conduct_accepted_at', 'applied_at', 'decided_at', 'decided_by', 'notifications_muted'])
             ->withTimestamps();
     }
 
