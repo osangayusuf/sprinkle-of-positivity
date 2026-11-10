@@ -28,9 +28,11 @@ return [
 
     /**
      * This is the database connection that will be used by the migration and
-     * the PushSubscription model shipped with this package.
+     * the PushSubscription model shipped with this package. Leave it unset to
+     * use the application's default connection (database.default); the
+     * package's own fallback to "mysql" breaks apps that run on SQLite.
      */
-    'database_connection' => env('WEBPUSH_DB_CONNECTION', env('DB_CONNECTION', 'mysql')),
+    'database_connection' => env('WEBPUSH_DB_CONNECTION'),
 
     /**
      * The HTTP client options used to deliver push notifications.
