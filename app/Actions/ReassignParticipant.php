@@ -4,7 +4,7 @@ namespace App\Actions;
 
 use App\Models\GroupMembership;
 use App\Models\User;
-use App\Notifications\ChallengeAlert;
+use App\Notifications\ParticipantAssigned;
 
 class ReassignParticipant
 {
@@ -16,10 +16,7 @@ class ReassignParticipant
         $membership->partner_id = $partner->id;
         $membership->save();
 
-        $partner->notify(new ChallengeAlert(
-            __('New participant assigned'),
-            __(':name is now assigned to you in :group.', ['name' => $membership->user->name, 'group' => $membership->group->name]),
-        ));
+        $partner->notify(new ParticipantAssigned($membership->user, $membership->group));
 
         return $membership;
     }

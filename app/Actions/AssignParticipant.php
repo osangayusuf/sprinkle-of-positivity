@@ -8,6 +8,7 @@ use App\Models\GroupMembership;
 use App\Models\Role;
 use App\Models\User;
 use App\Notifications\ChallengeAlert;
+use App\Notifications\ParticipantAssigned;
 use Illuminate\Support\Facades\Notification;
 
 class AssignParticipant
@@ -15,7 +16,8 @@ class AssignParticipant
     /**
      * Assign a participant to the group's accountability partner who looks
      * after the fewest participants, notifying them. Without a partner to
-     * pick, the participant stays unassigned and admins are alerted.
+     * pick, the participant stays unassigned and admins are alerted. The
+     * partner is told in-app and by email to engage them within 24 hours.
      *
      * `$excluding` skips partners who already declined this participant.
      *
@@ -32,10 +34,7 @@ class AssignParticipant
         $group = $membership->group;
 
         if ($partner) {
-            $partner->notify(new ChallengeAlert(
-                __('New participant assigned'),
-                __(':name is now assigned to you in :group.', ['name' => $participant->name, 'group' => $group->name]),
-            ));
+            $partner->notify(new ParticipantAssigned($participant, $group));
 
             return $partner;
         }

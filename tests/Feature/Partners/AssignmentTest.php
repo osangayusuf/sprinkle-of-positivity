@@ -7,6 +7,7 @@ use App\Models\Group;
 use App\Models\GroupMembership;
 use App\Models\User;
 use App\Notifications\ChallengeAlert;
+use App\Notifications\ParticipantAssigned;
 use Illuminate\Support\Facades\Notification;
 
 function pendingApplicant(Group $group): GroupMembership
@@ -30,7 +31,7 @@ test('an approved participant is assigned to the partner with the fewest partici
     app(DecideGroupApplication::class)->handle($membership, GroupMembershipStatus::Approved, $busy);
 
     expect($membership->fresh()->partner_id)->toBe($free->id);
-    Notification::assertSentTo($free, ChallengeAlert::class);
+    Notification::assertSentTo($free, ParticipantAssigned::class);
 });
 
 test('rejecting an applicant assigns no partner', function () {
@@ -128,7 +129,7 @@ test('an admin can reassign a participant to a partner of the group', function (
         ->assertRedirect();
 
     expect($membership->fresh()->partner_id)->toBe($second->id);
-    Notification::assertSentTo($second, ChallengeAlert::class);
+    Notification::assertSentTo($second, ParticipantAssigned::class);
 });
 
 test('an admin cannot assign a participant to someone who is not a partner of the group', function () {
