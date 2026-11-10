@@ -178,6 +178,9 @@ jobs:
             "${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}" \
             bash -s -- "$VPS_PATH" "$POST_DEPLOY_COMMAND" <<'REMOTE'
           set -euo pipefail
+          # Group-writable files, so the web server (www-data) can use what
+          # this deploy user creates in storage/ and bootstrap/cache/.
+          umask 002
           cd "$1"
           mkdir -p bootstrap/cache storage/framework/{cache,sessions,views} storage/logs
           php artisan migrate --force
