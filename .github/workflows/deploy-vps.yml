@@ -128,6 +128,7 @@ jobs:
         run: |
           # Server-owned paths (.env, uploads, logs, caches) are excluded so
           # --delete never touches them.
+          set +e
           rsync -az --delete --itemize-changes $DRY_RUN \
             -e "ssh -i ~/.ssh/deploy_key -o IdentitiesOnly=yes -o BatchMode=yes -p $VPS_PORT" \
             --exclude='.git*' \
@@ -150,7 +151,21 @@ jobs:
             --exclude='/public/storage' \
             --exclude='/resources/js/' \
             --exclude='/resources/css/' \
-            ./ "${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:${{ vars.VPS_PATH }}/"
+            ./ "${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:${{ vars.VPS_PATH }}/" \
+            2> "$RUNNER_TEMP/rsync.err"
+          status=$?
+          set -e
+          cat "$RUNNER_TEMP/rsync.err" >&2
+
+          # Exit 24 means every other file transferred and only some source
+          # files disappeared mid-run. Name them instead of failing the whole
+          # deploy over it; any other non-zero status is still a failure.
+          if [ "$status" -eq 24 ]; then
+            vanished=$(grep -i 'has vanished' "$RUNNER_TEMP/rsync.err" | head -n 20 || true)
+            echo "::warning title=rsync skipped vanished files::$(echo "$vanished" | tr '\n' ' ')"
+          elif [ "$status" -ne 0 ]; then
+            exit "$status"
+          fi
 
       - name: Finish deploy on the server
         if: ${{ inputs.dry_run != true }}
