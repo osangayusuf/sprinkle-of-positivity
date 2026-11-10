@@ -28,7 +28,8 @@ class MentionedInComment extends Notification implements ShouldQueue
     {
         return (new WebPushMessage)
             ->title($this->title())
-            ->body($this->body());
+            ->body($this->body())
+            ->data(['url' => route('groups.show', $this->group, absolute: false)]);
     }
 
     /**

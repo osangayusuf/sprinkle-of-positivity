@@ -19,6 +19,7 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
  * @property CarbonInterface|null $decided_at
  * @property int|null $decided_by
  * @property int|null $partner_id
+ * @property bool $notifications_muted
  */
 class GroupMembership extends Pivot
 {
@@ -37,6 +38,7 @@ class GroupMembership extends Pivot
             'code_of_conduct_accepted_at' => 'datetime',
             'applied_at' => 'datetime',
             'decided_at' => 'datetime',
+            'notifications_muted' => 'boolean',
         ];
     }
 

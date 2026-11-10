@@ -1,0 +1,143 @@
+name: deploy-vps
+
+# Deploys main to a VPS over SSH (rsync). Run it by hand from the Actions tab
+# (a dry run by default, which only lists what would change), or set the
+# repository variable AUTO_DEPLOY_VPS=true to deploy every time the tests
+# workflow passes on main. This is the VPS counterpart of deploy.yml (cPanel
+# over FTPS); the two are independent.
+#
+# Unlike the FTP deploy, SSH can run commands, so migrations and cache
+# rebuilds happen right here instead of via `deploy:finish`. The server needs
+# a persistent queue worker (e.g. a systemd unit running `php artisan
+# queue:work`), which `queue:restart` below tells to reload the new code.
+#
+# Secrets (environment "production"): VPS_HOST, VPS_USER, VPS_SSH_KEY,
+# VPS_KNOWN_HOSTS (output of `ssh-keyscan -p <port> <host>`).
+# Variables: VPS_PORT (default 22), VPS_PATH (absolute app directory on the
+# server), VPS_POST_DEPLOY_COMMAND (optional, e.g. a php-fpm reload).
+
+on:
+  workflow_run:
+    workflows: [tests]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run: list changes without uploading or running anything'
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-production-vps
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: >-
+      github.event_name == 'workflow_dispatch'
+      || (vars.AUTO_DEPLOY_VPS == 'true' && github.event.workflow_run.conclusion == 'success')
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+          persist-credentials: false
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # v2
+        with:
+          php-version: '8.4'
+          tools: composer:v2
+          coverage: none
+
+      - name: Setup Node
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install PHP dependencies
+        run: composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: Build frontend assets
+        env:
+          VITE_APP_NAME: ${{ vars.VITE_APP_NAME || 'Sprinkle of Positivity' }}
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+          npm ci
+          npm run build
+          rm .env
+
+      - name: Configure SSH
+        env:
+          VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
+          VPS_KNOWN_HOSTS: ${{ secrets.VPS_KNOWN_HOSTS }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$VPS_SSH_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          printf '%s\n' "$VPS_KNOWN_HOSTS" > ~/.ssh/known_hosts
+
+      - name: Upload application
+        env:
+          DRY_RUN: ${{ inputs.dry_run == true && '--dry-run' || '' }}
+          VPS_PORT: ${{ vars.VPS_PORT || 22 }}
+        run: |
+          # Server-owned paths (.env, uploads, logs, caches) are excluded so
+          # --delete never touches them.
+          rsync -az --delete --itemize-changes $DRY_RUN \
+            -e "ssh -i ~/.ssh/deploy_key -p $VPS_PORT" \
+            --exclude='.git*' \
+            --exclude='node_modules/' \
+            --exclude='.deploy/' \
+            --exclude='.env' \
+            --exclude='.env.*' \
+            --exclude='.ai/' \
+            --exclude='.claude/' \
+            --exclude='.github/' \
+            --exclude='.mcp.json' \
+            --exclude='boost.json' \
+            --exclude='CLAUDE.md' \
+            --exclude='design-reference/' \
+            --exclude='tests/' \
+            --exclude='/storage/' \
+            --exclude='/bootstrap/cache/' \
+            --exclude='database/*.sqlite' \
+            --exclude='/public/hot' \
+            --exclude='/public/storage' \
+            --exclude='/resources/js/' \
+            --exclude='/resources/css/' \
+            ./ "${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:${{ vars.VPS_PATH }}/"
+
+      - name: Finish deploy on the server
+        if: ${{ inputs.dry_run != true }}
+        env:
+          VPS_PORT: ${{ vars.VPS_PORT || 22 }}
+          VPS_PATH: ${{ vars.VPS_PATH }}
+          POST_DEPLOY_COMMAND: ${{ vars.VPS_POST_DEPLOY_COMMAND }}
+        run: |
+          ssh -i ~/.ssh/deploy_key -p "$VPS_PORT" \
+            "${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}" \
+            bash -s -- "$VPS_PATH" "$POST_DEPLOY_COMMAND" <<'REMOTE'
+          set -euo pipefail
+          cd "$1"
+          mkdir -p bootstrap/cache storage/framework/{cache,sessions,views} storage/logs
+          php artisan migrate --force
+          php artisan optimize:clear
+          php artisan optimize
+          [ -e public/storage ] || php artisan storage:link
+          # Tell the persistent queue worker to exit after its current job so
+          # the process manager restarts it on the new code.
+          php artisan queue:restart
+          if [ -n "${2:-}" ]; then
+            bash -c "$2"
+          fi
+          REMOTE

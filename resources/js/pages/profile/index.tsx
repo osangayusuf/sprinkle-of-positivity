@@ -1,10 +1,12 @@
-import { Head, Link, usePage } from '@inertiajs/react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
 import {
     Award,
     Bell,
+    BookOpen,
     ChevronRight,
     HeartHandshake,
     LogOut,
+    MessageCircle,
     User as UserIcon,
 } from 'lucide-react';
 import { PageHeader } from '@/components/page-header';
@@ -16,15 +18,26 @@ import { apply } from '@/routes/partner';
 import { edit } from '@/routes/profile';
 import type { AuthenticatedAuth } from '@/types/auth';
 
+type PushPreferences = { chat: boolean; insights: boolean };
+
 export default function ProfileIndex({
     points,
     level,
+    pushPreferences,
 }: {
     points: number;
     level: string | null;
+    pushPreferences: PushPreferences;
 }) {
     const { auth } = usePage<{ auth: AuthenticatedAuth }>().props;
     const push = usePushSubscription();
+
+    const setPushPreference = (key: keyof PushPreferences, value: boolean) =>
+        router.patch(
+            '/settings/push-preferences',
+            { [key]: value },
+            { preserveScroll: true },
+        );
 
     return (
         <>
@@ -142,6 +155,69 @@ export default function ProfileIndex({
                             </span>
                         </button>
                     )}
+
+                    {!push.supported && push.installRequired && (
+                        <div className="flex items-start gap-3 px-4 py-3">
+                            <Bell className="text-muted-foreground mt-0.5 size-4" />
+                            <span className="text-muted-foreground flex-1 text-xs">
+                                To get push notifications on iPhone or iPad, tap
+                                Share, choose Add to Home Screen, then open the
+                                app from your home screen.
+                            </span>
+                        </div>
+                    )}
+
+                    {push.supported && push.permission === 'denied' && (
+                        <p className="text-muted-foreground px-4 py-3 text-xs">
+                            Notifications are blocked for this site. Allow them
+                            in your browser settings, then try again.
+                        </p>
+                    )}
+
+                    <button
+                        type="button"
+                        onClick={() =>
+                            setPushPreference('chat', !pushPreferences.chat)
+                        }
+                        className="flex w-full items-center gap-3 px-4 py-3 text-left"
+                    >
+                        <MessageCircle className="text-muted-foreground size-4" />
+                        <span className="flex-1">
+                            <span className="block text-sm font-medium">
+                                Group chat alerts
+                            </span>
+                            <span className="text-muted-foreground block text-xs">
+                                New messages in your groups
+                            </span>
+                        </span>
+                        <span className="text-muted-foreground text-xs">
+                            {pushPreferences.chat ? 'On' : 'Off'}
+                        </span>
+                    </button>
+
+                    <button
+                        type="button"
+                        onClick={() =>
+                            setPushPreference(
+                                'insights',
+                                !pushPreferences.insights,
+                            )
+                        }
+                        className="flex w-full items-center gap-3 px-4 py-3 text-left"
+                    >
+                        <BookOpen className="text-muted-foreground size-4" />
+                        <span className="flex-1">
+                            <span className="block text-sm font-medium">
+                                Insight alerts
+                            </span>
+                            <span className="text-muted-foreground block text-xs">
+                                New insights and comments
+                            </span>
+                        </span>
+                        <span className="text-muted-foreground text-xs">
+                            {pushPreferences.insights ? 'On' : 'Off'}
+                        </span>
+                    </button>
 
                     <Link
                         href={logout()}

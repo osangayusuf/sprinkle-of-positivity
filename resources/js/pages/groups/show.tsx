@@ -1,5 +1,12 @@
-import { Head, Link, usePage } from '@inertiajs/react';
-import { ChevronLeft, Lock, MessageCircle, MoreVertical } from 'lucide-react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
+import {
+    Bell,
+    BellOff,
+    ChevronLeft,
+    Lock,
+    MessageCircle,
+    MoreVertical,
+} from 'lucide-react';
 import { SignInPrompt } from '@/components/sign-in-prompt';
 import { Button } from '@/components/ui/button';
 import type { Auth } from '@/types/auth';
@@ -11,6 +18,7 @@ type Props = {
     canManage: boolean;
     canViewContent: boolean;
     canChat: boolean;
+    notificationsMuted: boolean | null;
 };
 
 export default function GroupShow({
@@ -19,6 +27,7 @@ export default function GroupShow({
     canManage,
     canViewContent,
     canChat,
+    notificationsMuted,
 }: Props) {
     const { auth } = usePage<{ auth: Auth }>().props;
 
@@ -115,6 +124,30 @@ export default function GroupShow({
                                 <MessageCircle className="size-5" />
                                 Group chat
                             </Link>
+                        </Button>
+                    )}
+
+                    {notificationsMuted !== null && (
+                        <Button
+                            type="button"
+                            variant="ghost"
+                            className="text-muted-foreground h-11 w-full rounded-full text-sm"
+                            onClick={() =>
+                                router.patch(
+                                    `/groups/${group.slug}/notifications`,
+                                    { muted: !notificationsMuted },
+                                    { preserveScroll: true },
+                                )
+                            }
+                        >
+                            {notificationsMuted ? (
+                                <BellOff className="size-4" />
+                            ) : (
+                                <Bell className="size-4" />
+                            )}
+                            {notificationsMuted
+                                ? 'Notifications muted — tap to unmute'
+                                : 'Mute notifications for this group'}
                         </Button>
                     )}
 
