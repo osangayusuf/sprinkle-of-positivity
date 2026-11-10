@@ -76,15 +76,50 @@ jobs:
           npm run build
           rm .env
 
+      - name: Check deploy settings
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+          VPS_PATH: ${{ vars.VPS_PATH }}
+        run: |
+          # rsync --delete runs against VPS_PATH, so refuse anything that
+          # could point it at the server root or at nothing at all.
+          missing=0
+          for name in VPS_HOST VPS_USER; do
+            if [ -z "${!name}" ]; then
+              echo "::error::Secret $name is empty or not available to the production environment."
+              missing=1
+            fi
+          done
+          case "$VPS_PATH" in
+            ''|/|/home|/var|/var/www|/root)
+              echo "::error::Variable VPS_PATH is '$VPS_PATH'. Set it (as a variable, not a secret) to the app's own directory, e.g. /var/www/sprinkle."
+              missing=1
+              ;;
+            /*) ;;
+            *)
+              echo "::error::Variable VPS_PATH must be an absolute path, got '$VPS_PATH'."
+              missing=1
+              ;;
+          esac
+          exit $missing
+
       - name: Configure SSH
         env:
           VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
           VPS_KNOWN_HOSTS: ${{ secrets.VPS_KNOWN_HOSTS }}
         run: |
           install -m 700 -d ~/.ssh
-          printf '%s\n' "$VPS_SSH_KEY" > ~/.ssh/deploy_key
+          # Drop any Windows line endings picked up when the secret was pasted.
+          printf '%s\n' "$VPS_SSH_KEY" | tr -d '\r' > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
-          printf '%s\n' "$VPS_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          printf '%s\n' "$VPS_KNOWN_HOSTS" | tr -d '\r' > ~/.ssh/known_hosts
+          # `ssh-keygen -y` derives the public key, which fails for a key that
+          # is truncated, passphrase-protected or really a .pub file.
+          if ! ssh-keygen -y -f ~/.ssh/deploy_key > /dev/null; then
+            echo "::error::VPS_SSH_KEY is not a usable private key. Paste the whole file (BEGIN/END lines included) of a key created with an empty passphrase, not the .pub file."
+            exit 1
+          fi
 
       - name: Upload application
         env:
@@ -94,7 +129,7 @@ jobs:
           # Server-owned paths (.env, uploads, logs, caches) are excluded so
           # --delete never touches them.
           rsync -az --delete --itemize-changes $DRY_RUN \
-            -e "ssh -i ~/.ssh/deploy_key -p $VPS_PORT" \
+            -e "ssh -i ~/.ssh/deploy_key -o IdentitiesOnly=yes -o BatchMode=yes -p $VPS_PORT" \
             --exclude='.git*' \
             --exclude='node_modules/' \
             --exclude='.deploy/' \
@@ -124,7 +159,7 @@ jobs:
           VPS_PATH: ${{ vars.VPS_PATH }}
           POST_DEPLOY_COMMAND: ${{ vars.VPS_POST_DEPLOY_COMMAND }}
         run: |
-          ssh -i ~/.ssh/deploy_key -p "$VPS_PORT" \
+          ssh -i ~/.ssh/deploy_key -o IdentitiesOnly=yes -o BatchMode=yes -p "$VPS_PORT" \
             "${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}" \
             bash -s -- "$VPS_PATH" "$POST_DEPLOY_COMMAND" <<'REMOTE'
           set -euo pipefail
